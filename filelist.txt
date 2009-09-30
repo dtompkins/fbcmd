@@ -1,0 +1,29 @@
+fbcmd-X-XX.zip contents:
+
+filelist.txt                  - This file
+readme.txt                    - Distribution Notes
+versions.txt                  - Revisions and Contributions
+
+fbcmd.php                     - The main software PHP script
+
+fbcmd_include.php             - Helper functions for calling FBCMD from other programs
+sample-mycmd.php              - Sample file to show how to create your own commands
+
+sessionkeys.txt               - Your applicaiton-specific Keys for security (keep this secure)
+
+prefs.php                     - Place to edit your preferences
+
+fbcmd.bat                     - Windows batch file to call fbcmd.php
+
+sample-loadinfo-text.php      -- two sample files to use with the LOADINFO command
+sample-loadinfo-img.php       -/
+
+facebook.php                   \
+facebook_desktop.php            |
+facebookapi_php5_restlib.php    |
+jsonwrapper_inner.php           | - The core Facebook API interface & support files
+jsonwrapper.php                 |
+JSON.php                        |
+JSON-LICENSE                   /
+
+gpl.txt                        - GNU General Public License
