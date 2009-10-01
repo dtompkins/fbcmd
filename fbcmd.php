@@ -10,8 +10,11 @@
 //   |_| |_.__/ \___|_| |_| |_|\__,_|                                         //
 //                                                                            //
 //   Facebook Command Line Interface Utility                                  //
-//   http://facebook.com/fbcmd                                                //
-//   http://fbcmd.dtompkins.com                                               //
+//                                                                            //
+//   [Project Home Page & wiki]  http://fbcmd.dtompkins.com                   //
+//   [Facebook Page]             http://facebook.com/fbcmd                    //
+//   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
+//                                                                            //
 //   Copyright (c) 2007,2009 Dave Tompkins                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -38,6 +41,8 @@
 //                                                                            //
 //   email: mail+fbcmd [@at@] dtompkins.com                                   //
 //                                                                            //
+////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
 //   See http://fbcmd.dtompkins.com/history/ for a revision history.          //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
@@ -47,7 +52,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.00-beta3';
+  $fbcmdVersion = '1.00-beta3_in_progress';
 
 ////////////////////////////////////////////////////////////////////////////////
 
