@@ -52,7 +52,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable6';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable7';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -274,12 +274,14 @@
   $fbcmdPrefs['default_recent_count'] = '10';
   $fbcmdPrefs['default_savedisp_filename'] = '';
   $fbcmdPrefs['default_saveinfo_filename'] = '';
+  $fbcmdPrefs['default_sentmail_count'] = '10';    
   $fbcmdPrefs['default_stream_filter'] = '1';
   $fbcmdPrefs['default_stream_count'] = '10';
   $fbcmdPrefs['default_tagpic_pid'] = '';
   $fbcmdPrefs['default_tagpic_target'] = '=ME';
   $fbcmdPrefs['default_tagpic_x'] = '50';
   $fbcmdPrefs['default_tagpic_y'] = '50';
+  $fbcmdPrefs['default_updates_count'] = '10';    
   $fbcmdPrefs['default_wallpost_flist'] = '=ME';
   $fbcmdPrefs['default_wallpost_message'] = '';
 
@@ -366,9 +368,9 @@
   'OPICS',     'MESSAGE',   'POST',      'POSTIMG',   
   'POSTMP3',   'POSTVID',   'PPICS',     'RECENT',
   'RESET',     'RESTATUS',  'SAVEDISP',  'SAVEINFO',
-  'SAVEPREF',  'SFILTERS',  'STATUS',    'STREAM',
-  'TAGPIC',    'UFIELDS',   'USAGE',     'VERSION',
-  'WALLPOST',  'WHOAMI'
+  'SAVEPREF',  'SENTMAIL',  'SFILTERS',  'STATUS',
+  'STREAM',    'TAGPIC',    'UFIELDS',   'UPDATES',   
+  'USAGE',     'VERSION',   'WALLPOST',  'WHOAMI'
   );
 
   if (isset($fbcmd_include_newCommands)) {
@@ -1101,57 +1103,6 @@
     }
   }
   
-  function GetThreadId($p) { //, $allowSpecial = false) {
-    global $lastMailData;
-    global $userStatus;
-    global $fbUser;
-    global $fbObject;
-
-    // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
-      // if ($allowSpecial) {
-        // if (strtoupper($p) == 'CURSTATUS') {
-          // GetCurrentStatus();
-          // if ($userStatus == '') {
-            // FbcmdFatalError("CURSTATUS: Your status is blank");
-          // }
-          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
-        // } else {
-          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
-        // }
-        // try {
-          // $fbReturn = $fbObject->api_client->fql_query($fql);
-          // TraceReturn($fbReturn);
-        // } catch(Exception $e) {
-          // FbcmdException($e,'GET-POST');
-        // }
-        // if (isset($fbReturn[0]['post_id'])) {
-          // return $fbReturn[0]['post_id'];
-        // } else {
-          // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
-        // }
-      // } else {
-        // global $fbcmdCommand;
-        // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
-      // }
-    // } else {
-      if ($p < 1001) {
-        LoadMailData();
-        if (isset($lastMailData['ids'][$p])) {
-          return $lastMailData['ids'][$p];
-        } else {
-          FbcmdWarning ("Invalid Thread ID: {$p}");
-          return false;
-        }
-      } else {
-        return $p;
-      }
-    // }
-  }  
-  
-  
-  
-  
-
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'LIKE') {
@@ -1616,6 +1567,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'SENTMAIL') { //todo, wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_sentmail_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 and unread > 0";
+    } else {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 LIMIT {$fbcmdParams[1]}";
+    }
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'SFILTERS') {
     ValidateParamCount(0);
     $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
@@ -1743,6 +1717,28 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'UPDATES') { //todo, wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 and unread > 0";
+    } else {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
+    }
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
   if ($fbcmdCommand == 'VERSION') { //todo wiki
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
@@ -1890,7 +1886,7 @@
     }
     $eCode = $e->getCode();
     if ($eCode == 612) {
-      if ($defaultCommand == 'INBOX') {
+      if (($defaultCommand == 'INBOX')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
         FbcmdPermissions('read_mailbox');
       } else {
         FbcmdPermissions('read_stream');
@@ -2386,6 +2382,56 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function GetThreadId($p) { //, $allowSpecial = false) {
+    global $lastMailData;
+    global $userStatus;
+    global $fbUser;
+    global $fbObject;
+
+    // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
+      // if ($allowSpecial) {
+        // if (strtoupper($p) == 'CURSTATUS') {
+          // GetCurrentStatus();
+          // if ($userStatus == '') {
+            // FbcmdFatalError("CURSTATUS: Your status is blank");
+          // }
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+        // } else {
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
+        // }
+        // try {
+          // $fbReturn = $fbObject->api_client->fql_query($fql);
+          // TraceReturn($fbReturn);
+        // } catch(Exception $e) {
+          // FbcmdException($e,'GET-POST');
+        // }
+        // if (isset($fbReturn[0]['post_id'])) {
+          // return $fbReturn[0]['post_id'];
+        // } else {
+          // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
+        // }
+      // } else {
+        // global $fbcmdCommand;
+        // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
+      // }
+    // } else {
+      if ($p < 1001) {
+        LoadMailData();
+        if (isset($lastMailData['ids'][$p])) {
+          return $lastMailData['ids'][$p];
+        } else {
+          FbcmdWarning ("Invalid Thread ID: {$p}");
+          return false;
+        }
+      } else {
+        return $p;
+      }
+    // }
+  }  
+
+////////////////////////////////////////////////////////////////////////////////  
 ////////////////////////////////////////////////////////////////////////////////
 
   function IsEmpty($obj) {
@@ -3202,7 +3248,7 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function ShowUsage() {
+  function ShowUsage() { //todo add new commands
     global $fbcmdVersion;
 
     print "\n";
