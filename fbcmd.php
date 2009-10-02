@@ -52,7 +52,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable4';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable5';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1825,8 +1825,8 @@
   if ($fbcmdCommand == 'VERSION') { //todo wiki
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
-    PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_INSTRUCTIONS');
-    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),'http://fbcmd.tompkins.com/update'); //todo wiki
+    PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH','UPDATE_INSTRUCTIONS');
+    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch'],'http://fbcmd.tompkins.com/update'); //todo wiki
   }
   
 ////////////////////////////////////////////////////////////////////////////////
