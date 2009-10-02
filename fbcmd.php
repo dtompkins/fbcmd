@@ -109,7 +109,9 @@
   $fbcmdPrefs['keyfile'] = "{$fbcmdBaseDir}sessionkeys.txt";
   $fbcmdPrefs['prefs'] = ''; // (none)
   $fbcmdPrefs['postfile'] = "{$fbcmdBaseDir}postdata.txt";
-  $fbcmdPrefs['stream_save'] = '1';
+  $fbcmdPrefs['stream_save'] = '1';  
+  $fbcmdPrefs['mailfile'] = "{$fbcmdBaseDir}maildata.txt";
+  $fbcmdPrefs['mail_save'] = '1';
 
   // FBCMD Application Specific
   $fbcmdPrefs['appkey'] = 'd96ea311638cf65f04b33c87eacf371e';
@@ -175,6 +177,8 @@
   $fbcmdPrefs['fevents_attend_mask'] = '1';
   $fbcmdPrefs['fgroups_show_id'] = '1';
   $fbcmdPrefs['flist_chunksize'] = 10;
+  $fbcmdPrefs['inbox_show_snippit'] = 1;
+  $fbcmdPrefs['message_show_subject'] = '1';
   $fbcmdPrefs['online_idle'] = '1';
   $fbcmdPrefs['pic_size'] = '1';
   $fbcmdPrefs['ppic_size'] = '1';
@@ -294,7 +298,7 @@
     'pdf' => 'pic_dateformat',
     'pf' => 'ppics_filename',
     'plink' => 'pic_show_links',
-    'posts' => 'postfile',
+    'posts' => 'postfile', //todo mailfile
     'ppsize' => 'ppic_size',
     'pr' => 'pic_retry_count',
     'prd' => 'pic_retry_delay',
@@ -349,14 +353,15 @@
   'FEED2',     'FEEDLINK',  'FEEDNOTE',  'FEVENTS',
   'FGROUPS',   'FINFO',     'FLAST',     'FONLINE',
   'FPICS',     'FQL',       'FRIENDS',   'FSTATUS',
-  'FSTREAM',   'FULLPOST',  'HELP',      'LIKE',
-  'LIMITS',    'LOADDISP',  'LOADINFO',  'LOADNOTE',
-  'MUTUAL',    'NOTIFY',    'NSEND',     'OPICS',
-  'POST',      'POSTIMG',   'POSTMP3',   'POSTVID',
-  'PPICS',     'RECENT',    'RESET',     'RESTATUS',
-  'SAVEDISP',  'SAVEINFO',  'SAVEPREF',  'SFILTERS',
-  'STATUS',    'STREAM',    'TAGPIC',    'UFIELDS',
-  'USAGE',     'VERSION',   'WALLPOST',  'WHOAMI'
+  'FSTREAM',   'FULLPOST',  'HELP',      'INBOX',
+  'LIKE',      'LIMITS',    'LOADDISP',  'LOADINFO',
+  'LOADNOTE',  'MUTUAL',    'NOTIFY',    'NSEND',     
+  'OPICS',     'MESSAGE',   'POST',      'POSTIMG',   
+  'POSTMP3',   'POSTVID',   'PPICS',     'RECENT',
+  'RESET',     'RESTATUS',  'SAVEDISP',  'SAVEINFO',
+  'SAVEPREF',  'SFILTERS',  'STATUS',    'STREAM',
+  'TAGPIC',    'UFIELDS',   'USAGE',     'VERSION',
+  'WALLPOST',  'WHOAMI'
   );
 
   if (isset($fbcmd_include_newCommands)) {
@@ -1068,6 +1073,110 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'INBOX') {
+    //ValidateParamCount(0);
+    ValidateParamCount(0,1);
+    //SetDefaultParam(1,$fbcmdPrefs['default_albums_flist']);
+    SetDefaultParam(1,10);
+    //GetFlistIds($fbcmdParams[1],true);
+    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      foreach ($dataThread as $t) {
+        PrintRow(PrintIfPref('show_id',$t['snippet_author']),ProfileName($t['snippet_author']),$t['subject']);
+        // if ($fbcmdPrefs['inbox_show_snippit']) {
+          // PrintRow(PrintIfPref('show_id',$t['snippet_author']),ProfileName($t['snippet_author']),$t['subject']);
+        // }
+      }
+      SaveMailData($dataThread);
+    }
+  }
+  
+  function SaveMailData($obj) {
+    global $fbcmdPrefs;
+    if ($fbcmdPrefs['mail_save']) {
+      $saveMailData = array ('ids' => array('0'), 'timestamp' => time());
+      foreach ($obj as $thread) {
+        $saveMailData['ids'][] = $thread['thread_id'];
+      }
+      if (@file_put_contents($fbcmdPrefs['mailfile'],serialize($saveMailData)) == false) {
+        FbcmdWarning("Could not generate mailfile {$fbcmdPrefs['mailfile']}");
+      }
+    }
+  }
+  
+  function LoadMailData() {
+    global $fbcmdPrefs;
+    global $lastMailData;
+    if (isset($lastMailData)) {
+      return;
+    } else {
+      $lastMailData = array('0');
+      if ($fbcmdPrefs['mail_save']) {
+        if (!file_exists($fbcmdPrefs['mailfile'])) {
+          FbcmdWarning("Could not locate file {$fbcmdPrefs['mailfile']}");
+        } else {
+          $lastMailData = unserialize(@file_get_contents($fbcmdPrefs['mailfile']));
+        }
+      }
+    }
+  }
+  
+  function GetThreadId($p) { //, $allowSpecial = false) {
+    global $lastMailData;
+    global $userStatus;
+    global $fbUser;
+    global $fbObject;
+
+    // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
+      // if ($allowSpecial) {
+        // if (strtoupper($p) == 'CURSTATUS') {
+          // GetCurrentStatus();
+          // if ($userStatus == '') {
+            // FbcmdFatalError("CURSTATUS: Your status is blank");
+          // }
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+        // } else {
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
+        // }
+        // try {
+          // $fbReturn = $fbObject->api_client->fql_query($fql);
+          // TraceReturn($fbReturn);
+        // } catch(Exception $e) {
+          // FbcmdException($e,'GET-POST');
+        // }
+        // if (isset($fbReturn[0]['post_id'])) {
+          // return $fbReturn[0]['post_id'];
+        // } else {
+          // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
+        // }
+      // } else {
+        // global $fbcmdCommand;
+        // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
+      // }
+    // } else {
+      if ($p < 1001) {
+        LoadMailData();
+        if (isset($lastMailData['ids'][$p])) {
+          return $lastMailData['ids'][$p];
+        } else {
+          FbcmdWarning ("Invalid Thread ID: {$p}");
+          return false;
+        }
+      } else {
+        return $p;
+      }
+    // }
+  }  
+  
+  
+  
+  
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'LIKE') {
     ValidateParamCount(1);
     $likesList = explode(',',$fbcmdParams[1]);
@@ -1168,6 +1277,38 @@
     }
   }
 
+////////////////////////////////////////////////////////////////////////////////
+  // add show_title
+  if ($fbcmdCommand == 'MESSAGE') {
+    ValidateParamCount(1);
+    $curThreadId = GetThreadId($fbcmdParams[1]);
+    //$fql = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$fbcmdParams[1]}";
+    //$curThreadId = $fbcmdParams[1];
+    $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
+    $fqlMessage = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$curThreadId}";
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','Message','MessageNames'));
+    if (!empty($dataMessage)) {
+      //PrintHeader(PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME','AID',PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
+      if ($fbcmdPrefs['message_show_subject']) {
+        $subject = $dataThread[0]['subject'];
+        if ($subject == '') {
+          $subject = '[no subject]';
+        }
+        PrintRow(PrintIfPref('show_id',''),'Subject',$subject);      
+      }
+      foreach ($dataMessage as $m) {
+        $body = str_replace("\n", '<br>', $m['body']);
+        PrintRow(PrintIfPref('show_id',$m['author_id']),ProfileName($m['author_id']),$body);
+        
+        //select thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id from thread where thread_id= 1205270685137
+        
+        //PrintRow(PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),$a['aid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'MUTUAL') {
@@ -1779,7 +1920,11 @@
     }
     $eCode = $e->getCode();
     if ($eCode == 612) {
-      FbcmdPermissions('read_stream');
+      if ($defaultCommand == 'INBOX') {
+        FbcmdPermissions('read_mailbox');
+      } else {
+        FbcmdPermissions('read_stream');
+      }
     }
     if (($eCode == 200)||($eCode == 250)||($eCode == 281)||($eCode == 282)||($eCode == 323)) {
       FbcmdPermissions('publish_stream');
@@ -2838,6 +2983,7 @@ function PrintCsvRow($rowIn) {
     global $indexFriendBaseInfo;
     global $indexPageNames;
     global $indexStreamNames;
+    global $indexMessageNames;
     global $indexFlistNames;
     if (isset($indexFriendBaseInfo[$id])) {
       return $indexFriendBaseInfo[$id]['name'];
@@ -2847,6 +2993,9 @@ function PrintCsvRow($rowIn) {
     }
     if (isset($indexStreamNames[$id])) {
       return $indexStreamNames[$id]['name'];
+    }
+    if (isset($indexMessageNames[$id])) {
+      return $indexMessageNames[$id]['name'];
     }
     if (isset($indexFlistNames[$id])) {
       return $indexFlistNames[$id]['name'];
@@ -2918,7 +3067,7 @@ function PrintCsvRow($rowIn) {
         $savePostData['ids'][] = $post['post_id'];
       }
       if (@file_put_contents($fbcmdPrefs['postfile'],serialize($savePostData)) == false) {
-        FbcmdWarning("Could not generate keyfile {$fbcmdPrefs['postfile']}");
+        FbcmdWarning("Could not generate postfile {$fbcmdPrefs['postfile']}");
       }
     }
   }
