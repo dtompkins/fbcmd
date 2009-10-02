@@ -52,7 +52,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable5';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable6';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -154,11 +154,11 @@
   $fbcmdPrefs['stream_show_likes'] = '1';
   $fbcmdPrefs['stream_show_comments'] = '1';
   
-  $fbcmdPrefs['thread_show_date'] = '0'; //todo wiki
-  $fbcmdPrefs['thread_dateformat'] = 'D H:i';
-  $fbcmdPrefs['thread_showid'] = '0';
-  $fbcmdPrefs['thread_show_snippet'] = 1;
-
+  $fbcmdPrefs['folder_show_date'] = '0'; //todo wiki
+  $fbcmdPrefs['folder_dateformat'] = 'M d H:i';
+  $fbcmdPrefs['folder_show_threadid'] = '0';
+  $fbcmdPrefs['folder_show_snippet'] = '1';  
+  $fbcmdPrefs['folder_linefeed'] = '1';
 
   // PIC Preferences
   $fbcmdPrefs['pic_show_date'] = '0';
@@ -230,6 +230,7 @@
   $fbcmdPrefs['default_fstatus_flist'] = '=ALL';
   $fbcmdPrefs['default_fstream_flist'] = '=ALL';
   $fbcmdPrefs['default_fstream_count'] = '10';
+  $fbcmdPrefs['default_inbox_count'] = '10';
   $fbcmdPrefs['default_loaddisp_filename'] = '';
   $fbcmdPrefs['default_loadinfo_filename'] = '';
   $fbcmdPrefs['default_loadnote_title'] = '';
@@ -1079,104 +1080,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'INBOX') {
-    //ValidateParamCount(0);
+  if ($fbcmdCommand == 'INBOX') { //todo, wiki
     ValidateParamCount(0,1);
-    //SetDefaultParam(1,$fbcmdPrefs['default_albums_flist']);
-    SetDefaultParam(1,10);
-    //GetFlistIds($fbcmdParams[1],true);
-    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+    SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 and unread > 0";
+    } else {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+    }
     $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
     $keyMessageNames = 'id';
     MultiFQL(array('Thread','MessageNames'));
     if (!empty($dataThread)) {
-      //PrintThreadHeader();
+      PrintFolderHeader();
       $threadNum = 0;
       foreach ($dataThread as $t) {
-        PrintThreadObject(++$threadNum,$t);
+        PrintFolderObject(++$threadNum,$t);
       }
       SaveMailData($dataThread);
-    }
-  }
-  
-  function PrintThreadObject($threadNum, $thread) {
-
-    global $fbcmdPrefs;
-    global $fbUser;
-
-    $threadInfo = array();
-
-    if ($fbcmdPrefs['mail_save']) {
-      $showThreadNum = '[' . $threadNum . ']';
-      if ($thread['unread']) {
-        $showThreadNum .= '*';
-      } 
-      $threadInfo[] = $showThreadNum;
-    }
-
-    if ($fbcmdPrefs['thread_showid']) {
-      $threadInfo[] = $thread['thread_id'];
-    }
-    
-    $userInfo = array();
-    $userInfo[] = PrintIfPref('show_id',$thread['snippet_author']);
-
-    $userInfo[] = ProfileName($thread['snippet_author']);
-
-    $timeInfo = PrintIfPref('thread_show_date',date($fbcmdPrefs['thread_dateformat'],$thread['updated_time']));
-
-    $subjectShow = $thread['subject'];
-    if ($subjectShow == '') {
-      $subjectShow = '[no subject]';
-    }
-    PrintRow($threadInfo,$timeInfo,'subject',$subjectShow);
-    
-    $recipientsList = array();
-    foreach ($thread['recipients'] as $r) {
-      if ($r != $fbUser) {
-        $recipientsList[] = ProfileName($r);
-      }
-    }
-    $recipientsShow = implode(',',$recipientsList);    
-    PrintRow($threadInfo,$timeInfo,'to/from',$recipientsShow);        
-    
-    $snippetShow = str_replace("\n", ' ', $thread['snippet']);
-    if (count($recipientsList) > 1) {
-      $snippetShow = ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
-    }
-    PrintRow($threadInfo,$timeInfo,'snippet', $snippetShow);
-
-    PrintRow('');
-
-  }
-  
-  function SaveMailData($obj) {
-    global $fbcmdPrefs;
-    if ($fbcmdPrefs['mail_save']) {
-      $saveMailData = array ('ids' => array('0'), 'timestamp' => time());
-      foreach ($obj as $thread) {
-        $saveMailData['ids'][] = $thread['thread_id'];
-      }
-      if (@file_put_contents($fbcmdPrefs['mailfile'],serialize($saveMailData)) == false) {
-        FbcmdWarning("Could not generate mailfile {$fbcmdPrefs['mailfile']}");
-      }
-    }
-  }
-  
-  function LoadMailData() {
-    global $fbcmdPrefs;
-    global $lastMailData;
-    if (isset($lastMailData)) {
-      return;
-    } else {
-      $lastMailData = array('0');
-      if ($fbcmdPrefs['mail_save']) {
-        if (!file_exists($fbcmdPrefs['mailfile'])) {
-          FbcmdWarning("Could not locate file {$fbcmdPrefs['mailfile']}");
-        } else {
-          $lastMailData = unserialize(@file_get_contents($fbcmdPrefs['mailfile']));
-        }
-      }
     }
   }
   
@@ -2487,6 +2408,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function LoadMailData() {
+    global $fbcmdPrefs;
+    global $lastMailData;
+    if (isset($lastMailData)) {
+      return;
+    } else {
+      $lastMailData = array('0');
+      if ($fbcmdPrefs['mail_save']) {
+        if (!file_exists($fbcmdPrefs['mailfile'])) {
+          FbcmdWarning("Could not locate file {$fbcmdPrefs['mailfile']}");
+        } else {
+          $lastMailData = unserialize(@file_get_contents($fbcmdPrefs['mailfile']));
+        }
+      }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
+
   function LoadPostData() {
     global $fbcmdPrefs;
     global $lastPostData;
@@ -2742,6 +2683,74 @@ function PrintCsvRow($rowIn) {
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PrintFolderHeader() {
+    global $fbcmdPrefs;
+    $threadInfo = array();
+    if ($fbcmdPrefs['mail_save']) {
+      $threadInfo[] = '[#]';
+    }
+    if ($fbcmdPrefs['folder_show_threadid']) {
+      $threadInfo[] = 'THREAD_ID';
+    }
+    $timeInfo = PrintIfPref('folder_show_date','DATE');
+    PrintHeader($threadInfo,$timeInfo,'FIELD','VALUE');
+    if ($fbcmdPrefs['folder_linefeed']) {
+      PrintRow('');
+    }    
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PrintFolderObject($threadNum, $thread) {
+    global $fbcmdPrefs;
+    global $fbUser;
+
+    $threadInfo = array();
+    if ($fbcmdPrefs['mail_save']) {
+      $showThreadNum = '[' . $threadNum . ']';
+      if ($thread['unread']) {
+        $showThreadNum .= '*';
+      } 
+      $threadInfo[] = $showThreadNum;
+    }
+    if ($fbcmdPrefs['folder_show_threadid']) {
+      $threadInfo[] = $thread['thread_id'];
+    }
+    
+    $timeInfo = PrintIfPref('folder_show_date',date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
+
+    $subjectShow = $thread['subject'];
+    if ($subjectShow == '') {
+      $subjectShow = '[no subject]';
+    }
+    PrintRow($threadInfo,$timeInfo,'subject',$subjectShow);
+    
+    $recipientsList = array();
+    foreach ($thread['recipients'] as $r) {
+      if ($r != $fbUser) {
+        $recipientsList[] = ProfileName($r);
+      }
+    }
+    $recipientsShow = implode(',',$recipientsList);    
+    PrintRow($threadInfo,$timeInfo,':to/from',$recipientsShow);        
+    
+    if ($fbcmdPrefs['folder_show_snippet']) {
+      $snippetShow = str_replace("\n", ' ', $thread['snippet']);
+      if (count($recipientsList) > 1) {
+        $snippetShow = ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
+      }
+      PrintRow($threadInfo,$timeInfo,':snippet', $snippetShow);
+    }
+
+    if ($fbcmdPrefs['folder_linefeed']) {
+      PrintRow('');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////  
 ////////////////////////////////////////////////////////////////////////////////
 
   function PrintHeader() {
@@ -3071,6 +3080,22 @@ function PrintCsvRow($rowIn) {
     return 'unknown';
   }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveMailData($obj) {
+    global $fbcmdPrefs;
+    if ($fbcmdPrefs['mail_save']) {
+      $saveMailData = array ('ids' => array('0'), 'timestamp' => time());
+      foreach ($obj as $thread) {
+        $saveMailData['ids'][] = $thread['thread_id'];
+      }
+      if (@file_put_contents($fbcmdPrefs['mailfile'],serialize($saveMailData)) == false) {
+        FbcmdWarning("Could not generate mailfile {$fbcmdPrefs['mailfile']}");
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
