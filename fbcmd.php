@@ -52,7 +52,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.00-beta3-dev1-unstable3';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable4';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -154,7 +154,7 @@
   $fbcmdPrefs['stream_show_likes'] = '1';
   $fbcmdPrefs['stream_show_comments'] = '1';
   
-  $fbcmdPrefs['thread_show_date'] = '0';
+  $fbcmdPrefs['thread_show_date'] = '0'; //todo wiki
   $fbcmdPrefs['thread_dateformat'] = 'D H:i';
   $fbcmdPrefs['thread_showid'] = '0';
   $fbcmdPrefs['thread_show_snippet'] = 1;
@@ -190,6 +190,7 @@
   $fbcmdPrefs['restatus_comment_new'] = '1';
   $fbcmdPrefs['savepref_include_files'] = '0';
   $fbcmdPrefs['stream_new_from'] = 'created_time';
+  $fbcmdPrefs['update_branch'] = 'master'; //todo wiki
 
   // Parameter Defaults
   $fbcmdPrefs['default_addalbum_title'] = '';
@@ -1821,20 +1822,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'VERSION') {
-    ValidateParamCount(0);
-    try {
-      $fbOnlineVersion = @file_get_contents('http://fbcmd.dtompkins.com/attachments/curversion.txt');
-    } catch (Exception $e) {
-      FbcmdFatalError('Could not connect to http://fbcmd.dtompkins.com/');
-    }
-    if ($fbOnlineVersion == '') {
-      FbcmdFatalError('Could not connect to http://fbcmd.dtompkins.com/');
-    }
-    PrintHeader('THIS_VERSION','ONLINE_VERSION','DOWNLOAD_URL');
-    PrintRow($fbcmdVersion,$fbOnlineVersion,'http://fbcmd.dtompkins.com/');
+  if ($fbcmdCommand == 'VERSION') { //todo wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['update_branch']);
+    PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_INSTRUCTIONS');
+    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),'http://fbcmd.tompkins.com/update'); //todo wiki
   }
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'WHOAMI') {
@@ -2355,6 +2349,25 @@
     return;
   }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function GetGithubVersion($branch) {
+    try {
+      $phpFile = @file_get_contents("http://github.com/dtompkins/fbcmd/raw/{$branch}/fbcmd.php");
+      preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$phpFile,$matches);
+      if (isset($matches[1])) {
+        $githubVersion = $matches[1];
+      } else {
+        $githubVersion = 'err';
+      }
+      
+    } catch (Exception $e) {
+      $githubVersion = 'unavailable';
+    }
+    return $githubVersion;
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
