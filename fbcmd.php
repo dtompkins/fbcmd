@@ -153,6 +153,12 @@
   $fbcmdPrefs['stream_show_attachments'] = '0';
   $fbcmdPrefs['stream_show_likes'] = '1';
   $fbcmdPrefs['stream_show_comments'] = '1';
+  
+  $fbcmdPrefs['thread_show_date'] = '0';
+  $fbcmdPrefs['thread_dateformat'] = 'D H:i';
+  $fbcmdPrefs['thread_showid'] = '0';
+  $fbcmdPrefs['thread_show_snippet'] = 1;
+
 
   // PIC Preferences
   $fbcmdPrefs['pic_show_date'] = '0';
@@ -177,7 +183,6 @@
   $fbcmdPrefs['fevents_attend_mask'] = '1';
   $fbcmdPrefs['fgroups_show_id'] = '1';
   $fbcmdPrefs['flist_chunksize'] = 10;
-  $fbcmdPrefs['inbox_show_snippit'] = 1;
   $fbcmdPrefs['message_show_subject'] = '1';
   $fbcmdPrefs['online_idle'] = '1';
   $fbcmdPrefs['pic_size'] = '1';
@@ -1084,14 +1089,64 @@
     $keyMessageNames = 'id';
     MultiFQL(array('Thread','MessageNames'));
     if (!empty($dataThread)) {
+      //PrintThreadHeader();
+      $threadNum = 0;
       foreach ($dataThread as $t) {
-        PrintRow(PrintIfPref('show_id',$t['snippet_author']),ProfileName($t['snippet_author']),$t['subject']);
-        // if ($fbcmdPrefs['inbox_show_snippit']) {
-          // PrintRow(PrintIfPref('show_id',$t['snippet_author']),ProfileName($t['snippet_author']),$t['subject']);
-        // }
+        PrintThreadObject(++$threadNum,$t);
       }
       SaveMailData($dataThread);
     }
+  }
+  
+  function PrintThreadObject($threadNum, $thread) {
+
+    global $fbcmdPrefs;
+    global $fbUser;
+
+    $threadInfo = array();
+
+    if ($fbcmdPrefs['mail_save']) {
+      $showThreadNum = '[' . $threadNum . ']';
+      if ($thread['unread']) {
+        $showThreadNum .= '*';
+      } 
+      $threadInfo[] = $showThreadNum;
+    }
+
+    if ($fbcmdPrefs['thread_showid']) {
+      $threadInfo[] = $thread['thread_id'];
+    }
+    
+    $userInfo = array();
+    $userInfo[] = PrintIfPref('show_id',$thread['snippet_author']);
+
+    $userInfo[] = ProfileName($thread['snippet_author']);
+
+    $timeInfo = PrintIfPref('thread_show_date',date($fbcmdPrefs['thread_dateformat'],$thread['updated_time']));
+
+    $subjectShow = $thread['subject'];
+    if ($subjectShow == '') {
+      $subjectShow = '[no subject]';
+    }
+    PrintRow($threadInfo,$timeInfo,'subject',$subjectShow);
+    
+    $recipientsList = array();
+    foreach ($thread['recipients'] as $r) {
+      if ($r != $fbUser) {
+        $recipientsList[] = ProfileName($r);
+      }
+    }
+    $recipientsShow = implode(',',$recipientsList);    
+    PrintRow($threadInfo,$timeInfo,'to/from',$recipientsShow);        
+    
+    $snippetShow = str_replace("\n", ' ', $thread['snippet']);
+    if (count($recipientsList) > 1) {
+      $snippetShow = ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
+    }
+    PrintRow($threadInfo,$timeInfo,'snippet', $snippetShow);
+
+    PrintRow('');
+
   }
   
   function SaveMailData($obj) {
