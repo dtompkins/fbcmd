@@ -13,6 +13,7 @@
 //                                                                            //
 //   [Project Home Page & wiki]  http://fbcmd.dtompkins.com                   //
 //   [Facebook Page]             http://facebook.com/fbcmd                    //
+//   [Discussion Group]          http://groups.google.com/group/fbcmd         //
 //   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
 //                                                                            //
 //   Copyright (c) 2007,2009 Dave Tompkins                                    //
@@ -39,11 +40,11 @@
 //   Having said all that, the author would love you to send him:             //
 //   Suggestions,  Modifications and Improvements for re-distribution.        //
 //                                                                            //
-//   email: mail+fbcmd [@at@] dtompkins.com                                   //
+//   http://fbcmd.dtompkins.com/contribute                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
-//   See http://fbcmd.dtompkins.com/history/ for a revision history.          //
+//   http://fbcmd.dtompkins.com/history/ for a revision history.              //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -52,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable8';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable9';
 
 ////////////////////////////////////////////////////////////////////////////////
 
