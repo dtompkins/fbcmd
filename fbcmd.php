@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2-unstable5';
+  $fbcmdVersion = '1.0-beta3-dev2-unstable6';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -175,6 +175,7 @@
   
   $fbcmdPrefs['notices_show_date'] = '0'; //todo wiki
   $fbcmdPrefs['notices_dateformat'] = 'M d H:i';
+  $fbcmdPrefs['notices_show_id'] = '0';
   $fbcmdPrefs['notices_blankrow'] = '1';
 
   // PIC Preferences
@@ -1258,17 +1259,14 @@
         if ($fbcmdPrefs['msg_blankrow']) {
           PrintRow('');
         }
-        
         if ($dataThread[0]['subject'] != '') {
           PrintRow(PrintIfPref('show_id',''),'Subject',PrintIfPref('msg_show_date',''),$dataThread[0]['subject']);
           if ($fbcmdPrefs['msg_blankrow']) {
             PrintRow('');
           }
         }
-        
         foreach ($dataMessage as $m) {
-          // note: the created_time field appears to be flakey
-          if ($m['created_time'] == '') {
+          if ($m['created_time'] == '') { // note: the created_time field appears to be flakey
             $displayDate = '';
           } else {
             $displayDate = date($fbcmdPrefs['msg_dateformat'],$m['created_time']);
@@ -1311,9 +1309,9 @@
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
     if ((strtoupper($fbcmdParams[1]) == 'UNREAD')||(strtoupper($fbcmdParams[1]) == 'MARKREAD')) {
-      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0 AND is_unread = 1";
+      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time,is_unread FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0 AND is_unread = 1";
     } else {
-      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0";
+      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time,is_unread FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0";
     }
     $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT sender_id FROM #fqlNotification)';
     $keyMessageNames = 'id';
@@ -1322,29 +1320,10 @@
     MultiFQL(array('Notification','MessageNames','ApplicationNames'));
     
     if (!empty($dataNotification)) {
-      //PrintFolderHeader();
+      PrintNotificationHeader();
       $threadNum = 0;
       foreach ($dataNotification as $n) {
-        $threadNum++;
-        $prefix = '';
-        if ($n['sender_id'] != $fbUser) {
-          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'from',ProfileName($n['sender_id']));
-          $prefix = ':';
-        }
-
-        if ($fbcmdPrefs['notices_show_date']) {
-          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'date',date($fbcmdPrefs['notices_dateformat'],$n['created_time']));
-          $prefix = ':';
-        }
-
-        if ($n['title_text'] != '') {
-          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
-          $prefix = ':';
-        }        
-        if ($n['body_text'] != '') {
-          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'body',strip_tags($n['body_text']));
-        }
-        PrintRow('');
+        PrintNotificationObject(++$threadNum,$n);
       }
       if (strtoupper($fbcmdParams[1]) == 'MARKREAD') {
         $unreadIds = array();
@@ -2891,7 +2870,6 @@ function PrintCsvRow($rowIn) {
     if (isset($printMatrix)) {
       $columnWidth = Array();
       if (count($printMatrix) > 0) {
-        // Determine column widths
         foreach ($printMatrix as $row) {
           while (count($row) > count($columnWidth)) {
             $columnWidth[] = 0;
@@ -2902,7 +2880,6 @@ function PrintCsvRow($rowIn) {
             }
           }
         }
-        // Add padding
         for ($i=0; $i<count($columnWidth)-1; $i++) {
           $columnWidth[$i] += $fbcmdPrefs['print_col_padding'];
         }
@@ -3071,6 +3048,58 @@ function PrintCsvRow($rowIn) {
   function PrintIfPref($paramName,$optVar) {
     global $fbcmdPrefs;
     return PrintIf($fbcmdPrefs[$paramName],$optVar);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PrintNotificationHeader() {
+    global $fbcmdPrefs;
+    $header = array();
+    $header[] = '[#]';
+    $header[] = PrintIfPref('notices_show_id','NOTIFICATION_ID');
+    $header[] = 'SOURCE';
+    $header[] = 'FIELD';
+    $header[] = 'VALUE';
+    PrintHeader($header);
+    if ($fbcmdPrefs['notices_blankrow']) {
+      PrintRow('');
+    }
+  }
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PrintNotificationObject($threadNum, $n) {
+    global $fbcmdPrefs;
+    global $fbUser;
+    
+    $postInfo = array();
+    $postInfo[] = '[' . $threadNum . ']';    
+    if ($n['is_unread']) {
+      $postInfo[0] .= '*';    
+    }
+    if ($fbcmdPrefs['notices_show_id']) {
+      $postInfo[] = $n['notification_id'];
+    }
+    $prefix = '';
+    if ($n['sender_id'] != $fbUser) {
+      PrintRow($postInfo,ProfileName($n['app_id']),$prefix . 'from',ProfileName($n['sender_id']));
+      $prefix = ':';
+    }
+    if ($fbcmdPrefs['notices_show_date']) {
+      PrintRow($postInfo,ProfileName($n['app_id']),$prefix . 'date',date($fbcmdPrefs['notices_dateformat'],$n['created_time']));
+      $prefix = ':';
+    }
+    if ($n['title_text'] != '') {
+      PrintRow($postInfo,ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
+      $prefix = ':';
+    }        
+    if ($n['body_text'] != '') {
+      PrintRow($postInfo,ProfileName($n['app_id']),$prefix . 'body',strip_tags($n['body_text']));
+    }
+    if ($fbcmdPrefs['notices_blankrow']) {
+      PrintRow('');
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
