@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev3-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev3-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -293,6 +293,7 @@
   $fbcmdPrefs['default_savedisp_filename'] = '';
   $fbcmdPrefs['default_saveinfo_filename'] = '';
   $fbcmdPrefs['default_sentmail_count'] = '10';    
+  $fbcmdPrefs['default_showpref_defaults'] = '0';
   $fbcmdPrefs['default_stream_filter'] = '1';
   $fbcmdPrefs['default_stream_count'] = '10';
   $fbcmdPrefs['default_tagpic_pid'] = '';
@@ -380,8 +381,9 @@
     'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
     'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTICES','NOTIFY','NSEND',
     'OPICS','MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
-    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS','STATUS',
-    'STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION','WALLPOST','WHOAMI'
+    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS',
+    'SHOWPREF','STATUS','STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION',
+    'WALLPOST','WHOAMI'
   );
 
   if (isset($fbcmd_include_newCommands)) {
@@ -1699,7 +1701,21 @@
       }
     }
   }
+  
+////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'SHOWPREF') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_showpref_defaults']);
+    PrintHeader('PREFERANCE','VALUE');
+    foreach ($fbcmdPrefs as $switchKey => $switchValue) {
+      if ($switchKey != 'prefs') {
+        if ((substr($switchKey,0,8) != 'default_')||($fbcmdParams[1]))
+        PrintRow($switchKey,var_export($switchValue,true));
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'STATUS') {
@@ -3219,12 +3235,14 @@ function PrintCsvRow($rowIn) {
       if (isset($post['comments']['count'])) {
         $totalCount = $post['comments']['count'];
         if ($shownCount < $totalCount) {
-          PrintRow($postInfo,$userInfo,$timeInfo,':comment',"Showing {$shownCount} of {$totalCount} Comments");
+          PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
         }
       }
+      $commentCount = 0;
       foreach ($commentData as $comment) {
+        $commentCount++;
         $timeInfo = PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
-        PrintRow($postInfo,$userInfo,$timeInfo,':comment',ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
+        PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
       }
     } else {
       if ($fbcmdPrefs['stream_show_comments']) {
@@ -3238,14 +3256,16 @@ function PrintCsvRow($rowIn) {
               }
             }
             if ($shownCount == 0) {
-              PrintRow($postInfo,$userInfo,$timeInfo,':comment',"{$totalCount} Comments");
+              PrintRow($postInfo,$userInfo,$timeInfo,':comments',"{$totalCount} Comments");
             } else {
               if ($shownCount < $totalCount) {
-                PrintRow($postInfo,$userInfo,$timeInfo,':comment',"Showing {$shownCount} of {$totalCount} Comments");
+                PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
               }
+              $commentCount = 0;
               foreach ($post['comments']['comment_list'] as $comment) {
+                $commentCount++;
                 $timeInfo = PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
-                PrintRow($postInfo,$userInfo,$timeInfo,':comment',ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
+                PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
               }
             }
           }
@@ -3468,7 +3488,7 @@ function PrintCsvRow($rowIn) {
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (($fbcmdPrefs['savepref_include_files'])||(($switchKey != 'keyfile')&&($switchKey != 'postfile'))) {
+        if (($fbcmdPrefs['savepref_include_files'])||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
           $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
         }
       }
@@ -3584,7 +3604,7 @@ function PrintCsvRow($rowIn) {
     print "  FSTATUS   [flist]                                                            \n";
     print "            List current status of friend(s)                                   \n\n";
 
-    print "  FSTREAM   [flist] [count]                                                    \n";
+    print "  FSTREAM   [flist] [count|new]                                                \n";
     print "            Show stream stories for friend(s)                                  \n\n";
 
     print "  FULLPOST  post_id                                                            \n";
@@ -3593,7 +3613,7 @@ function PrintCsvRow($rowIn) {
     print "  HELP      <no parameters>                                                    \n";
     print "            Display this help message                                          \n\n";
 
-    print "  INBOX     [#|unread|new]                                                     \n";
+    print "  INBOX     [count|unread|new]                                                 \n";
     print "            Display the latest messages from the inbox                         \n\n";
 
     print "  LIKE      post_ids                                                           \n";
@@ -3662,22 +3682,25 @@ function PrintCsvRow($rowIn) {
     print "  SAVEPREF  [filename]                                                         \n";
     print "            Save your current preferences / switch settings to a file          \n\n";
 
-    print "  SENTMAIL  [#|unread|new]                                                     \n";
+    print "  SENTMAIL  [count|unread|new]                                                 \n";
     print "            Display the latest messages from your sent mail folder             \n\n";
 
     print "  SFILTERS  <no parameters>                                                    \n";
     print "            Display available stream filters for the STREAM command            \n\n";
+    
+    print "  SHOWPREF  [0|1]                                                              \n";
+    print "            Show your current preferences (and optionally defaults too)        \n\n";
 
     print "  STATUS    [message]                                                          \n";
     print "            Set your status (or display current status if no parameter)        \n\n";
 
-    print "  STREAM    [stream_filter] [count]                                            \n";
+    print "  STREAM    [filter_rank|filter_key|#filter_name] [count|new]                  \n";
     print "            Show stream stories (with optional filter -- see SFILTERS)         \n\n";
 
     print "  TAGPIC    pic_id target [x y]                                                \n";
     print "            Tag a photo                                                        \n\n";
 
-    print "  UPDATES   [#|unread|new]                                                     \n";
+    print "  UPDATES   [count|unread|new]                                                 \n";
     print "            Display the latest updates from pages you are a fan of             \n\n";
 
     print "  UFIELDS   <no parameters>                                                    \n";
@@ -3696,7 +3719,7 @@ function PrintCsvRow($rowIn) {
 
     print "  fbcmd status \"is excited to play with fbcmd\"\n";
     print "  fbcmd finfo birthday_date -csv\n";
-    print "  fbcmd stream 1 25\n\n";
+    print "  fbcmd stream #family 25\n\n";
 
     print "for additional help, examples, parameter usage, flists, preference settings,\n";
     print "visit the FBCMD wiki at:\n\n";
