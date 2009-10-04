@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2';
+  $fbcmdVersion = '1.0-beta3-dev3-unstable3';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -200,12 +200,15 @@
   $fbcmdPrefs['events_attend_mask'] = '15';
   $fbcmdPrefs['fevents_attend_mask'] = '1';
   $fbcmdPrefs['fgroups_show_id'] = '1';
-  $fbcmdPrefs['flist_chunksize'] = 10;
+  $fbcmdPrefs['flist_chunksize'] = '10';
   $fbcmdPrefs['online_idle'] = '1';
   $fbcmdPrefs['pic_size'] = '1';
   $fbcmdPrefs['ppic_size'] = '1';
   $fbcmdPrefs['restatus_comment_new'] = '1';
   $fbcmdPrefs['savepref_include_files'] = '0';
+  $fbcmdPrefs['status_tag'] = '1'; //todo wiki 
+  $fbcmdPrefs['status_tag_syntax'] = '/@(\S+)/';
+  $fbcmdPrefs['status_tag_order'] = 'friends:username:0,friends:name:0,pages:username:0,pages:name:0,friends:name:1,pages:name:1,groups:name:0,groups:name:1';  
   $fbcmdPrefs['stream_new_from'] = 'created_time';
   $fbcmdPrefs['update_branch'] = 'master'; //todo wiki
 
@@ -293,6 +296,7 @@
   $fbcmdPrefs['default_savedisp_filename'] = '';
   $fbcmdPrefs['default_saveinfo_filename'] = '';
   $fbcmdPrefs['default_sentmail_count'] = '10';    
+  $fbcmdPrefs['default_showpref_defaults'] = '0';
   $fbcmdPrefs['default_stream_filter'] = '1';
   $fbcmdPrefs['default_stream_count'] = '10';
   $fbcmdPrefs['default_tagpic_pid'] = '';
@@ -380,8 +384,9 @@
     'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
     'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTICES','NOTIFY','NSEND',
     'OPICS','MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
-    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS','STATUS',
-    'STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION','WALLPOST','WHOAMI'
+    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS',
+    'SHOWPREF','STATUS','STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION',
+    'WALLPOST','WHOAMI'
   );
 
   if (isset($fbcmd_include_newCommands)) {
@@ -1699,7 +1704,21 @@
       }
     }
   }
+  
+////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'SHOWPREF') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_showpref_defaults']);
+    PrintHeader('PREFERANCE','VALUE');
+    foreach ($fbcmdPrefs as $switchKey => $switchValue) {
+      if ($switchKey != 'prefs') {
+        if ((substr($switchKey,0,8) != 'default_')||($fbcmdParams[1]))
+        PrintRow($switchKey,var_export($switchValue,true));
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'STATUS') {
@@ -1716,8 +1735,13 @@
         }
       }
     } else {
+      if ($fbcmdPrefs['status_tag']) {
+        $statusText = TagText($fbcmdParams[1]);
+      } else {
+        $statusText = $fbcmdParams[1];
+      }
       try {
-        $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $fbcmdParams[1],'status_includes_verb' => true));
+        $fbReturn = $fbObject->api_client->stream_publish($statusText);
         TraceReturn($fbReturn);
       } catch(Exception $e) {
         FbcmdException($e);
@@ -3219,12 +3243,14 @@ function PrintCsvRow($rowIn) {
       if (isset($post['comments']['count'])) {
         $totalCount = $post['comments']['count'];
         if ($shownCount < $totalCount) {
-          PrintRow($postInfo,$userInfo,$timeInfo,':comment',"Showing {$shownCount} of {$totalCount} Comments");
+          PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
         }
       }
+      $commentCount = 0;
       foreach ($commentData as $comment) {
+        $commentCount++;
         $timeInfo = PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
-        PrintRow($postInfo,$userInfo,$timeInfo,':comment',ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
+        PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
       }
     } else {
       if ($fbcmdPrefs['stream_show_comments']) {
@@ -3238,14 +3264,16 @@ function PrintCsvRow($rowIn) {
               }
             }
             if ($shownCount == 0) {
-              PrintRow($postInfo,$userInfo,$timeInfo,':comment',"{$totalCount} Comments");
+              PrintRow($postInfo,$userInfo,$timeInfo,':comments',"{$totalCount} Comments");
             } else {
               if ($shownCount < $totalCount) {
-                PrintRow($postInfo,$userInfo,$timeInfo,':comment',"Showing {$shownCount} of {$totalCount} Comments");
+                PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
               }
+              $commentCount = 0;
               foreach ($post['comments']['comment_list'] as $comment) {
+                $commentCount++;
                 $timeInfo = PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
-                PrintRow($postInfo,$userInfo,$timeInfo,':comment',ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
+                PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
               }
             }
           }
@@ -3468,7 +3496,7 @@ function PrintCsvRow($rowIn) {
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (($fbcmdPrefs['savepref_include_files'])||(($switchKey != 'keyfile')&&($switchKey != 'postfile'))) {
+        if (($fbcmdPrefs['savepref_include_files'])||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
           $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
         }
       }
@@ -3512,10 +3540,10 @@ function PrintCsvRow($rowIn) {
     print "  ADDALBUM  title [description] [location] [privacy]                           \n";
     print "            Create a new photo album                                           \n\n";
 
-    print "  ADDPIC    filename [album_id] [caption]                                      \n";
+    print "  ADDPIC    filename [album_id|latest] [caption]                               \n";
     print "            Upload (add) a photo to an album                                   \n\n";
 
-    print "  ADDPICD   dirname [album_id]                                                 \n";
+    print "  ADDPICD   dirname [album_id|latest]                                          \n";
     print "            Upload (add) all *.jpg files in a directory to an album            \n\n";
 
     print "  ALBUMS    [flist]                                                            \n";
@@ -3584,7 +3612,7 @@ function PrintCsvRow($rowIn) {
     print "  FSTATUS   [flist]                                                            \n";
     print "            List current status of friend(s)                                   \n\n";
 
-    print "  FSTREAM   [flist] [count]                                                    \n";
+    print "  FSTREAM   [flist] [count|new]                                                \n";
     print "            Show stream stories for friend(s)                                  \n\n";
 
     print "  FULLPOST  post_id                                                            \n";
@@ -3593,8 +3621,8 @@ function PrintCsvRow($rowIn) {
     print "  HELP      <no parameters>                                                    \n";
     print "            Display this help message                                          \n\n";
 
-    print "  INBOX     [count]                                                            \n";
-    print "            Display the latest n messages from the inbox                       \n\n";
+    print "  INBOX     [count|unread|new]                                                 \n";
+    print "            Display the latest messages from the inbox                         \n\n";
 
     print "  LIKE      post_ids                                                           \n";
     print "            Like a story that appears in the stream                            \n\n";
@@ -3612,10 +3640,13 @@ function PrintCsvRow($rowIn) {
     print "            Same as FEEDNOTE but loads the contents from a file                \n\n";
 
     print "  MSG       message_id                                                         \n";
-    print "            Displays a message thread                                          \n\n";
+    print "            Displays a full message thread (e.g.: after an INBOX)              \n\n";
     
     print "  MUTUAL    flist                                                              \n";
     print "            List friend(s) in common with other friend(s)                      \n\n";
+
+    print "  NOTICES   [unread|markread]                                                  \n";
+    print "            See brief notifications from facebook, applications & users        \n\n";
 
     print "  NOTIFY    <no parameters>                                                    \n";
     print "            See (simple) notifications such as # of unread messages            \n\n";
@@ -3659,28 +3690,31 @@ function PrintCsvRow($rowIn) {
     print "  SAVEPREF  [filename]                                                         \n";
     print "            Save your current preferences / switch settings to a file          \n\n";
 
-    print "  SENTMAIL  [count]                                                            \n";
-    print "            Display the latest n messages from your sent mail folder           \n\n";
+    print "  SENTMAIL  [count|unread|new]                                                 \n";
+    print "            Display the latest messages from your sent mail folder             \n\n";
 
     print "  SFILTERS  <no parameters>                                                    \n";
     print "            Display available stream filters for the STREAM command            \n\n";
+    
+    print "  SHOWPREF  [0|1]                                                              \n";
+    print "            Show your current preferences (and optionally defaults too)        \n\n";
 
     print "  STATUS    [message]                                                          \n";
     print "            Set your status (or display current status if no parameter)        \n\n";
 
-    print "  STREAM    [stream_filter] [count]                                            \n";
-    print "            Show stream stories (with optional filter)                         \n\n";
+    print "  STREAM    [filter_rank|filter_key|#filter_name] [count|new]                  \n";
+    print "            Show stream stories (with optional filter -- see SFILTERS)         \n\n";
 
     print "  TAGPIC    pic_id target [x y]                                                \n";
     print "            Tag a photo                                                        \n\n";
 
-    print "  UPDATES   [count]                                                            \n";
-    print "            Display the latest n updates from pages you are a fan of           \n\n";
+    print "  UPDATES   [count|unread|new]                                                 \n";
+    print "            Display the latest updates from pages you are a fan of             \n\n";
 
     print "  UFIELDS   <no parameters>                                                    \n";
     print "            List current user table fields (for use with FINFO)                \n\n";
 
-    print "  VERSION   <no parameters>                                                    \n";
+    print "  VERSION   [branch]                                                           \n";
     print "            Check for the latest version of FBCMD available                    \n\n";
 
     print "  WHOAMI    <no parameters>                                                    \n";
@@ -3693,7 +3727,7 @@ function PrintCsvRow($rowIn) {
 
     print "  fbcmd status \"is excited to play with fbcmd\"\n";
     print "  fbcmd finfo birthday_date -csv\n";
-    print "  fbcmd stream 1 25\n\n";
+    print "  fbcmd stream #family 25\n\n";
 
     print "for additional help, examples, parameter usage, flists, preference settings,\n";
     print "visit the FBCMD wiki at:\n\n";
@@ -3702,6 +3736,86 @@ function PrintCsvRow($rowIn) {
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function TagFieldMatch($matchString, $dataToSearch, $matchField, $idField, $partial = false, $nameField = 'name') {
+    $matchList = array();
+    if ($partial) {
+      $matchExp = "/$matchString/i";
+    } else {
+      $matchExp = "/^$matchString/i";
+    }
+    foreach ($dataToSearch as $d) {
+      if (preg_match($matchExp,$d[$matchField])) {
+        $matchList[] = array($d[$idField],$d[$nameField]);
+      }
+    }
+    return $matchList;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+function TagText($textToTag) {
+  global $fbcmdPrefs;
+  global $fbUser;
+  global $fqlMatchFriends;
+  global $dataMatchFriends;
+  global $fqlMatchPages;
+  global $dataMatchPages;
+  global $fqlMatchGroups;
+  global $dataMatchGroups;
+
+  $textToTag = str_replace('@@','[[AT]]',$textToTag);
+  
+  if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches,PREG_SET_ORDER)) {
+    
+    $fqlMatchFriends = "SELECT uid,name,username FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1={$fbUser} AND uid2=uid2)";
+    $fqlMatchPages = "SELECT page_id,name,username FROM page WHERE page_id IN (SELECT page_id FROM page_fan WHERE uid={$fbUser})";
+    $fqlMatchGroups = "SELECT gid,name FROM group WHERE gid IN (SELECT gid FROM group_member WHERE uid={$fbUser})";
+    MultiFQL(array('MatchFriends','MatchPages','MatchGroups'));
+    
+    $matchOrder = explode(',',$fbcmdPrefs['status_tag_order']);
+
+    foreach ($matches as $pregMatch) {
+      $nameMatch = $pregMatch[1];
+      $matchList = array();
+      foreach ($matchOrder as $order) {
+        $matchParams = explode(':',$order);
+        if ($matchParams[0] == 'friends') {
+          $matchList = TagFieldMatch($nameMatch, $dataMatchFriends, $matchParams[1], 'uid', $matchParams[2]);
+        }
+        if ($matchParams[0] == 'pages') {
+          $matchList = TagFieldMatch($nameMatch, $dataMatchPages, $matchParams[1], 'page_id', $matchParams[2]);
+        }
+        if ($matchParams[0] == 'groups') {
+          $matchList = TagFieldMatch($nameMatch, $dataMatchGroups, $matchParams[1], 'gid', $matchParams[2]);
+        }
+        if (count($matchList) > 0) {
+          break;
+        }
+      }
+      if (count($matchList) == 1) {
+        $taggedText = "@[{$matchList[0][0]}:{$matchList[0][0]}:{$matchList[0][1]}]";
+      } else {
+        $taggedText = "[[AT]]$nameMatch";
+        if (count($matchList) == 0) {
+          FbcmdWarning("Tag {$pregMatch[0]} had no matches.  Use @@ to avoid tagging");
+        } else {
+          FbcmdWarning("Tag {$pregMatch[0]} had multiple matches: Leaving text untagged");
+          foreach ($matchList as $item) {
+            print "  {$item[1]}\n";
+          }
+        }
+      }
+      $textToTag = str_replace($pregMatch[0],$taggedText,$textToTag);
+    }
+  }
+  
+  $textToTag = str_replace('[[AT]]','@',$textToTag);
+  
+  return $textToTag;
+}  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   function TraceReturn($obj) {
