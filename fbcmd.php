@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2';
+  $fbcmdVersion = '1.0-beta3-dev3-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3512,10 +3512,10 @@ function PrintCsvRow($rowIn) {
     print "  ADDALBUM  title [description] [location] [privacy]                           \n";
     print "            Create a new photo album                                           \n\n";
 
-    print "  ADDPIC    filename [album_id] [caption]                                      \n";
+    print "  ADDPIC    filename [album_id|latest] [caption]                               \n";
     print "            Upload (add) a photo to an album                                   \n\n";
 
-    print "  ADDPICD   dirname [album_id]                                                 \n";
+    print "  ADDPICD   dirname [album_id|latest]                                          \n";
     print "            Upload (add) all *.jpg files in a directory to an album            \n\n";
 
     print "  ALBUMS    [flist]                                                            \n";
@@ -3593,8 +3593,8 @@ function PrintCsvRow($rowIn) {
     print "  HELP      <no parameters>                                                    \n";
     print "            Display this help message                                          \n\n";
 
-    print "  INBOX     [count]                                                            \n";
-    print "            Display the latest n messages from the inbox                       \n\n";
+    print "  INBOX     [#|unread|new]                                                     \n";
+    print "            Display the latest messages from the inbox                         \n\n";
 
     print "  LIKE      post_ids                                                           \n";
     print "            Like a story that appears in the stream                            \n\n";
@@ -3612,10 +3612,13 @@ function PrintCsvRow($rowIn) {
     print "            Same as FEEDNOTE but loads the contents from a file                \n\n";
 
     print "  MSG       message_id                                                         \n";
-    print "            Displays a message thread                                          \n\n";
+    print "            Displays a full message thread (e.g.: after an INBOX)              \n\n";
     
     print "  MUTUAL    flist                                                              \n";
     print "            List friend(s) in common with other friend(s)                      \n\n";
+
+    print "  NOTICES   [unread|markread]                                                  \n";
+    print "            See brief notifications from facebook, applications & users        \n\n";
 
     print "  NOTIFY    <no parameters>                                                    \n";
     print "            See (simple) notifications such as # of unread messages            \n\n";
@@ -3659,8 +3662,8 @@ function PrintCsvRow($rowIn) {
     print "  SAVEPREF  [filename]                                                         \n";
     print "            Save your current preferences / switch settings to a file          \n\n";
 
-    print "  SENTMAIL  [count]                                                            \n";
-    print "            Display the latest n messages from your sent mail folder           \n\n";
+    print "  SENTMAIL  [#|unread|new]                                                     \n";
+    print "            Display the latest messages from your sent mail folder             \n\n";
 
     print "  SFILTERS  <no parameters>                                                    \n";
     print "            Display available stream filters for the STREAM command            \n\n";
@@ -3669,18 +3672,18 @@ function PrintCsvRow($rowIn) {
     print "            Set your status (or display current status if no parameter)        \n\n";
 
     print "  STREAM    [stream_filter] [count]                                            \n";
-    print "            Show stream stories (with optional filter)                         \n\n";
+    print "            Show stream stories (with optional filter -- see SFILTERS)         \n\n";
 
     print "  TAGPIC    pic_id target [x y]                                                \n";
     print "            Tag a photo                                                        \n\n";
 
-    print "  UPDATES   [count]                                                            \n";
-    print "            Display the latest n updates from pages you are a fan of           \n\n";
+    print "  UPDATES   [#|unread|new]                                                     \n";
+    print "            Display the latest updates from pages you are a fan of             \n\n";
 
     print "  UFIELDS   <no parameters>                                                    \n";
     print "            List current user table fields (for use with FINFO)                \n\n";
 
-    print "  VERSION   <no parameters>                                                    \n";
+    print "  VERSION   [branch]                                                           \n";
     print "            Check for the latest version of FBCMD available                    \n\n";
 
     print "  WHOAMI    <no parameters>                                                    \n";
