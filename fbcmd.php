@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev3-unstable2';
+  $fbcmdVersion = '1.0-beta3-dev3-unstable3';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -200,12 +200,15 @@
   $fbcmdPrefs['events_attend_mask'] = '15';
   $fbcmdPrefs['fevents_attend_mask'] = '1';
   $fbcmdPrefs['fgroups_show_id'] = '1';
-  $fbcmdPrefs['flist_chunksize'] = 10;
+  $fbcmdPrefs['flist_chunksize'] = '10';
   $fbcmdPrefs['online_idle'] = '1';
   $fbcmdPrefs['pic_size'] = '1';
   $fbcmdPrefs['ppic_size'] = '1';
   $fbcmdPrefs['restatus_comment_new'] = '1';
   $fbcmdPrefs['savepref_include_files'] = '0';
+  $fbcmdPrefs['status_tag'] = '1'; //todo wiki 
+  $fbcmdPrefs['status_tag_syntax'] = '/@(\S+)/';
+  $fbcmdPrefs['status_tag_order'] = 'friends:username:0,friends:name:0,pages:username:0,pages:name:0,friends:name:1,pages:name:1,groups:name:0,groups:name:1';  
   $fbcmdPrefs['stream_new_from'] = 'created_time';
   $fbcmdPrefs['update_branch'] = 'master'; //todo wiki
 
@@ -1732,8 +1735,13 @@
         }
       }
     } else {
+      if ($fbcmdPrefs['status_tag']) {
+        $statusText = TagText($fbcmdParams[1]);
+      } else {
+        $statusText = $fbcmdParams[1];
+      }
       try {
-        $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $fbcmdParams[1],'status_includes_verb' => true));
+        $fbReturn = $fbObject->api_client->stream_publish($statusText);
         TraceReturn($fbReturn);
       } catch(Exception $e) {
         FbcmdException($e);
@@ -3728,6 +3736,86 @@ function PrintCsvRow($rowIn) {
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function TagFieldMatch($matchString, $dataToSearch, $matchField, $idField, $partial = false, $nameField = 'name') {
+    $matchList = array();
+    if ($partial) {
+      $matchExp = "/$matchString/i";
+    } else {
+      $matchExp = "/^$matchString/i";
+    }
+    foreach ($dataToSearch as $d) {
+      if (preg_match($matchExp,$d[$matchField])) {
+        $matchList[] = array($d[$idField],$d[$nameField]);
+      }
+    }
+    return $matchList;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+function TagText($textToTag) {
+  global $fbcmdPrefs;
+  global $fbUser;
+  global $fqlMatchFriends;
+  global $dataMatchFriends;
+  global $fqlMatchPages;
+  global $dataMatchPages;
+  global $fqlMatchGroups;
+  global $dataMatchGroups;
+
+  $textToTag = str_replace('@@','[[AT]]',$textToTag);
+  
+  if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches,PREG_SET_ORDER)) {
+    
+    $fqlMatchFriends = "SELECT uid,name,username FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1={$fbUser} AND uid2=uid2)";
+    $fqlMatchPages = "SELECT page_id,name,username FROM page WHERE page_id IN (SELECT page_id FROM page_fan WHERE uid={$fbUser})";
+    $fqlMatchGroups = "SELECT gid,name FROM group WHERE gid IN (SELECT gid FROM group_member WHERE uid={$fbUser})";
+    MultiFQL(array('MatchFriends','MatchPages','MatchGroups'));
+    
+    $matchOrder = explode(',',$fbcmdPrefs['status_tag_order']);
+
+    foreach ($matches as $pregMatch) {
+      $nameMatch = $pregMatch[1];
+      $matchList = array();
+      foreach ($matchOrder as $order) {
+        $matchParams = explode(':',$order);
+        if ($matchParams[0] == 'friends') {
+          $matchList = TagFieldMatch($nameMatch, $dataMatchFriends, $matchParams[1], 'uid', $matchParams[2]);
+        }
+        if ($matchParams[0] == 'pages') {
+          $matchList = TagFieldMatch($nameMatch, $dataMatchPages, $matchParams[1], 'page_id', $matchParams[2]);
+        }
+        if ($matchParams[0] == 'groups') {
+          $matchList = TagFieldMatch($nameMatch, $dataMatchGroups, $matchParams[1], 'gid', $matchParams[2]);
+        }
+        if (count($matchList) > 0) {
+          break;
+        }
+      }
+      if (count($matchList) == 1) {
+        $taggedText = "@[{$matchList[0][0]}:{$matchList[0][0]}:{$matchList[0][1]}]";
+      } else {
+        $taggedText = "[[AT]]$nameMatch";
+        if (count($matchList) == 0) {
+          FbcmdWarning("Tag {$pregMatch[0]} had no matches.  Use @@ to avoid tagging");
+        } else {
+          FbcmdWarning("Tag {$pregMatch[0]} had multiple matches: Leaving text untagged");
+          foreach ($matchList as $item) {
+            print "  {$item[1]}\n";
+          }
+        }
+      }
+      $textToTag = str_replace($pregMatch[0],$taggedText,$textToTag);
+    }
+  }
+  
+  $textToTag = str_replace('[[AT]]','@',$textToTag);
+  
+  return $textToTag;
+}  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   function TraceReturn($obj) {
