@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2-unstable2';
+  $fbcmdVersion = '1.0-beta3-dev2-unstable3';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +138,7 @@
   $fbcmdPrefs['print_wrap_auto'] = '1';
   $fbcmdPrefs['print_wrap_width'] = '80';
   $fbcmdPrefs['print_wrap_cut'] = '1';
+  $fbcmdPrefs['print_linefeed_subst'] = '  ';
 
   // CSV Format
   $fbcmdPrefs['print_csv'] = '0';
@@ -166,11 +167,13 @@
   $fbcmdPrefs['folder_show_snippet'] = '1';  
   $fbcmdPrefs['folder_blankrow'] = '1';
   
-  $fbcmdPrefs['message_show_date'] = '0'; //todo wiki
-  $fbcmdPrefs['message_dateformat'] = 'M d H:i';
-  $fbcmdPrefs['message_multirow'] = '1';
-  $fbcmdPrefs['message_linefeed_subst'] = '  ';
-  $fbcmdPrefs['message_blankrow'] = '1';
+  $fbcmdPrefs['msg_show_date'] = '0'; //todo wiki
+  $fbcmdPrefs['msg_dateformat'] = 'M d H:i';
+  $fbcmdPrefs['msg_blankrow'] = '1';
+  
+  $fbcmdPrefs['notices_show_date'] = '0'; //todo wiki
+  $fbcmdPrefs['notices_dateformat'] = 'M d H:i';
+  $fbcmdPrefs['notices_blankrow'] = '1';
 
   // PIC Preferences
   $fbcmdPrefs['pic_show_date'] = '0';
@@ -1242,47 +1245,37 @@
   if ($fbcmdCommand == 'MSG') { //todo wiki 
     ValidateParamCount(1);
     $curThreadId = GetThreadId($fbcmdParams[1]);
-    $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
-    $fqlMessage = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$curThreadId}";
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-    $keyMessageNames = 'id';
-    MultiFQL(array('Thread','Message','MessageNames'));
-    if (!empty($dataMessage)) {
-      PrintHeader(PrintIfPref('show_id','USER_ID'),'FROM',PrintIfPref('message_show_date','DATE'),'MESSAGE');
-      if ($fbcmdPrefs['message_blankrow']) {
-        PrintRow('');
-      }
-      
-      if ($dataThread[0]['subject'] != '') {
-        PrintRow(PrintIfPref('show_id',''),'Subject',PrintIfPref('message_show_date',''),$dataThread[0]['subject']);
-        if ($fbcmdPrefs['message_blankrow']) {
+    if ($curThreadId) {
+      $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
+      $fqlMessage = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$curThreadId}";
+      $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+      $keyMessageNames = 'id';
+      MultiFQL(array('Thread','Message','MessageNames'));
+      if (!empty($dataMessage)) {
+        PrintHeader(PrintIfPref('show_id','USER_ID'),'FROM',PrintIfPref('msg_show_date','DATE'),'MESSAGE');
+        if ($fbcmdPrefs['msg_blankrow']) {
           PrintRow('');
         }
-      }
-      
-      foreach ($dataMessage as $m) {
-        $body = array();
-        if ($fbcmdPrefs['message_multirow']) {
-          $body = explode("\n",$m['body']);
-        } else {
-          if ($fbcmdPrefs['message_linefeed_subst']) {
-            $body[] = str_replace("\n", $fbcmdPrefs['message_linefeed_subst'], $m['body']);
-          } else {
-            $body[] = $m['body'];
+        
+        if ($dataThread[0]['subject'] != '') {
+          PrintRow(PrintIfPref('show_id',''),'Subject',PrintIfPref('msg_show_date',''),$dataThread[0]['subject']);
+          if ($fbcmdPrefs['msg_blankrow']) {
+            PrintRow('');
           }
         }
         
-        foreach ($body as $b) {
+        foreach ($dataMessage as $m) {
           // note: the created_time field appears to be flakey
           if ($m['created_time'] == '') {
             $displayDate = '';
           } else {
-            $displayDate = date($fbcmdPrefs['message_dateformat'],$m['created_time']);
+            $displayDate = date($fbcmdPrefs['msg_dateformat'],$m['created_time']);
           }
-          PrintRow(PrintIfPref('show_id',$m['author_id']),ProfileName($m['author_id']),PrintIfPref('message_show_date',$displayDate),$b);
-        }
-        if ($fbcmdPrefs['message_blankrow']) {
-          PrintRow('');
+          PrintRow(PrintIfPref('show_id',$m['author_id']),ProfileName($m['author_id']),PrintIfPref('msg_show_date',$displayDate),$m['body']);
+          //todo: attachments?
+          if ($fbcmdPrefs['msg_blankrow']) {
+            PrintRow('');
+          }
         }
       }
     }
@@ -1314,8 +1307,7 @@
 
   if ($fbcmdCommand == 'NOTICES') { //todo, wiki
     ValidateParamCount(0,1);
-    //SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
-    SetDefaultParam(1,'');
+    SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
     if ((strtoupper($fbcmdParams[1]) == 'UNREAD')||(strtoupper($fbcmdParams[1]) == 'MARKREAD')) {
       $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0 AND is_unread = 1";
     } else {
@@ -1337,6 +1329,12 @@
           PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'from',ProfileName($n['sender_id']));
           $prefix = ':';
         }
+
+        if ($fbcmdPrefs['notices_show_date']) {
+          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'date',date($fbcmdPrefs['notices_dateformat'],$n['created_time']));
+          $prefix = ':';
+        }
+
         if ($n['title_text'] != '') {
           PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
           $prefix = ':';
@@ -2870,6 +2868,10 @@ function PrintCsvRow($rowIn) {
       if ($bookend) {
         $col = $fbcmdPrefs['csv_bookend'] . $col . $fbcmdPrefs['csv_bookend'];
       }
+      if ($fbcmdPrefs['print_linefeed_subst']) {
+        $col = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $col);
+      }
+
       $rowOut[] = $col;
     }
     print implode($fbcmdPrefs['csv_separator'],$rowOut) . "\n";
@@ -2912,23 +2914,29 @@ function PrintCsvRow($rowIn) {
               $printMatrix = array();
               foreach ($backupMatrix as $row) {
                 if (isset($row[$colToWrap])) {
-                  if (strlen($row[$colToWrap]) > $rightWidth) {
-                    $rightCol = array_pop($row);
-                    $wrapped = wordwrap($rightCol,$rightWidth,"\n",$fbcmdPrefs['print_wrap_cut']);
-                    $newRows = explode("\n",$wrapped);
-                    foreach ($newRows as $nr) {
-                      $addRow = $row;
-                      array_push($addRow,$nr);
-                      $printMatrix[] = CleanColumns($addRow);
-                    }
-                  } else {
-                    $printMatrix[] = $row;
+                  $rightCol = array_pop($row);
+                  $wrapped = wordwrap($rightCol,$rightWidth,"\n",$fbcmdPrefs['print_wrap_cut']);
+                  $newRows = explode("\n",$wrapped);
+                  foreach ($newRows as $nr) {
+                    $addRow = $row;
+                    array_push($addRow,$nr);
+                    $printMatrix[] = CleanColumns($addRow);
                   }
                 } else {
                   $printMatrix[] = $row;
                 }
               }
               //array_splice              
+            }
+          }
+        } else {
+          if ($fbcmdPrefs['print_linefeed_subst']) {
+            $colToWrap = count($columnWidth) - 1;
+            for ($j=0; $j < count($printMatrix); $j++) {
+              if (isset($printMatrix[$j][$colToWrap])) {
+                //$row[$colToWrap] = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $row[$colToWrap]);
+                $printMatrix[$j][$colToWrap] = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $printMatrix[$j][$colToWrap]);
+              }
             }
           }
         }
@@ -2959,8 +2967,7 @@ function PrintCsvRow($rowIn) {
     if ($fbcmdPrefs['folder_show_threadid']) {
       $threadInfo[] = 'THREAD_ID';
     }
-    $timeInfo = PrintIfPref('folder_show_date','DATE');
-    PrintHeader($threadInfo,$timeInfo,'FIELD','VALUE');
+    PrintHeader($threadInfo,'FIELD','VALUE');
     if ($fbcmdPrefs['folder_blankrow']) {
       PrintRow('');
     }    
@@ -2985,13 +2992,11 @@ function PrintCsvRow($rowIn) {
       $threadInfo[] = $thread['thread_id'];
     }
     
-    $timeInfo = PrintIfPref('folder_show_date',date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
-
     $subjectShow = $thread['subject'];
     if ($subjectShow == '') {
       $subjectShow = '[no subject]';
     }
-    PrintRow($threadInfo,$timeInfo,'subject',$subjectShow);
+    PrintRow($threadInfo,'subject',$subjectShow);
     
     $recipientsList = array();
     foreach ($thread['recipients'] as $r) {
@@ -3000,14 +3005,20 @@ function PrintCsvRow($rowIn) {
       }
     }
     $recipientsShow = implode(',',$recipientsList);    
-    PrintRow($threadInfo,$timeInfo,':to/from',$recipientsShow);        
+    PrintRow($threadInfo,':to/from',$recipientsShow);        
+    
+    
+    if ($fbcmdPrefs['folder_show_date']) {
+      PrintRow($threadInfo,':date', date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
+    }
+    
     
     if ($fbcmdPrefs['folder_show_snippet']) {
       $snippetShow = str_replace("\n", ' ', $thread['snippet']);
       if (count($recipientsList) > 1) {
         $snippetShow = ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
       }
-      PrintRow($threadInfo,$timeInfo,':snippet', $snippetShow);
+      PrintRow($threadInfo,':snippet', $snippetShow);
     }
 
     if ($fbcmdPrefs['folder_blankrow']) {
