@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable11';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable12';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -367,7 +367,7 @@
     'FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL',
     'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
     'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTIFY','NSEND','OPICS',
-    'MESSAGE','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
+    'MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
     'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS','STATUS',
     'STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION','WALLPOST','WHOAMI'
   );
@@ -1228,7 +1228,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MESSAGE') { //todo wiki -- rename to MSG?
+  if ($fbcmdCommand == 'MSG') { //todo wiki 
     ValidateParamCount(1);
     $curThreadId = GetThreadId($fbcmdParams[1]);
     $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
@@ -1923,7 +1923,7 @@
     }
     $eCode = $e->getCode();
     if ($eCode == 612) {
-      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MESSAGE')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
+      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MSG')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
         FbcmdPermissions('read_mailbox');
       } else {
         FbcmdPermissions('read_stream');
@@ -3290,7 +3290,7 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function ShowUsage() { //todo add new commands
+  function ShowUsage() { 
     global $fbcmdVersion;
 
     print "\n";
@@ -3353,6 +3353,9 @@ function PrintCsvRow($rowIn) {
     print "  FGROUPS   [flist]                                                            \n";
     print "            List groups that friend(s) are members of                          \n\n";
 
+    print "  FINBOX    [flist]                                                            \n";
+    print "            Display messages from friend(s)                                    \n\n";
+
     print "  FINFO     fields [flist]                                                     \n";
     print "            List information fields for friend(s) (see UFIELDS)                \n\n";
 
@@ -3381,7 +3384,10 @@ function PrintCsvRow($rowIn) {
     print "            Displays a stream post with all of the comments                    \n\n";
 
     print "  HELP      <no parameters>                                                    \n";
-    print "            Display this message                                               \n\n";
+    print "            Display this help message                                          \n\n";
+
+    print "  INBOX     [count]                                                            \n";
+    print "            Display the latest n messages from the inbox                       \n\n";
 
     print "  LIKE      post_ids                                                           \n";
     print "            Like a story that appears in the stream                            \n\n";
@@ -3398,6 +3404,9 @@ function PrintCsvRow($rowIn) {
     print "  LOADNOTE  title filename                                                     \n";
     print "            Same as FEEDNOTE but loads the contents from a file                \n\n";
 
+    print "  MSG       message_id                                                         \n";
+    print "            Displays a message thread                                          \n\n";
+    
     print "  MUTUAL    flist                                                              \n";
     print "            List friend(s) in common with other friend(s)                      \n\n";
 
@@ -3443,6 +3452,9 @@ function PrintCsvRow($rowIn) {
     print "  SAVEPREF  [filename]                                                         \n";
     print "            Save your current preferences / switch settings to a file          \n\n";
 
+    print "  SENTMAIL  [count]                                                            \n";
+    print "            Display the latest n messages from your sent mail folder           \n\n";
+
     print "  SFILTERS  <no parameters>                                                    \n";
     print "            Display available stream filters for the STREAM command            \n\n";
 
@@ -3454,6 +3466,9 @@ function PrintCsvRow($rowIn) {
 
     print "  TAGPIC    pic_id target [x y]                                                \n";
     print "            Tag a photo                                                        \n\n";
+
+    print "  UPDATES   [count]                                                            \n";
+    print "            Display the latest n updates from pages you are a fan of           \n\n";
 
     print "  UFIELDS   <no parameters>                                                    \n";
     print "            List current user table fields (for use with FINFO)                \n\n";
