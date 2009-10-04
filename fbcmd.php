@@ -247,6 +247,7 @@
   $fbcmdPrefs['default_loadnote_title'] = '';
   $fbcmdPrefs['default_loadnote_filename'] = '';
   $fbcmdPrefs['default_mutual_flist'] = '=ALL';
+  $fbcmdPrefs['default_notices_type'] = '';
   $fbcmdPrefs['default_nsend_flist'] = '=ME';
   $fbcmdPrefs['default_nsend_message'] = '';
   $fbcmdPrefs['default_opics_flist'] = '=ME';
@@ -371,8 +372,8 @@
     'DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE',
     'FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL',
     'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
-    'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTIFY','NSEND','OPICS',
-    'MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
+    'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTICES','NOTIFY','NSEND',
+    'OPICS','MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
     'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS','STATUS',
     'STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION','WALLPOST','WHOAMI'
   );
@@ -1267,7 +1268,7 @@
         }
         
         foreach ($body as $b) {
-          // the created_time field appears to be flakey
+          // note: the created_time field appears to be flakey
           if ($m['created_time'] == '') {
             $displayDate = '';
           } else {
@@ -1304,7 +1305,65 @@
     } while ($curChunkIds);
   }
 
-  ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'NOTICES') { //todo, wiki
+    ValidateParamCount(0,1);
+    //SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
+    SetDefaultParam(1,'');
+    if ((strtoupper($fbcmdParams[1]) == 'UNREAD')||(strtoupper($fbcmdParams[1]) == 'MARKREAD')) {
+      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0 AND is_unread = 1";
+    } else {
+      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0";
+    }
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT sender_id FROM #fqlNotification)';
+    $keyMessageNames = 'id';
+    $fqlApplicationNames = 'SELECT app_id,display_name FROM application WHERE app_id IN (SELECT app_id FROM #fqlNotification)';
+    $keyApplicationNames = 'app_id';
+    MultiFQL(array('Notification','MessageNames','ApplicationNames'));
+    
+    if (!empty($dataNotification)) {
+      //PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataNotification as $n) {
+        $threadNum++;
+        $prefix = '';
+        if ($n['sender_id'] != $fbUser) {
+          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'from',ProfileName($n['sender_id']));
+          $prefix = ':';
+        }
+        if ($n['title_text'] != '') {
+          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
+          $prefix = ':';
+        }        
+        if ($n['body_text'] != '') {
+          PrintRow($threadNum,ProfileName($n['app_id']),$prefix . 'body',strip_tags($n['body_text']));
+        }
+        PrintRow('');
+      }
+      if (strtoupper($fbcmdParams[1]) == 'MARKREAD') {
+        $unreadIds = array();
+        foreach ($dataNotification as $n) {
+          $unreadIds[] = $n['notification_id'];
+        }
+        if (count($unreadIds) > 0) {
+          $fbReturn = $fbObject->api_client->call_method('facebook.Notifications.markRead',array('notification_ids' => implode(',',$unreadIds)));
+          TraceReturn($fbReturn);
+        }
+      }
+    }
+  }
+  
+  function MarkRead($notificationId) {
+    global $fbObject;
+    print "MARKING: $notificationId \n";
+    
+    $fbReturn = $fbObject->api_client->call_method('facebook.Notifications.markRead',array('notification_ids' => $notificationId));
+    TraceReturn($fbReturn);
+
+  }
+
+////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'NOTIFY') {
     ValidateParamCount(0);
@@ -3218,6 +3277,7 @@ function PrintCsvRow($rowIn) {
     global $indexStreamNames;
     global $indexMessageNames;
     global $indexFlistNames;
+    global $indexApplicationNames;
     if (isset($indexFriendBaseInfo[$id])) {
       return $indexFriendBaseInfo[$id]['name'];
     }
@@ -3232,6 +3292,9 @@ function PrintCsvRow($rowIn) {
     }
     if (isset($indexFlistNames[$id])) {
       return $indexFlistNames[$id]['name'];
+    }
+    if (isset($indexApplicationNames[$id])) {
+      return $indexApplicationNames[$id]['display_name'];
     }
     return 'unknown';
   }
