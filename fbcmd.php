@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable9';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable10';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2265,7 +2265,12 @@
     }
     if (count($flistMatchArray)==0) {
       if ($failOnEmpty) {
-        FbcmdFatalError("Empty flist: {$flistString}");
+        if (strtoupper($flistString) == '=BDAY') {
+          print "No Friends With Birthdays Today\n";
+          exit;
+        } else {
+          FbcmdFatalError("Empty flist: {$flistString}");
+        }
       } else {
         $flistMatchIdString = '';
       }
