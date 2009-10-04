@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2-unstable4';
+  $fbcmdVersion = '1.0-beta3-dev2-unstable5';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -135,10 +135,12 @@
   $fbcmdPrefs['trace'] = '0';
   $fbcmdPrefs['facebook_debug'] = false;
   $fbcmdPrefs['print_wrap'] = '1'; //todo wiki
-  $fbcmdPrefs['print_wrap_auto'] = '1';
+  $fbcmdPrefs['print_wrap_env_var'] = 'COLUMNS';
   $fbcmdPrefs['print_wrap_width'] = '80';
+  $fbcmdPrefs['print_wrap_min_width'] = '20';
   $fbcmdPrefs['print_wrap_cut'] = '1';
   $fbcmdPrefs['print_linefeed_subst'] = '  ';
+  $fbcmdPrefs['print_col_padding'] = '2';
 
   // CSV Format
   $fbcmdPrefs['print_csv'] = '0';
@@ -2892,7 +2894,7 @@ function PrintCsvRow($rowIn) {
         // Determine column widths
         foreach ($printMatrix as $row) {
           while (count($row) > count($columnWidth)) {
-            $columnWidth [] = 0;
+            $columnWidth[] = 0;
           }
           for ($i=0; $i<count($row); $i++) {
             if (strlen($row[$i])>$columnWidth[$i]) {
@@ -2900,41 +2902,44 @@ function PrintCsvRow($rowIn) {
             }
           }
         }
+        // Add padding
+        for ($i=0; $i<count($columnWidth)-1; $i++) {
+          $columnWidth[$i] += $fbcmdPrefs['print_col_padding'];
+        }
         
         if ($fbcmdPrefs['print_wrap']) {
-          $totalWidth = 0;
-          $totalWidth = array_sum($columnWidth);
-          if ($totalWidth - 2 >= $fbcmdPrefs['print_wrap_width']) {
-            // need to wrap
-            $colToWrap = count($columnWidth) - 1;
-            $leftWidth = ($totalWidth - $columnWidth[$colToWrap] - 2);
-            $rightWidth = $fbcmdPrefs['print_wrap_width'] - $leftWidth - 1;
-            if ($rightWidth >= 20) { // don't wrap if there are < 20 characters // todo
-              $backupMatrix = $printMatrix;
-              $printMatrix = array();
-              foreach ($backupMatrix as $row) {
-                if (isset($row[$colToWrap])) {
-                  $rightCol = array_pop($row);
-                  $wrapped = wordwrap($rightCol,$rightWidth,"\n",$fbcmdPrefs['print_wrap_cut']);
-                  $newRows = explode("\n",$wrapped);
-                  foreach ($newRows as $nr) {
-                    $addRow = $row;
-                    array_push($addRow,$nr);
-                    $printMatrix[] = CleanColumns($addRow);
-                  }
-                } else {
-                  $printMatrix[] = $row;
-                }
-              }
-              //array_splice              
+          $consoleWidth = $fbcmdPrefs['print_wrap_width'];
+          if ($fbcmdPrefs['print_wrap_env_var']) {
+            if (getenv($fbcmdPrefs['print_wrap_env_var'])) {
+              $consoleWidth = getenv($fbcmdPrefs['print_wrap_env_var']);
             }
           }
-        } else {
+          $colToWrap = count($columnWidth) - 1;
+          $wrapWidth = $consoleWidth - array_sum($columnWidth) + $columnWidth[$colToWrap] - 1;
+          if ($wrapWidth < $fbcmdPrefs['print_wrap_min_width']) { 
+            $wrapWidth = $columnWidth[$colToWrap]+1;
+          }
+          $backupMatrix = $printMatrix;
+          $printMatrix = array();
+          foreach ($backupMatrix as $row) {
+            if (isset($row[$colToWrap])) {
+              $rightCol = array_pop($row);
+              $wrapped = wordwrap($rightCol,$wrapWidth,"\n",$fbcmdPrefs['print_wrap_cut']);
+              $newRows = explode("\n",$wrapped);
+              foreach ($newRows as $nr) {
+                $addRow = $row;
+                array_push($addRow,$nr);
+                $printMatrix[] = CleanColumns($addRow);
+              }
+            } else {
+              $printMatrix[] = $row;
+            }
+          }
+        } else { 
           if ($fbcmdPrefs['print_linefeed_subst']) {
             $colToWrap = count($columnWidth) - 1;
             for ($j=0; $j < count($printMatrix); $j++) {
               if (isset($printMatrix[$j][$colToWrap])) {
-                //$row[$colToWrap] = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $row[$colToWrap]);
                 $printMatrix[$j][$colToWrap] = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $printMatrix[$j][$colToWrap]);
               }
             }
@@ -2944,7 +2949,7 @@ function PrintCsvRow($rowIn) {
         foreach ($printMatrix as $row) {
           for ($i=0; $i<count($row); $i++) {
             if ($i < count($row)-1) {
-              print str_pad($row[$i], $columnWidth[$i]+2, ' ');
+              print str_pad($row[$i], $columnWidth[$i], ' ');
             } else {
               print $row[$i];
             }
