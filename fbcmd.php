@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev2-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1067,7 +1067,7 @@
     SetDefaultParam(2,$fbcmdPrefs['default_fstream_count']);
     GetFlistIds($fbcmdParams[1],true);
     if (strtoupper($fbcmdParams[2])=='NEW') {
-      CheckTimeStamp();
+      CheckStreamTimeStamp();
       $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE source_id IN ({$flistMatchIdString}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
     } else {
       $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE source_id IN ({$flistMatchIdString}) LIMIT {$fbcmdParams[2]}";
@@ -1113,9 +1113,14 @@
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
     if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 and unread > 0";
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 AND unread > 0";
     } else {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+      if (strtoupper($fbcmdParams[1]) == 'NEW') {
+        CheckMailTimeStamp();
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 AND updated_time > {$lastMailData['timestamp']}";
+      } else {
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+      }
     }
     $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
     $keyMessageNames = 'id';
@@ -1675,9 +1680,14 @@
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_sentmail_count']);
     if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 and unread > 0";
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 AND unread > 0";
     } else {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 LIMIT {$fbcmdParams[1]}";
+      if (strtoupper($fbcmdParams[1]) == 'NEW') {
+        CheckMailTimeStamp();
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 AND updated_time > {$lastMailData['timestamp']}";
+      } else {
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 LIMIT {$fbcmdParams[1]}";
+      }
     }
     $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
     $keyMessageNames = 'id';
@@ -1755,7 +1765,7 @@
       }
     }
     if (strtoupper($fbcmdParams[2])=='NEW') {
-      CheckTimeStamp();
+      CheckStreamTimeStamp();
       $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE filter_key IN ({$filterKeyQuery}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
     } else {
       $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE filter_key IN ({$filterKeyQuery}) LIMIT {$fbcmdParams[2]}";
@@ -1825,9 +1835,14 @@
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
     if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 and unread > 0";
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND unread > 0";
     } else {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
+      if (strtoupper($fbcmdParams[1]) == 'NEW') {
+        CheckMailTimeStamp();
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND updated_time > {$lastMailData['timestamp']}";
+      } else {
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
+      }
     }
     $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
     $keyMessageNames = 'id';
@@ -1936,15 +1951,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function CheckTimeStamp() {
+  function CheckMailTimeStamp() {
+    LoadMailData();
+    global $fbcmdPrefs;
+    global $lastMailData;
+    if (!isset($lastMailData['timestamp'])) {
+      if ($fbcmdPrefs['mail_save']) {
+        FbcmdFatalError("Unexpected: Could not determine timestamp from last folder command");
+      } else {
+        FbcmdFatalError("NEW requires the preference -mail_save to be set");
+      }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function CheckStreamTimeStamp() {
     LoadPostData();
     global $fbcmdPrefs;
     global $lastPostData;
     if (!isset($lastPostData['timestamp'])) {
-      if ($fbcmdPrefs('stream_save')) {
+      if ($fbcmdPrefs['stream_save']) {
         FbcmdFatalError("Unexpected: Could not determine timestamp from last stream command");
       } else {
-        FbcmdFatalError("NEW requires the preference -savepostdata to be set");
+        FbcmdFatalError("NEW requires the preference -stream_save to be set");
       }
     }
   }
