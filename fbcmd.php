@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev1-unstable10';
+  $fbcmdVersion = '1.0-beta3-dev1-unstable11';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -130,7 +130,7 @@
   $fbcmdPrefs['quiet'] = '0';
   $fbcmdPrefs['print_blanks'] = '0';
   $fbcmdPrefs['print_header'] = '1';
-  $fbcmdPrefs['hide_dup_rows'] = '0';
+  $fbcmdPrefs['hide_dup_rows'] = '1';
   $fbcmdPrefs['show_id'] = '0';
   $fbcmdPrefs['trace'] = '0';
   $fbcmdPrefs['facebook_debug'] = false;
@@ -362,21 +362,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdCommandList = array(
-  'ADDALBUM',  'ADDPIC',    'ADDPICD',   'ALBUMS',
-  'ALLINFO',   'APICS',     'AUTH',      'COMMENT',
-  'DELPOST',   'DISPLAY',   'EVENTS',    'FEED1',
-  'FEED2',     'FEEDLINK',  'FEEDNOTE',  'FEVENTS',
-  'FGROUPS',   'FINFO',     'FLAST',     'FONLINE',
-  'FPICS',     'FQL',       'FRIENDS',   'FSTATUS',
-  'FSTREAM',   'FULLPOST',  'HELP',      'INBOX',
-  'LIKE',      'LIMITS',    'LOADDISP',  'LOADINFO',
-  'LOADNOTE',  'MUTUAL',    'NOTIFY',    'NSEND',     
-  'OPICS',     'MESSAGE',   'POST',      'POSTIMG',   
-  'POSTMP3',   'POSTVID',   'PPICS',     'RECENT',
-  'RESET',     'RESTATUS',  'SAVEDISP',  'SAVEINFO',
-  'SAVEPREF',  'SENTMAIL',  'SFILTERS',  'STATUS',
-  'STREAM',    'TAGPIC',    'UFIELDS',   'UPDATES',   
-  'USAGE',     'VERSION',   'WALLPOST',  'WHOAMI'
+    'ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','COMMENT',
+    'DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE',
+    'FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL',
+    'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
+    'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTIFY','NSEND','OPICS',
+    'MESSAGE','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
+    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS','STATUS',
+    'STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION','WALLPOST','WHOAMI'
   );
 
   if (isset($fbcmd_include_newCommands)) {
@@ -868,6 +861,28 @@
         }
       }
     } while ($curChunkIds);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'FINBOX') { //todo, wiki
+    ValidateParamCount(1);
+    GetFlistIds($fbcmdParams[1]);
+    $matchInRecipients = "('" . implode("' in recipients OR '",$flistMatchArray) . "' in recipients)";
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
+    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 and $matchInRecipients";
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1908,7 +1923,7 @@
     }
     $eCode = $e->getCode();
     if ($eCode == 612) {
-      if (($defaultCommand == 'INBOX')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
+      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MESSAGE')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
         FbcmdPermissions('read_mailbox');
       } else {
         FbcmdPermissions('read_stream');
