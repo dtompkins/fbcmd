@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev2-unstable3';
+  $fbcmdVersion = '1.0-beta3-dev2-unstable4';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2333,7 +2333,7 @@
           } else {
             global $dataPageId;
             foreach ($dataPageId as $page_id) {
-              array_push_unique($flistMatchArray,$page_id[0]); // TODO: should be $page_id['page_id']; // SEE BUG: http://bugs.developers.facebook.com/show_bug.cgi?id=5977
+              array_push_unique($flistMatchArray,$page_id['page_id']);
             }
           }
           continue;
