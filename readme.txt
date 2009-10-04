@@ -10,21 +10,28 @@
 //                                                                            //
 //   [Project Home Page & wiki]  http://fbcmd.dtompkins.com                   //
 //   [Facebook Page]             http://facebook.com/fbcmd                    //
+//   [Discussion Group]          http://groups.google.com/group/fbcmd         //
 //   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
 //                                                                            //
 //   Copyright (c) 2007,2009 Dave Tompkins                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
+//                                                                            //
+//   See http://fbcmd.dtompkins.com/history/ for a revision history.          //
+//                                                                            //
+////////////////////////////////////////////////////////////////////////////////
 
-RELEASE NOTES (1.00-beta3)
-* This is a BETA release, but very stable
-* It's being kept at BETA until a few design details are 'finalized'
+See the Project Home Page & wiki for more information:
 
-GENERAL INSTALLATION GUIDE
-* http://fbcmd.dtompkins.com/installation
+[Installation]  http://fbcmd.dtompkins.com/installation
+[Syntax]        http://fbcmd.dtompkins.com/syntax
+[Commands]      http://fbcmd.dtompkins.com/commands
+[Help]          http://fbcmd.dtompkins.com/help
 
-COPYRIGHT
-* see fbcmd.php for information
+For ways of keeping your version up-to-date:
 
-REVISION HISTORY:
-* http://fbcmd.dtompkins.com/history
+[Update]        http://fbcmd.dtompkins.com/update
+
+To get involved in the project, or get some help:
+
+[Contribute]    http://fbcmd.dtompkins.com/contribute

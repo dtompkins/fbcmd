@@ -13,6 +13,7 @@
 //                                                                            //
 //   [Project Home Page & wiki]  http://fbcmd.dtompkins.com                   //
 //   [Facebook Page]             http://facebook.com/fbcmd                    //
+//   [Discussion Group]          http://groups.google.com/group/fbcmd         //
 //   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
 //                                                                            //
 //   Copyright (c) 2007,2009 Dave Tompkins                                    //
@@ -39,11 +40,11 @@
 //   Having said all that, the author would love you to send him:             //
 //   Suggestions,  Modifications and Improvements for re-distribution.        //
 //                                                                            //
-//   email: mail+fbcmd [@at@] dtompkins.com                                   //
+//   http://fbcmd.dtompkins.com/contribute                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
-//   See http://fbcmd.dtompkins.com/history/ for a revision history.          //
+//   http://fbcmd.dtompkins.com/history/ for a revision history.              //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -52,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.00-beta3-dev1';
+  $fbcmdVersion = '1.0-beta3-dev1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -109,7 +110,9 @@
   $fbcmdPrefs['keyfile'] = "{$fbcmdBaseDir}sessionkeys.txt";
   $fbcmdPrefs['prefs'] = ''; // (none)
   $fbcmdPrefs['postfile'] = "{$fbcmdBaseDir}postdata.txt";
-  $fbcmdPrefs['stream_save'] = '1';
+  $fbcmdPrefs['stream_save'] = '1';  
+  $fbcmdPrefs['mailfile'] = "{$fbcmdBaseDir}maildata.txt";
+  $fbcmdPrefs['mail_save'] = '1';
 
   // FBCMD Application Specific
   $fbcmdPrefs['appkey'] = 'd96ea311638cf65f04b33c87eacf371e';
@@ -127,7 +130,7 @@
   $fbcmdPrefs['quiet'] = '0';
   $fbcmdPrefs['print_blanks'] = '0';
   $fbcmdPrefs['print_header'] = '1';
-  $fbcmdPrefs['hide_dup_rows'] = '0';
+  $fbcmdPrefs['hide_dup_rows'] = '1';
   $fbcmdPrefs['show_id'] = '0';
   $fbcmdPrefs['trace'] = '0';
   $fbcmdPrefs['facebook_debug'] = false;
@@ -151,6 +154,18 @@
   $fbcmdPrefs['stream_show_attachments'] = '0';
   $fbcmdPrefs['stream_show_likes'] = '1';
   $fbcmdPrefs['stream_show_comments'] = '1';
+  
+  $fbcmdPrefs['folder_show_date'] = '0'; //todo wiki
+  $fbcmdPrefs['folder_dateformat'] = 'M d H:i';
+  $fbcmdPrefs['folder_show_threadid'] = '0';
+  $fbcmdPrefs['folder_show_snippet'] = '1';  
+  $fbcmdPrefs['folder_blankrow'] = '1';
+  
+  $fbcmdPrefs['message_show_date'] = '0'; //todo wiki
+  $fbcmdPrefs['message_dateformat'] = 'M d H:i';
+  $fbcmdPrefs['message_multirow'] = '1';
+  $fbcmdPrefs['message_linefeed_subst'] = '  ';
+  $fbcmdPrefs['message_blankrow'] = '1';
 
   // PIC Preferences
   $fbcmdPrefs['pic_show_date'] = '0';
@@ -181,6 +196,7 @@
   $fbcmdPrefs['restatus_comment_new'] = '1';
   $fbcmdPrefs['savepref_include_files'] = '0';
   $fbcmdPrefs['stream_new_from'] = 'created_time';
+  $fbcmdPrefs['update_branch'] = 'master'; //todo wiki
 
   // Parameter Defaults
   $fbcmdPrefs['default_addalbum_title'] = '';
@@ -220,6 +236,7 @@
   $fbcmdPrefs['default_fstatus_flist'] = '=ALL';
   $fbcmdPrefs['default_fstream_flist'] = '=ALL';
   $fbcmdPrefs['default_fstream_count'] = '10';
+  $fbcmdPrefs['default_inbox_count'] = '10';
   $fbcmdPrefs['default_loaddisp_filename'] = '';
   $fbcmdPrefs['default_loadinfo_filename'] = '';
   $fbcmdPrefs['default_loadnote_title'] = '';
@@ -263,16 +280,18 @@
   $fbcmdPrefs['default_recent_count'] = '10';
   $fbcmdPrefs['default_savedisp_filename'] = '';
   $fbcmdPrefs['default_saveinfo_filename'] = '';
+  $fbcmdPrefs['default_sentmail_count'] = '10';    
   $fbcmdPrefs['default_stream_filter'] = '1';
   $fbcmdPrefs['default_stream_count'] = '10';
   $fbcmdPrefs['default_tagpic_pid'] = '';
   $fbcmdPrefs['default_tagpic_target'] = '=ME';
   $fbcmdPrefs['default_tagpic_x'] = '50';
   $fbcmdPrefs['default_tagpic_y'] = '50';
+  $fbcmdPrefs['default_updates_count'] = '10';    
   $fbcmdPrefs['default_wallpost_flist'] = '=ME';
   $fbcmdPrefs['default_wallpost_message'] = '';
 
-  $fbcmdPrefAliases = array(
+  $fbcmdPrefAliases = array( //todo mailfile, new switches
     'af' => 'apics_filename',
     'bl' => 'print_blanks',
     'ch' => 'flist_chunksize',
@@ -294,7 +313,7 @@
     'pdf' => 'pic_dateformat',
     'pf' => 'ppics_filename',
     'plink' => 'pic_show_links',
-    'posts' => 'postfile',
+    'posts' => 'postfile', 
     'ppsize' => 'ppic_size',
     'pr' => 'pic_retry_count',
     'prd' => 'pic_retry_delay',
@@ -343,20 +362,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdCommandList = array(
-  'ADDALBUM',  'ADDPIC',    'ADDPICD',   'ALBUMS',
-  'ALLINFO',   'APICS',     'AUTH',      'COMMENT',
-  'DELPOST',   'DISPLAY',   'EVENTS',    'FEED1',
-  'FEED2',     'FEEDLINK',  'FEEDNOTE',  'FEVENTS',
-  'FGROUPS',   'FINFO',     'FLAST',     'FONLINE',
-  'FPICS',     'FQL',       'FRIENDS',   'FSTATUS',
-  'FSTREAM',   'FULLPOST',  'HELP',      'LIKE',
-  'LIMITS',    'LOADDISP',  'LOADINFO',  'LOADNOTE',
-  'MUTUAL',    'NOTIFY',    'NSEND',     'OPICS',
-  'POST',      'POSTIMG',   'POSTMP3',   'POSTVID',
-  'PPICS',     'RECENT',    'RESET',     'RESTATUS',
-  'SAVEDISP',  'SAVEINFO',  'SAVEPREF',  'SFILTERS',
-  'STATUS',    'STREAM',    'TAGPIC',    'UFIELDS',
-  'USAGE',     'VERSION',   'WALLPOST',  'WHOAMI'
+    'ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','COMMENT',
+    'DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE',
+    'FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL',
+    'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
+    'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTIFY','NSEND','OPICS',
+    'MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
+    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS','STATUS',
+    'STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION','WALLPOST','WHOAMI'
   );
 
   if (isset($fbcmd_include_newCommands)) {
@@ -852,6 +865,28 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'FINBOX') { //todo, wiki
+    ValidateParamCount(1);
+    GetFlistIds($fbcmdParams[1]);
+    $matchInRecipients = "('" . implode("' in recipients OR '",$flistMatchArray) . "' in recipients)";
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
+    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 and $matchInRecipients";
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'FINFO') {
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_finfo_fields']);
@@ -1068,6 +1103,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'INBOX') { //todo, wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 and unread > 0";
+    } else {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+    }
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'LIKE') {
     ValidateParamCount(1);
     $likesList = explode(',',$fbcmdParams[1]);
@@ -1168,6 +1226,54 @@
     }
   }
 
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'MSG') { //todo wiki 
+    ValidateParamCount(1);
+    $curThreadId = GetThreadId($fbcmdParams[1]);
+    $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
+    $fqlMessage = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$curThreadId}";
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','Message','MessageNames'));
+    if (!empty($dataMessage)) {
+      PrintHeader(PrintIfPref('show_id','USER_ID'),'FROM',PrintIfPref('message_show_date','DATE'),'MESSAGE');
+      if ($fbcmdPrefs['message_blankrow']) {
+        PrintRow('');
+      }
+      
+      if ($dataThread[0]['subject'] != '') {
+        PrintRow(PrintIfPref('show_id',''),'Subject',PrintIfPref('message_show_date',''),$dataThread[0]['subject']);
+        if ($fbcmdPrefs['message_blankrow']) {
+          PrintRow('');
+        }
+      }
+      
+      foreach ($dataMessage as $m) {
+        $body = array();
+        if ($fbcmdPrefs['message_multirow']) {
+          $body = explode("\n",$m['body']);
+        } else {
+          if ($fbcmdPrefs['message_linefeed_subst']) {
+            $body[] = str_replace("\n", $fbcmdPrefs['message_linefeed_subst'], $m['body']);
+          } else {
+            $body[] = $m['body'];
+          }
+        }
+        
+        foreach ($body as $b) {
+          // the created_time field appears to be flakey
+          if ($m['created_time'] == '') {
+            $displayDate = '';
+          } else {
+            $displayDate = date($fbcmdPrefs['message_dateformat'],$m['created_time']);
+          }
+          PrintRow(PrintIfPref('show_id',$m['author_id']),ProfileName($m['author_id']),PrintIfPref('message_show_date',$displayDate),$b);
+        }
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'MUTUAL') {
@@ -1498,6 +1604,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'SENTMAIL') { //todo, wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_sentmail_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 and unread > 0";
+    } else {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 LIMIT {$fbcmdParams[1]}";
+    }
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'SFILTERS') {
     ValidateParamCount(0);
     $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
@@ -1625,20 +1754,35 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'VERSION') {
-    ValidateParamCount(0);
-    try {
-      $fbOnlineVersion = @file_get_contents('http://fbcmd.dtompkins.com/attachments/curversion.txt');
-    } catch (Exception $e) {
-      FbcmdFatalError('Could not connect to http://fbcmd.dtompkins.com/');
+  if ($fbcmdCommand == 'UPDATES') { //todo, wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 and unread > 0";
+    } else {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
     }
-    if ($fbOnlineVersion == '') {
-      FbcmdFatalError('Could not connect to http://fbcmd.dtompkins.com/');
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
     }
-    PrintHeader('THIS_VERSION','ONLINE_VERSION','DOWNLOAD_URL');
-    PrintRow($fbcmdVersion,$fbOnlineVersion,'http://fbcmd.dtompkins.com/');
   }
-
+  
+////////////////////////////////////////////////////////////////////////////////
+  if ($fbcmdCommand == 'VERSION') { //todo wiki
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['update_branch']);
+    PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH','UPDATE_INSTRUCTIONS');
+    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch'],'http://fbcmd.tompkins.com/update'); //todo wiki
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'WHOAMI') {
@@ -1779,7 +1923,11 @@
     }
     $eCode = $e->getCode();
     if ($eCode == 612) {
-      FbcmdPermissions('read_stream');
+      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MSG')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
+        FbcmdPermissions('read_mailbox');
+      } else {
+        FbcmdPermissions('read_stream');
+      }
     }
     if (($eCode == 200)||($eCode == 250)||($eCode == 281)||($eCode == 282)||($eCode == 323)) {
       FbcmdPermissions('publish_stream');
@@ -2132,7 +2280,12 @@
     }
     if (count($flistMatchArray)==0) {
       if ($failOnEmpty) {
-        FbcmdFatalError("Empty flist: {$flistString}");
+        if (strtoupper($flistString) == '=BDAY') {
+          print "No Friends With Birthdays Today\n";
+          exit;
+        } else {
+          FbcmdFatalError("Empty flist: {$flistString}");
+        }
       } else {
         $flistMatchIdString = '';
       }
@@ -2155,6 +2308,25 @@
     return;
   }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function GetGithubVersion($branch) {
+    try {
+      $phpFile = @file_get_contents("http://github.com/dtompkins/fbcmd/raw/{$branch}/fbcmd.php");
+      preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$phpFile,$matches);
+      if (isset($matches[1])) {
+        $githubVersion = $matches[1];
+      } else {
+        $githubVersion = 'err';
+      }
+      
+    } catch (Exception $e) {
+      $githubVersion = 'unavailable';
+    }
+    return $githubVersion;
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2254,6 +2426,56 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function GetThreadId($p) { //, $allowSpecial = false) {
+    global $lastMailData;
+    global $userStatus;
+    global $fbUser;
+    global $fbObject;
+
+    // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
+      // if ($allowSpecial) {
+        // if (strtoupper($p) == 'CURSTATUS') {
+          // GetCurrentStatus();
+          // if ($userStatus == '') {
+            // FbcmdFatalError("CURSTATUS: Your status is blank");
+          // }
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+        // } else {
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
+        // }
+        // try {
+          // $fbReturn = $fbObject->api_client->fql_query($fql);
+          // TraceReturn($fbReturn);
+        // } catch(Exception $e) {
+          // FbcmdException($e,'GET-POST');
+        // }
+        // if (isset($fbReturn[0]['post_id'])) {
+          // return $fbReturn[0]['post_id'];
+        // } else {
+          // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
+        // }
+      // } else {
+        // global $fbcmdCommand;
+        // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
+      // }
+    // } else {
+      if ($p < 1001) {
+        LoadMailData();
+        if (isset($lastMailData['ids'][$p])) {
+          return $lastMailData['ids'][$p];
+        } else {
+          FbcmdWarning ("Invalid Thread ID: {$p}");
+          return false;
+        }
+      } else {
+        return $p;
+      }
+    // }
+  }  
+
+////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
+
   function IsEmpty($obj) {
     if (is_array($obj)) {
       foreach ($obj as $o) {
@@ -2272,6 +2494,26 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function LoadMailData() {
+    global $fbcmdPrefs;
+    global $lastMailData;
+    if (isset($lastMailData)) {
+      return;
+    } else {
+      $lastMailData = array('0');
+      if ($fbcmdPrefs['mail_save']) {
+        if (!file_exists($fbcmdPrefs['mailfile'])) {
+          FbcmdWarning("Could not locate file {$fbcmdPrefs['mailfile']}");
+        } else {
+          $lastMailData = unserialize(@file_get_contents($fbcmdPrefs['mailfile']));
+        }
+      }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////  
 ////////////////////////////////////////////////////////////////////////////////
 
   function LoadPostData() {
@@ -2529,6 +2771,74 @@ function PrintCsvRow($rowIn) {
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PrintFolderHeader() {
+    global $fbcmdPrefs;
+    $threadInfo = array();
+    if ($fbcmdPrefs['mail_save']) {
+      $threadInfo[] = '[#]';
+    }
+    if ($fbcmdPrefs['folder_show_threadid']) {
+      $threadInfo[] = 'THREAD_ID';
+    }
+    $timeInfo = PrintIfPref('folder_show_date','DATE');
+    PrintHeader($threadInfo,$timeInfo,'FIELD','VALUE');
+    if ($fbcmdPrefs['folder_blankrow']) {
+      PrintRow('');
+    }    
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PrintFolderObject($threadNum, $thread) {
+    global $fbcmdPrefs;
+    global $fbUser;
+
+    $threadInfo = array();
+    if ($fbcmdPrefs['mail_save']) {
+      $showThreadNum = '[' . $threadNum . ']';
+      if ($thread['unread']) {
+        $showThreadNum .= '*';
+      } 
+      $threadInfo[] = $showThreadNum;
+    }
+    if ($fbcmdPrefs['folder_show_threadid']) {
+      $threadInfo[] = $thread['thread_id'];
+    }
+    
+    $timeInfo = PrintIfPref('folder_show_date',date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
+
+    $subjectShow = $thread['subject'];
+    if ($subjectShow == '') {
+      $subjectShow = '[no subject]';
+    }
+    PrintRow($threadInfo,$timeInfo,'subject',$subjectShow);
+    
+    $recipientsList = array();
+    foreach ($thread['recipients'] as $r) {
+      if ($r != $fbUser) {
+        $recipientsList[] = ProfileName($r);
+      }
+    }
+    $recipientsShow = implode(',',$recipientsList);    
+    PrintRow($threadInfo,$timeInfo,':to/from',$recipientsShow);        
+    
+    if ($fbcmdPrefs['folder_show_snippet']) {
+      $snippetShow = str_replace("\n", ' ', $thread['snippet']);
+      if (count($recipientsList) > 1) {
+        $snippetShow = ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
+      }
+      PrintRow($threadInfo,$timeInfo,':snippet', $snippetShow);
+    }
+
+    if ($fbcmdPrefs['folder_blankrow']) {
+      PrintRow('');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////  
 ////////////////////////////////////////////////////////////////////////////////
 
   function PrintHeader() {
@@ -2838,6 +3148,7 @@ function PrintCsvRow($rowIn) {
     global $indexFriendBaseInfo;
     global $indexPageNames;
     global $indexStreamNames;
+    global $indexMessageNames;
     global $indexFlistNames;
     if (isset($indexFriendBaseInfo[$id])) {
       return $indexFriendBaseInfo[$id]['name'];
@@ -2848,12 +3159,31 @@ function PrintCsvRow($rowIn) {
     if (isset($indexStreamNames[$id])) {
       return $indexStreamNames[$id]['name'];
     }
+    if (isset($indexMessageNames[$id])) {
+      return $indexMessageNames[$id]['name'];
+    }
     if (isset($indexFlistNames[$id])) {
       return $indexFlistNames[$id]['name'];
     }
     return 'unknown';
   }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveMailData($obj) {
+    global $fbcmdPrefs;
+    if ($fbcmdPrefs['mail_save']) {
+      $saveMailData = array ('ids' => array('0'), 'timestamp' => time());
+      foreach ($obj as $thread) {
+        $saveMailData['ids'][] = $thread['thread_id'];
+      }
+      if (@file_put_contents($fbcmdPrefs['mailfile'],serialize($saveMailData)) == false) {
+        FbcmdWarning("Could not generate mailfile {$fbcmdPrefs['mailfile']}");
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2918,7 +3248,7 @@ function PrintCsvRow($rowIn) {
         $savePostData['ids'][] = $post['post_id'];
       }
       if (@file_put_contents($fbcmdPrefs['postfile'],serialize($savePostData)) == false) {
-        FbcmdWarning("Could not generate keyfile {$fbcmdPrefs['postfile']}");
+        FbcmdWarning("Could not generate postfile {$fbcmdPrefs['postfile']}");
       }
     }
   }
@@ -2960,7 +3290,7 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function ShowUsage() {
+  function ShowUsage() { 
     global $fbcmdVersion;
 
     print "\n";
@@ -3023,6 +3353,9 @@ function PrintCsvRow($rowIn) {
     print "  FGROUPS   [flist]                                                            \n";
     print "            List groups that friend(s) are members of                          \n\n";
 
+    print "  FINBOX    [flist]                                                            \n";
+    print "            Display messages from friend(s)                                    \n\n";
+
     print "  FINFO     fields [flist]                                                     \n";
     print "            List information fields for friend(s) (see UFIELDS)                \n\n";
 
@@ -3051,7 +3384,10 @@ function PrintCsvRow($rowIn) {
     print "            Displays a stream post with all of the comments                    \n\n";
 
     print "  HELP      <no parameters>                                                    \n";
-    print "            Display this message                                               \n\n";
+    print "            Display this help message                                          \n\n";
+
+    print "  INBOX     [count]                                                            \n";
+    print "            Display the latest n messages from the inbox                       \n\n";
 
     print "  LIKE      post_ids                                                           \n";
     print "            Like a story that appears in the stream                            \n\n";
@@ -3068,6 +3404,9 @@ function PrintCsvRow($rowIn) {
     print "  LOADNOTE  title filename                                                     \n";
     print "            Same as FEEDNOTE but loads the contents from a file                \n\n";
 
+    print "  MSG       message_id                                                         \n";
+    print "            Displays a message thread                                          \n\n";
+    
     print "  MUTUAL    flist                                                              \n";
     print "            List friend(s) in common with other friend(s)                      \n\n";
 
@@ -3113,6 +3452,9 @@ function PrintCsvRow($rowIn) {
     print "  SAVEPREF  [filename]                                                         \n";
     print "            Save your current preferences / switch settings to a file          \n\n";
 
+    print "  SENTMAIL  [count]                                                            \n";
+    print "            Display the latest n messages from your sent mail folder           \n\n";
+
     print "  SFILTERS  <no parameters>                                                    \n";
     print "            Display available stream filters for the STREAM command            \n\n";
 
@@ -3124,6 +3466,9 @@ function PrintCsvRow($rowIn) {
 
     print "  TAGPIC    pic_id target [x y]                                                \n";
     print "            Tag a photo                                                        \n\n";
+
+    print "  UPDATES   [count]                                                            \n";
+    print "            Display the latest n updates from pages you are a fan of           \n\n";
 
     print "  UFIELDS   <no parameters>                                                    \n";
     print "            List current user table fields (for use with FINFO)                \n\n";
