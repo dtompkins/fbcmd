@@ -133,7 +133,7 @@
   $fbcmdPrefs['print_clean'] = '1'; // todo wiki
   $fbcmdPrefs['show_id'] = '0';
   $fbcmdPrefs['trace'] = '0';
-  $fbcmdPrefs['facebook_debug'] = false;
+  $fbcmdPrefs['facebook_debug'] = '0';
   $fbcmdPrefs['print_wrap'] = '1'; //todo wiki
   $fbcmdPrefs['print_wrap_env_var'] = 'COLUMNS';
   $fbcmdPrefs['print_wrap_width'] = '80';

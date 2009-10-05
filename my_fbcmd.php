@@ -21,12 +21,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // This is a sample program to show how to create your own COMMAND(S) for FBCMD
-// see: http://fbcmd.dtompkins.com/help/how-to/add-command
+// see: http://fbcmd.dtompkins.com/help/how-to/add-command for more info.
+
+// *** WARNING: Do *NOT* modify this file: if you use the fbcmd_update utility
+//              this file will be updated & replaced.  Create your own instead.
+
+// If you have a new command and would like to share it with others, visit:
+// http http://fbcmd.dtompkins.com/contribute
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step One: include the fbcmd_include.php
 
-  require 'fbcmd_include.php';
+  require 'support/fbcmd_include.php';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step Two: Run the FbcmdInitInclude() procedure
@@ -36,7 +42,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Step Three: Add any arguments to be appended
 
-  //FbcmdAddArgument('-preference=value');
+  FbcmdAddArgument('-quiet=0');
+  FbcmdAddArgument('-facebook_debug=0');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step Four: List your new commands so that FBCMD will recognize them
@@ -46,7 +53,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Step Five: Include (run) FBCMD
 
-  require '../fbcmd.php';
+  require 'fbcmd.php';
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step Six: Add your own commands:
