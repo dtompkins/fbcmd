@@ -169,7 +169,7 @@
   $comment3 = "or copy this file to a pathed folder";
   
   $execPath = realpath("{$installDir}fbcmd.php");
-  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+  if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
     $contentsBatch = "@echo off\n";
     $contentsBatch .= "REM *** {$comment1} by fbcmd_update.php\n";
     $contentsBatch .= "REM *** {$comment2}\n";
@@ -187,13 +187,21 @@
   print "Generating script file: [{$batchName}]...";
   if (@file_put_contents("{$batchName}",$contentsBatch)) {
     print "ok\n";
+    if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
+      print "Making script file executable: [{$batchName}]...";
+      if (chmod($batchName,0755)) {
+        print "ok\n";
+      } else {
+        print "fail (do it maually)\n";
+      }
   } else {
     print "fail!\n";
     exit;
   }
-  print "\nScript File: $comment1\n";
-  print "$comment2\n";
-  print "$comment3\n";
+  print "\nScript File: [{$batchName}]...\n";
+  print "{$comment1}\n";
+  print "{$comment2}\n";
+  print "{$comment3}\n";
   
   print "\n";
   
