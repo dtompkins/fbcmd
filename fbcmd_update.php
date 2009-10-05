@@ -22,7 +22,7 @@
 
 // This is a Utility to update your version of fbcmd
 
-  print "\nFBCMD Update Utility -- version 2\n\n";
+  print "\nFBCMD Update Utility -- version 2.1\n\n";
   print "http://fbcmd.dtompkins.com/update for help\n\n";
   
   print "syntax:    php fbcmd_update.php DIRECTORY [BRANCH]\n";
@@ -163,6 +163,39 @@
   
   print "\nUpdate: COMPLETE!\n\n";
   print "FBCMD Version: [{$oldVersion}] --> [{$newVersion}]\n\n";
+
+  $comment1 = "This script file was auto-generated";
+  $comment2 = "You should either add this folder to the path";
+  $comment3 = "or copy this file to a pathed folder";
+  
+  $execPath = realpath("{$installDir}fbcmd.php");
+  if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    $contentsBatch = "@echo off\n";
+    $contentsBatch .= "REM *** {$comment1} by fbcmd_update.php\n";
+    $contentsBatch .= "REM *** {$comment2}\n";
+    $contentsBatch .= "REM *** {$comment3}\n";
+    $contentsBatch .= "php $execPath %*\n";
+    $batchName = "{$installDir}fbcmd.bat";
+  } else {
+    $contentsBatch = "#! /bin/bash\n";
+    $contentsBatch .= "# *** {$comment1} by fbcmd_update.php\n";
+    $contentsBatch .= "# *** {$comment2}\n";
+    $contentsBatch .= "# *** {$comment3}\n";
+    $contentsBatch .= "php $execPath %*\n"; // todo add column widths
+    $batchName = "{$installDir}fbcmd";
+  }
+  print "Generating script file: [{$batchName}]...";
+  if (@file_put_contents("{$batchName}",$contentsBatch)) {
+    print "ok\n";
+  } else {
+    print "fail!\n";
+    exit;
+  }
+  print "\nScript File: $comment1\n";
+  print "$comment2\n";
+  print "$comment3\n";
+  
+  print "\n";
   
   exit;
   
