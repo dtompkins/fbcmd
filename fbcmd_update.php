@@ -22,9 +22,7 @@
 
 // This is a Utility to update your version of fbcmd
 
-// TODO: better description
-
-  print "\nFBCMD Update Utility -- version 1\n\n";
+  print "\nFBCMD Update Utility -- version 2\n\n";
   print "http://fbcmd.dtompkins.com/update for help\n\n";
   
   print "syntax:    php fbcmd_update.php DIRECTORY [BRANCH]\n";
@@ -46,9 +44,10 @@
     $dirFbcmd = CleanPath('.');
   }
   
-// set some simple defaults:
-  $fbcmdPrefs['pic_mkdir_mode'] = 0777;
+  // set some simple defaults:
+  $fbcmdPrefs['mkdir_mode'] = 0777;
   $fbcmdPrefs['update_branch'] = 'master';
+  
   if (file_exists("{$dirFbcmd}prefs.php")) {
     print "Found: preference file: {$dirFbcmd}prefs.php\n";
     print "Loading: preferences...\n";
@@ -119,7 +118,7 @@
       print "Saving new updater: [{$installDir}fbcmd_update.php]...";
       if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
         print "ok\n";
-        print "Update INCOMPLETE: run new updater: {$installDir}fbcmd_update.php\n";
+        print "\nUpdate INCOMPLETE: run new updater: {$installDir}fbcmd_update.php\n";
         exit;
       } else {
         print "fail!\n";
@@ -160,7 +159,6 @@
   
   exit;
   
-  
   function GetGithub($filename, $save = true) {
     global $branch;
     global $installDir;
@@ -187,8 +185,7 @@
     return $fileContents;
   }
 
-  function CleanPath($curPath)
-  {
+  function CleanPath($curPath) {
     $path = $curPath;
     if ($path == '') {
       $path = './';
@@ -206,7 +203,7 @@
     $filePath = dirname($fileName);
     if (!file_exists($filePath)) {
       print "Creating Directory: [{$filePath}]... ";
-      if (mkdir($filePath,$fbcmdPrefs['pic_mkdir_mode'],true)) {
+      if (mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
         print "ok\n";
       } else {
         print "fail!\n";
