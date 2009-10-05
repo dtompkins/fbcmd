@@ -156,7 +156,7 @@
   }
   
   print "\nUpdate: COMPLETE!\n\n";
-  print "FBCMD Version: [{$oldVersion}] --> [{$newversion}]\n\n";
+  print "FBCMD Version: [{$oldVersion}] --> [{$newVersion}]\n\n";
   
   exit;
   
