@@ -33,7 +33,11 @@
   } else {
     $installDir = CleanPath('.');
   }
-  print "Updating files in: {$installDir}\n";
+  $addPath = realpath("{$installDir}");
+  if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+    $addPath = str_replace('/', '\\', $addPath);
+  }  
+  print "Installation Directory: {$addPath}\n";  
 
   $dirFbcmd = getenv('FBCMD');
   if ($dirFbcmd) {
@@ -162,13 +166,10 @@
     }
   }
   
-  print "\nUpdate: COMPLETE!\n\n";
-  print "FBCMD Version: [{$oldVersion}] --> [{$newVersion}]\n\n";
-
   $comment1 = "This script file was auto-generated";
   $comment2 = "You should either add this folder to the path";
-  $comment3 = "or copy this file to a pathed folder";
-  
+  $comment3 = "or copy this file to a pathed folder";  
+
   $execPath = realpath("{$installDir}fbcmd.php");
   if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
     $contentsBatch = "@echo off\n";
@@ -193,20 +194,39 @@
       if (chmod($batchName,0755)) {
         print "ok\n";
       } else {
-        print "fail (do it maually)\n";
+        print "fail (do it maually: chmod +x fbcmd)\n";
       }
     }
   } else {
     print "fail!\n";
     exit;
   }
-  print "\nScript File: [{$batchName}]...\n";
-  print "{$comment1}\n";
-  print "{$comment2}\n";
-  print "{$comment3}\n";
   
   print "\n";
+
+  $currentPath = getenv('PATH');  
+  if (stripos($currentPath,$addPath)) {
+    print "Found: current path appears to include {$addPath}\n";
+    $showPath = false;
+  } else {
+    $showPath = true;
+  }
   
+  print "\nUpdate: COMPLETE!\n\n";
+  print "FBCMD Version: [{$oldVersion}] --> [{$newVersion}]\n\n";  
+  
+  if ($showPath) {
+    print "\nNote: Your PATH does not appear to include {$addPath}\n";
+    print "To add {$addPath} to your path:\n";    
+    if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+      print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
+      print "Edit the PATH entry and add: ;{$addPath}\n\n";
+    } else {
+      print "Add the following line to your ~/.bash_profile file:\n";
+      print "  PATH=$PATH:{$addPath}; export PATH\n\n";
+    }
+  }
+
   exit;
   
   function GetGithub($filename, $save = true) {
