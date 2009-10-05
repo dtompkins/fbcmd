@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev4-unstable3';
+  $fbcmdVersion = '1.0-beta3-dev4-unstable4';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -422,16 +422,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  // include the Facebook API code
-
-  // try {
-    // if(!include_once('facebook/facebook.php')) {
-      // FbcmdFatalError('Missing Facebook API files: can\'t find facebook*.php in ' . get_include_path());
-    // }
-    // if(!include_once('facebook/facebook_desktop.php')) {
-      // FbcmdFatalError('Missing Facebook API files: can\'t find facebook*.php in ' . get_include_path());
-    // }
-  // }
+  require_once('facebook/facebook.php');
+  require_once('facebook/facebook_desktop.php');
   
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -525,6 +517,12 @@
     $fbUser = $fbObject->api_client->users_getLoggedInUser();
   } catch (Exception $e) {
     FbcmdException($e,'Could not use session key / log in user');
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == '');
+    ShowUsage();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
