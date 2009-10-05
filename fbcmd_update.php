@@ -115,18 +115,24 @@
       print "Current or local updater is identical\n";
     } else {
       print "Current or local updater does not match\n";
+      CheckPath("{$installDir}fbcmd_update.php");
       print "Saving new updater: [{$installDir}fbcmd_update.php]...";
       if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
         print "ok\n";
-        print "\nUpdate INCOMPLETE: run new updater: {$installDir}fbcmd_update.php\n";
-        exit;
+        print "\nUpdate INCOMPLETE: run new updater: {$installDir}fbcmd_update.php\n\n";
+        if (!isset($argv[3])) {
+          exit;
+        }
       } else {
         print "fail!\n";
-        print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n";
-        exit;
+        print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n\n";
+        if (!isset($argv[3])) {
+          exit;
+        }
       }
     }
   } else {
+    CheckPath("{$installDir}fbcmd_update.php");  
     print "Saving new updater: [{$installDir}fbcmd_update.php]...";
     if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
       print "ok\n";
@@ -190,7 +196,6 @@
     if ($path == '') {
       $path = './';
     }
-    $path = realpath($path);
     $path = str_replace('\\', '/', $path);
     if ($path[strlen($path)-1] != '/') {
       $path .= '/';
