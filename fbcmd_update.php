@@ -100,21 +100,19 @@
   
   $contentsRemoteUpdater = GetGithub("fbcmd_update.php",false);
   
-  $fileDest = "{$installDir}/{$filename}";
-  
   if ($contentsCurrentUpdater) {
     if ($contentsCurrentUpdater == $contentsRemoteUpdater) {
       print "Current updater is identical\n";
     } else {
       print "Current updater does not match\n";
-      print "Saving: [{$installDir}/fbcmd_update.php]...";
-      if (@file_put_contents("{$installDir}/fbcmd_update.php",$contentsRemoteUpdater)) {
+      print "Saving new updater: [{$installDir}fbcmd_update.php]...";
+      if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
         print "ok\n";
-        print "Update INCOMPLETE: run {$installDir}/fbcmd_update.php\n";
+        print "Update INCOMPLETE: run new updater: {$installDir}fbcmd_update.php\n";
         exit;
       } else {
         print "fail!\n";
-        print "Fatal error: could not save [{$installDir}/fbcmd_update.php]\n";
+        print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n";
       }
     }
   } else {
@@ -132,7 +130,7 @@
     global $branch;
     global $installDir;
     $fileSrc = "http://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
-    $fileDest = "{$installDir}/{$filename}";
+    $fileDest = "{$installDir}{$filename}";
     print "Downloading: [$fileSrc]... ";
     $fileContents = @file_get_contents($fileSrc);
     if ($fileContents) {
