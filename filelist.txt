@@ -12,10 +12,6 @@ gpl.txt         # GNU General Public License
 
 #############################################################################
 
-.gitignore      # List of files to ignore for developers using git
-
-#############################################################################
-
 # The Following are core Facebook API interface & support files
 
 facebook/facebook.php
@@ -46,6 +42,8 @@ support/sample-loadinfo-text.php   # sample for the LOADINFO command
 # postdata.txt         # cached stream id data (from STREAM commands)
 # maildata.txt         # cached folder id data (from INBOX commands)
 
+#############################################################################
+
 
 #############################################################################
 
@@ -56,3 +54,4 @@ support/sample-loadinfo-text.php   # sample for the LOADINFO command
 
 # fbmcd.bat          # The batch file to run FBCMD (Windows)
 # fbcmd              # The bash file to run FBCMD (Other)
+
