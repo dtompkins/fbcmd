@@ -148,7 +148,7 @@
     print "Saving new updater: [{$installDir}fbcmd_update.php]...";
     if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
       print "ok\n";
-      print "\nUpdate INCOMPLETE: restart with new updater: {$installDir}fbcmd_update.php\n\n";
+      print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
       FatalError();
     } else {
       print "fail!\n";
