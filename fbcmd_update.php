@@ -181,7 +181,7 @@
     $contentsBatch .= "# *** {$comment1} by fbcmd_update.php\n";
     $contentsBatch .= "# *** {$comment2}\n";
     $contentsBatch .= "# *** {$comment3}\n";
-    $contentsBatch .= "php $execPath %*\n"; // todo add column widths
+    $contentsBatch .= "php $execPath $* -print_wrap_width=$(tput cols)\n";
     $batchName = "{$installDir}fbcmd";
   }
   print "Generating script file: [{$batchName}]...";
