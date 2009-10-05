@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev4-unstable4';
+  $fbcmdVersion = '1.0-beta3-dev4-unstable5';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -81,20 +81,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   // You can set an environment variable FBCMD to specify the location of
-  // your sessionkeys.txt file, prefs.php, postdata.txt, maildata.txt file...
-  // it defaults to c:\fbcmd\ (windows) or ~/fbcmd/ (linux/other)
+  // your peronal files: sessionkeys.txt, prefs.php, postdata.txt, maildata.txt
+  
+  // Defaults: Windows:          %USERPROFILE%\fbcmd or c:\fbcmd\ if not set
+  // Defaults: Mac/Linux/Other:  $HOME/.fbcmd (~/.fbcmd)
 
-  if ($fbcmdBaseDir = getenv('FBCMD')) {
+  $fbcmdBaseDir = getenv('FBCMD');
+  if ($fbcmdBaseDir) {
     $fbcmdBaseDir = CleanPath($fbcmdBaseDir);
   } else {
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-      $fbcmdBaseDir = 'c:/fbcmd/';
+      if (getenv('USERPROFILE')) {
+        $fbcmdBaseDir = CleanPath(getenv('USERPROFILE')) . 'fbcmd/';
+      } else {
+        $fbcmdBaseDir = 'c:/fbcmd/';
+      }
     } else {
-      $fbcmdBaseDir = CleanPath(getenv('HOME')) . 'fbcmd/';
+      $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
     }
   }
-  //set_include_path (get_include_path() . PATH_SEPARATOR . $fbcmdBaseDir);
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   // This section sets your preferences
@@ -190,7 +196,7 @@
   $fbcmdPrefs['opics_filename'] = '[pid].jpg';
 
   $fbcmdPrefs['pic_skip_exists'] = '1';
-  $fbcmdPrefs['pic_mkdir'] = '1';
+  $fbcmdPrefs['auto_mkdir'] = '1';
   $fbcmdPrefs['pic_retry_count'] = '10';
   $fbcmdPrefs['pic_retry_delay'] = '2';
 
@@ -429,6 +435,7 @@
 
   if ($fbcmdCommand == 'RESET') {
     ValidateParamCount(0);
+    VerifyOutputDir($fbcmdPrefs['keyfile']);
     if (@file_put_contents($fbcmdPrefs['keyfile'],"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n")==false) {
       FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
     }
@@ -450,6 +457,7 @@
     }
     $fbcmdUserSessionKey = $session['session_key'];
     $fbcmdUserSecretKey = $session['secret'];
+    VerifyOutputDir($fbcmdPrefs['keyfile']);
     if (@file_put_contents ($fbcmdPrefs['keyfile'],"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n")==false) {
       FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
     }
@@ -3890,10 +3898,11 @@ function TagText($textToTag) {
 
   function VerifyOutputDir($fileName) {
     global $fbcmdPrefs;
+    $fileName = str_replace('\\', '/', $fileName);
     if (strrpos($fileName,'/')) {
       $filePath = CleanPath(substr($fileName,0,strrpos($fileName,'/')));
       if (!file_exists($filePath)) {
-        if ($fbcmdPrefs['pic_mkdir']) {
+        if ($fbcmdPrefs['auto_mkdir']) {
           if (!mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
             FbcmdFatalError("Could Not Create Path: {$filePath}");
           }
