@@ -224,7 +224,6 @@
   
   if ($showPath) {
     print "\nNote: Your PATH does not appear to include {$fullPath}\n";
-    print "To add {$fullPath} to your path:\n";    
     if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
       print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
       print "Edit the PATH entry and add: ;{$fullPath}\n";
@@ -235,14 +234,16 @@
   }
   
   if (!$isFbcmdSet) {
-    print "\nNote: The environment variable FBCMD is not set\n";
     if (file_exists("{$fbcmdBaseDir}sessionkeys.txt")) {    
-      print "fbcmd is storing your user files in: {$fbcmdBaseDir}\n";
+      print "\nNote: fbcmd is storing your key files and preferences in: {$fbcmdBaseDir}\n";
     } else {
-      print "By default, fbcmd will store your user files in: {$fbcmdBaseDir}\n";
+      print "\nBy default, fbcmd will store your key files and preferences in: {$fbcmdBaseDir}\n";
+      print "\nYou can set the the environment variable FBCMD to change this location\n";
     }
   }
 
+  print "\n";
+  
   exit;
   
   function GetGithub($filename, $save = true) {
