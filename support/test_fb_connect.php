@@ -3,12 +3,12 @@
 
   $GLOBALS['facebook_config']['debug'] = false;
   
-  print "\n";  
+  set_include_path (get_include_path() . PATH_SEPARATOR . '../');
   
   try {
-    if(!@include_once('../facebook/facebookapi_php5_restlib.php')) throw new Exception('');
-    if(!@include_once('../facebook/facebook.php')) throw new Exception('');
-    if(!@include_once('../facebook/facebook_desktop.php')) throw new Exception('');
+    if(!include_once('facebook/facebookapi_php5_restlib.php')) throw new Exception('');
+    if(!include_once('facebook/facebook.php')) throw new Exception('');
+    if(!include_once('facebook/facebook_desktop.php')) throw new Exception('');
   } catch (Exception $e) {
     print 'Missing Facebook API files: can\'t find facebook*.php in ' . get_include_path();
     print "\n";    

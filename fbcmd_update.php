@@ -24,39 +24,48 @@
 
 // TODO: better description
 
-  print "FBCMD Update Utility -- version 1\n";
+  print "\nFBCMD Update Utility -- version 1\n\n";
+  print "http://fbcmd.dtompkins.com/update for help\n\n";
+  
+  print "syntax:    php fbcmd_update.php DIRECTORY [BRANCH]\n";
+  print "default:   php fbcmd_update.php . master\n\n";
+
+  if (isset($argv[1])) {
+    $installDir = CleanPath($argv[1]);
+  } else {
+    $installDir = CleanPath('.');
+  }
+  print "Updating files in: {$installDir}\n";
 
   $dirFbcmd = getenv('FBCMD');
   if ($dirFbcmd) {
     $dirFbcmd = CleanPath($dirFbcmd);
     print "Found: environment variable FBCMD={$dirFbcmd}\n";
-    $installDir = $dirFbcmd;
   } else {
     print "Not found: environment variable FBCMD\n";
-    $installDir = CleanPath('./');
-  }
-  print "Installing software to: {$installDir}\n";
-  
-  $dirFbcmdConfig = getenv('FBCMD_CONFIG');
-  if ($dirFbcmdConfig) {
-    $dirFbcmdConfig = CleanPath($dirFbcmdConfig);
-    print "Found: environment variable FBCMD_CONFIG={$dirFbcmdConfig}\n";
-    $configDir = $dirFbcmdConfig;
-  } else {
-    print "Not found: environment variable FBCMD_CONFIG\n";
-    $configDir = $installDir;
+    $dirFbcmd = CleanPath('.');
   }
   
 // set some simple defaults:
   $fbcmdPrefs['pic_mkdir_mode'] = 0777;
   $fbcmdPrefs['update_branch'] = 'master';
-  
-  if (file_exists("{$configDir}prefs.php")) {
-    print "Found: preference file: {$configDir}prefs.php\n";
+  if (file_exists("{$dirFbcmd}prefs.php")) {
+    print "Found: preference file: {$dirFbcmd}prefs.php\n";
     print "Loading: preferences...\n";
-    include("{$fbcmdBaseDir}prefs.php");
+    include("{$dirFbcmd}prefs.php");
   } else {
-    print "Not found: preference file (using defaults... OK if new installation)\n";
+    print "Not found: preference file (using defaults)\n";
+  }
+  $defaultBranch = strtolower($fbcmdPrefs['update_branch']);
+  if (isset($argv[2])) {
+    $branch = strtolower($argv[2]);
+  } else {
+    $branch = $defaultBranch;
+  }
+  if ($defaultBranch != $branch) {
+    print "Overriding default branch: [$defaultBranch] with [$branch]\n";
+  } else {
+    print "Using default branch: [$branch]\n";
   }
   
   if (file_exists("{$installDir}fbcmd.php")) {
@@ -70,18 +79,6 @@
     }
   } else {
     print "Not found: existing fbcmd.php file (OK if new installation)\n";
-  }
-  
-  $defaultBranch = strtolower($fbcmdPrefs['update_branch']);
-  if (isset($argv[1])) {
-    $branch = strtolower($argv[1]);
-  } else {
-    $branch = $defaultBranch;
-  }
-  if ($defaultBranch != $branch) {
-    print "Overriding default or preferred branch: [$defaultBranch] with specified branch: [$branch]\n";
-  } else {
-    print "Using default or preferred branch: [$branch]\n";
   }
   
   $currentUpdater = $argv[0];
