@@ -215,11 +215,15 @@ class Facebook {
   // Invalidate the session currently being used, and clear any state associated
   // with it. Note that the user will still remain logged into Facebook.
   public function expire_session() {
-    if ($this->api_client->auth_expireSession()) {
+    try {
+      if ($this->api_client->auth_expireSession()) {
+        $this->clear_cookie_state();
+        return true;
+      } else {
+        return false;
+      }
+    } catch (Exception $e) {
       $this->clear_cookie_state();
-      return true;
-    } else {
-      return false;
     }
   }
 

@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev4-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev4-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -425,9 +425,9 @@
   // include the Facebook API code
 
   try {
-    if(!@include_once('facebookapi_php5_restlib.php')) throw new Exception('');
-    if(!@include_once('facebook.php')) throw new Exception('');
-    if(!@include_once('facebook_desktop.php')) throw new Exception('');
+    if(!@include_once('facebook/facebookapi_php5_restlib.php')) throw new Exception('');
+    if(!@include_once('facebook/facebook.php')) throw new Exception('');
+    if(!@include_once('facebook/facebook_desktop.php')) throw new Exception('');
   } catch (Exception $e) {
     FbcmdFatalError('Missing Facebook API files: can\'t find facebook*.php in ' . get_include_path());
   }
