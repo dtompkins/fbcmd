@@ -54,7 +54,7 @@
     print "Loading: preferences...\n";
     include("{$dirFbcmd}prefs.php");
   } else {
-    print "Not found: preference file (using defaults)\n";
+    print "Not found: preference file: [{$dirFbcmd}prefs.php] (using defaults)\n";
   }
   $defaultBranch = strtolower($fbcmdPrefs['update_branch']);
   if (isset($argv[2])) {
