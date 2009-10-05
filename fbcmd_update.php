@@ -67,7 +67,7 @@
     print "Using default branch: [$branch]\n";
   }
 
-  $oldVersion = '';
+  $oldVersion = 'none';
   $newVersion = '';
   if (file_exists("{$installDir}fbcmd.php")) {
     print "Found: existing fbcmd: {$installDir}fbcmd.php\n";
@@ -156,6 +156,7 @@
           $newVersion = $matches[1];
         } else {
           print "Non-fatal error: could not determine new version\n";
+          $newVersion = '???';
         }
       }      
     }
