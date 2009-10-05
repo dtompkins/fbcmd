@@ -12,8 +12,6 @@ gpl.txt         # GNU General Public License
 
 #############################################################################
 
-fbcmd.bat       # Windows batch file to call fbcmd.php
-my_fbcmd.php    # example of how you can create your own commands
 .gitignore      # List of files to ignore for developers using git
 
 #############################################################################
@@ -34,6 +32,7 @@ facebook/jsonwrapper/JSON/LICENSE
 # The following are misc. support files
 
 support/test_fb_connect.php        # Test to see if you can connect to FB
+support/my_fbcmd.php               # example for creating your own commands
 support/fbcmd_include.php          # Helper functions for my_fbcmd.php
 support/sample-loadinfo-img.php    # sample for the LOADINFO command
 support/sample-loadinfo-text.php   # sample for the LOADINFO command
@@ -47,10 +46,13 @@ support/sample-loadinfo-text.php   # sample for the LOADINFO command
 # postdata.txt         # cached stream id data (from STREAM commands)
 # maildata.txt         # cached folder id data (from INBOX commands)
 
+
 #############################################################################
 
-# The following files are special and handled by fbcmd_update differently:
+# The following files are specially handled by fbcmd_update:
 
 # filelist.txt       # This File
 # fbcmd_update.php   # The program to update the fbcmd distribution
 
+# fbmcd.bat          # The batch file to run FBCMD (Windows)
+# fbcmd              # The bash file to run FBCMD (Other)

@@ -3544,6 +3544,7 @@ function PrintCsvRow($rowIn) {
 
   function ShowUsage() { 
     global $fbcmdVersion;
+    global $fbcmd_include_newCommands;
 
     print "\n";
     print "fbcmd [v{$fbcmdVersion}] Facebook Command Line Interface\n\n";
@@ -3739,6 +3740,14 @@ function PrintCsvRow($rowIn) {
 
     print "  WALLPOST  flist message                                                      \n";
     print "            Post a message on the wall of friend(s)                            \n\n";
+    
+    if (isset($fbcmd_include_newCommands)) {
+      print "Additional Commands: \n\n";
+      foreach ($fbcmd_include_newCommands as $c) {
+        print "  $c\n";
+      }
+      print "\n";
+    }
 
     print "examples:\n\n";
 
