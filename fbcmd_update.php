@@ -67,15 +67,17 @@
   } else {
     print "Using default branch: [$branch]\n";
   }
-  
+
+  $oldVersion = '';
+  $newVersion = '';
   if (file_exists("{$installDir}fbcmd.php")) {
     print "Found: existing fbcmd: {$installDir}fbcmd.php\n";
     $oldFbcmdFile = @file_get_contents("{$installDir}fbcmd.php");
     preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$oldFbcmdFile,$matches);
     if (isset($matches[1])) {
-      print "Current version: [{$matches[1]}]\n";
+      $oldVersion = $matches[1];
     } else {
-      print "Non-fatal error: could not determine current version\n";
+      print "Non-fatal error: could not determine old version\n";
     }
   } else {
     print "Not found: existing fbcmd.php file (OK if new installation)\n";
@@ -134,22 +136,27 @@
       print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n";
     }
   }
+  
   $fileList = GetGithub("filelist.txt");
   $files = explode("\n",$fileList);
-  $downloadList = array();
+  
   foreach ($files as $f) {
     $g = preg_replace('/\s*\#.*$/','',$f);
     if ($g) {
-      $downloadList[] = $g;
+      $contents = GetGithub($g);
+      if ($g == 'fbcmd.php') {
+        preg_match("/fbcmdVersion\s=\s'([^']+)'/",$contents,$matches);
+        if (isset($matches[1])) {
+          $newVersion = $matches[1];
+        } else {
+          print "Non-fatal error: could not determine new version\n";
+        }
+      }      
     }
   }
   
-  foreach ($downloadList as $f) {
-    GetGithub($f);
-  }
-  
-  print "\nUpdate: SUCCESS!\n\n";
-  
+  print "\nUpdate: COMPLETE!\n\n";
+  print "FBCMD Version: [{$oldVersion}] --> [{$newversion}]\n\n";
   
   exit;
   
