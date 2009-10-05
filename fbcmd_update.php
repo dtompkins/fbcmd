@@ -125,7 +125,7 @@
       } else {
         print "fail!\n";
         print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n";
-        TODO: exit;
+        exit;
       }
     }
   } else {
