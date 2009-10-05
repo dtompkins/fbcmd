@@ -230,7 +230,7 @@
       print "Edit the PATH entry and add: ;{$fullPath}\n";
     } else {
       print "Add the following line to your ~/.bash_profile file:\n";
-      print "  PATH=$PATH:{$fullPath}; export PATH\n";
+      print "  PATH=\$PATH:{$fullPath}; export PATH\n";
     }
   }
   
