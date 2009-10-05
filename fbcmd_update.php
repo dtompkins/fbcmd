@@ -22,24 +22,24 @@
 
 // This is a Utility to update your version of fbcmd
 
-  print "FBCMD Update Utility -- version 0*\n";
+// TODO: better description
 
-// This is very basic for now... needs to be updated.
+  print "FBCMD Update Utility -- version 1\n";
 
   $dirFbcmd = getenv('FBCMD');
   if ($dirFbcmd) {
-    $dirFbcmd = CleanPath($fbcmdBaseDir);
+    $dirFbcmd = CleanPath($dirFbcmd);
     print "Found: environment variable FBCMD={$dirFbcmd}\n";
     $installDir = $dirFbcmd;
   } else {
     print "Not found: environment variable FBCMD\n";
-    $installDir = "./";
+    $installDir = CleanPath('./');
   }
   print "Installing software to: {$installDir}\n";
   
   $dirFbcmdConfig = getenv('FBCMD_CONFIG');
   if ($dirFbcmdConfig) {
-    $dirFbcmdConfig = CleanPath($fbcmdBaseDir);
+    $dirFbcmdConfig = CleanPath($dirFbcmdConfig);
     print "Found: environment variable FBCMD_CONFIG={$dirFbcmdConfig}\n";
     $configDir = $dirFbcmdConfig;
   } else {
@@ -64,7 +64,7 @@
     $oldFbcmdFile = @file_get_contents("{$installDir}fbcmd.php");
     preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$oldFbcmdFile,$matches);
     if (isset($matches[1])) {
-      print "Current version: {$matches[1]}\n";
+      print "Current version: [{$matches[1]}]\n";
     } else {
       print "Non-fatal error: could not determine current version\n";
     }
@@ -85,8 +85,9 @@
   }
   
   $currentUpdater = $argv[0];
+  $contentsCurrentUpdater = '';  
   if (file_exists("{$currentUpdater}")) {
-    print "Loading local updater: [{$currentUpdater}]... ";
+    print "Loading current updater: [{$currentUpdater}]... ";
     $contentsCurrentUpdater = @file_get_contents($currentUpdater);
     if ($contentsCurrentUpdater) {
       print "ok\n";
@@ -94,17 +95,28 @@
       print "fail! (non-fatal)\n";
     }
   } else {
-    print "Non-fatal error: can't locate current program: [{$currentUpdater}]\n";
-    $contentsCurrentUpdater = '';
+    print "Non-fatal error: can't locate current updater: [{$currentUpdater}]\n";
+    $localUpdater = "{$installDir}fbcmd_update.php";
+    if (file_exists("{$localUpdater}")) {
+      print "Loading local updater: [{$localUpdater}]... ";
+      $contentsCurrentUpdater = @file_get_contents($localUpdater);
+      if ($contentsCurrentUpdater) {
+        print "ok\n";
+      } else {
+        print "fail! (non-fatal)\n";
+      }
+    } else {
+      print "Non-fatal error: can't locate local updater: [{$currentUpdater}]\n";
+    }
   }
   
   $contentsRemoteUpdater = GetGithub("fbcmd_update.php",false);
   
   if ($contentsCurrentUpdater) {
     if ($contentsCurrentUpdater == $contentsRemoteUpdater) {
-      print "Current updater is identical\n";
+      print "Current or local updater is identical\n";
     } else {
-      print "Current updater does not match\n";
+      print "Current or local updater does not match\n";
       print "Saving new updater: [{$installDir}fbcmd_update.php]...";
       if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
         print "ok\n";
@@ -113,14 +125,33 @@
       } else {
         print "fail!\n";
         print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n";
+        TODO: exit;
       }
     }
   } else {
-  
+    print "Saving new updater: [{$installDir}fbcmd_update.php]...";
+    if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
+      print "ok\n";
+    } else {
+      print "fail!\n";
+      print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n";
+    }
   }
- 
+  $fileList = GetGithub("filelist.txt");
+  $files = explode("\n",$fileList);
+  $downloadList = array();
+  foreach ($files as $f) {
+    $g = preg_replace('/\s*\#.*$/','',$f);
+    if ($g) {
+      $downloadList[] = $g;
+    }
+  }
   
-  $fileList = GetGithub("filelist.txt",true);
+  foreach ($downloadList as $f) {
+    GetGithub($f);
+  }
+  
+  print "\nUpdate: SUCCESS!\n\n";
   
   
   exit;
@@ -140,6 +171,7 @@
       exit;
     }
     if ($save) {
+      CheckPath($fileDest);
       print "Saving: [{$fileDest}]... ";
       if (@file_put_contents($fileDest,$fileContents)) {
         print "ok\n";
@@ -153,24 +185,28 @@
 
   function CleanPath($curPath)
   {
-    if ($curPath == '') {
-      return './';
-    } else {
-      $curPath = str_replace('\\', '/', $curPath);
-      if ($curPath[strlen($curPath)-1] != '/') {
-        $curPath .= '/';
-      }
+    $path = $curPath;
+    if ($path == '') {
+      $path = './';
     }
-    return $curPath;
+    $path = realpath($path);
+    $path = str_replace('\\', '/', $path);
+    if ($path[strlen($path)-1] != '/') {
+      $path .= '/';
+    }
+    return $path;
   }
   
-  function CheckOutputDir($fileName) {
-    if (strrpos($fileName,'/')) {
-      $filePath = CleanPath(substr($fileName,0,strrpos($fileName,'/')));
-      if (!file_exists($filePath)) {
-        if (!mkdir($filePath,$fbcmdPrefs['pic_mkdir_mode'],true)) {
-          print "Error: Could Not Create Path: {$filePath}";
-        }
+  function CheckPath($fileName) {
+    global $fbcmdPrefs;
+    $filePath = dirname($fileName);
+    if (!file_exists($filePath)) {
+      print "Creating Directory: [{$filePath}]... ";
+      if (mkdir($filePath,$fbcmdPrefs['pic_mkdir_mode'],true)) {
+        print "ok\n";
+      } else {
+        print "fail!\n";
+        exit;
       }
     }
   }
