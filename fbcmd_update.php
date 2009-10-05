@@ -194,6 +194,7 @@
       } else {
         print "fail (do it maually)\n";
       }
+    }
   } else {
     print "fail!\n";
     exit;
