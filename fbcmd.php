@@ -83,8 +83,8 @@
   // You can set an environment variable FBCMD to specify the location of
   // your peronal files: sessionkeys.txt, prefs.php, postdata.txt, maildata.txt
   
-  // Defaults: Windows:          %USERPROFILE%\fbcmd or c:\fbcmd\ if not set
-  // Defaults: Mac/Linux/Other:  $HOME/.fbcmd (~/.fbcmd)
+  // Defaults: Windows:          %USERPROFILE%\fbcmd\ (c:\Users\YOU\fbcmd\)
+  // Defaults: Mac/Linux/Other:  $HOME/.fbcmd/        (~/.fbcmd/)
 
   $fbcmdBaseDir = getenv('FBCMD');
   if ($fbcmdBaseDir) {
