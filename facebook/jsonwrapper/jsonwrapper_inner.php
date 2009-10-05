@@ -1,6 +1,6 @@
 <?php
 
-require_once 'JSON.php';
+require_once 'JSON/JSON.php';
 
 function json_encode($arg)
 {

@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev3';
+  $fbcmdVersion = '1.0-beta3-dev4';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -81,20 +81,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   // You can set an environment variable FBCMD to specify the location of
-  // your sessionkeys.txt file, prefs.php, posts.txt file...
-  // it defaults to c:\fbcmd\ (windows) or ~/fbcmd/ (linux/other)
+  // your peronal files: sessionkeys.txt, prefs.php, postdata.txt, maildata.txt
+  
+  // Defaults: Windows:          %USERPROFILE%\fbcmd or c:\fbcmd\ if not set
+  // Defaults: Mac/Linux/Other:  $HOME/.fbcmd (~/.fbcmd)
 
-  if ($fbcmdBaseDir = getenv('FBCMD')) {
+  $fbcmdBaseDir = getenv('FBCMD');
+  if ($fbcmdBaseDir) {
     $fbcmdBaseDir = CleanPath($fbcmdBaseDir);
   } else {
     if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-      $fbcmdBaseDir = 'c:/fbcmd/';
+      if (getenv('USERPROFILE')) {
+        $fbcmdBaseDir = CleanPath(getenv('USERPROFILE')) . 'fbcmd/';
+      } else {
+        $fbcmdBaseDir = 'c:/fbcmd/';
+      }
     } else {
-      $fbcmdBaseDir = CleanPath(getenv('HOME')) . 'fbcmd/';
+      $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
     }
   }
-  set_include_path (get_include_path() . PATH_SEPARATOR . $fbcmdBaseDir);
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   // This section sets your preferences
@@ -133,7 +139,7 @@
   $fbcmdPrefs['print_clean'] = '1'; // todo wiki
   $fbcmdPrefs['show_id'] = '0';
   $fbcmdPrefs['trace'] = '0';
-  $fbcmdPrefs['facebook_debug'] = false;
+  $fbcmdPrefs['facebook_debug'] = '0';
   $fbcmdPrefs['print_wrap'] = '1'; //todo wiki
   $fbcmdPrefs['print_wrap_env_var'] = 'COLUMNS';
   $fbcmdPrefs['print_wrap_width'] = '80';
@@ -190,8 +196,7 @@
   $fbcmdPrefs['opics_filename'] = '[pid].jpg';
 
   $fbcmdPrefs['pic_skip_exists'] = '1';
-  $fbcmdPrefs['pic_mkdir'] = '1';
-  $fbcmdPrefs['pic_mkdir_mode'] = 0777;
+  $fbcmdPrefs['auto_mkdir'] = '1';
   $fbcmdPrefs['pic_retry_count'] = '10';
   $fbcmdPrefs['pic_retry_delay'] = '2';
 
@@ -201,6 +206,7 @@
   $fbcmdPrefs['fevents_attend_mask'] = '1';
   $fbcmdPrefs['fgroups_show_id'] = '1';
   $fbcmdPrefs['flist_chunksize'] = '10';
+  $fbcmdPrefs['mkdir_mode'] = 0777;  
   $fbcmdPrefs['online_idle'] = '1';
   $fbcmdPrefs['pic_size'] = '1';
   $fbcmdPrefs['ppic_size'] = '1';
@@ -395,11 +401,11 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (($fbcmdCommand == '')||($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
+  if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
     ShowUsage();
   }
 
-////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////  
 
   if (in_array($fbcmdCommand,array('DFILE','FEED','FEED3','FSTATUSID','FLSTATUS','PICS'))) {
     FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
@@ -407,7 +413,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (!in_array($fbcmdCommand,$fbcmdCommandList)) {
+  if (!in_array($fbcmdCommand,$fbcmdCommandList)&&($fbcmdCommand != '')) {
     FbcmdFatalError("Unknown Command: [{$fbcmdCommand}] try fbcmd HELP");
   }
 
@@ -422,20 +428,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  // include the Facebook API code
-
-  try {
-    if(!@include_once('facebookapi_php5_restlib.php')) throw new Exception('');
-    if(!@include_once('facebook.php')) throw new Exception('');
-    if(!@include_once('facebook_desktop.php')) throw new Exception('');
-  } catch (Exception $e) {
-    FbcmdFatalError('Missing Facebook API files: can\'t find facebook*.php in ' . get_include_path());
-  }
-
+  require_once('facebook/facebook.php');
+  require_once('facebook/facebook_desktop.php');
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'RESET') {
     ValidateParamCount(0);
+    VerifyOutputDir($fbcmdPrefs['keyfile']);
     if (@file_put_contents($fbcmdPrefs['keyfile'],"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n")==false) {
       FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
     }
@@ -457,6 +457,7 @@
     }
     $fbcmdUserSessionKey = $session['session_key'];
     $fbcmdUserSecretKey = $session['secret'];
+    VerifyOutputDir($fbcmdPrefs['keyfile']);
     if (@file_put_contents ($fbcmdPrefs['keyfile'],"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n")==false) {
       FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
     }
@@ -481,23 +482,33 @@
   // attempt to read in the keyfile
 
   if (!file_exists($fbcmdPrefs['keyfile'])) {
-    FbcmdFatalError("Could not locate keyfile {$fbcmdPrefs['keyfile']}");
+    if ($fbcmdCommand != '') {
+      FbcmdFatalError("Could not locate keyfile {$fbcmdPrefs['keyfile']}");
+    }
+    print "\n";
+    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
+    print "It appears to be the first time you are running the application\n";
+    print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
+    print "Note this current (default) location for your keyfile.  If you'd like to\n";
+    print "change this location, create an FBCMD environment variable to point to\n";
+    print "a folder where your personal keyfile and preferences will be stored.\n\n";
+    print "see http://fbcmd.dtompkins.com/installation for more info.\n\n";
+    $fbcmdUserSessionKey = 'EMPTY';
+  } else {
+    $fbcmdKeyFile = file($fbcmdPrefs['keyfile'],FILE_IGNORE_NEW_LINES);
+    if (count($fbcmdKeyFile) < 2) {
+      FbcmdFatalError("Invalid keyfile {$fbcmdPrefs['keyfile']}");
+    }
+    $fbcmdUserSessionKey = $fbcmdKeyFile[0];
+    $fbcmdUserSecretKey = $fbcmdKeyFile[1];
   }
-  $fbcmdKeyFile = file($fbcmdPrefs['keyfile'],FILE_IGNORE_NEW_LINES);
-  if (count($fbcmdKeyFile) < 2) {
-    FbcmdFatalError("Invalid keyfile {$fbcmdPrefs['keyfile']}");
-  }
-  $fbcmdUserSessionKey = $fbcmdKeyFile[0];
-  $fbcmdUserSecretKey = $fbcmdKeyFile[1];
-
   if (strncmp($fbcmdUserSessionKey,'EMPTY',5)==0) {
     if (!$fbcmdPrefs['quiet']) {
       print "\n";
-      print "fbcmd [v{$fbcmdVersion}] Facebook Command Line Interface\n\n";
-      print "Welcome to FBCMD.  To use this applicaiton, you need to obtain a\n";
-      print "facebook authorization code which can be obtained here:\n\n";
+      print "This application is not currently authorized.  To grant authorization,\n";
+      print "Generate an access code at this website:\n\n";
       print "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}\n\n";
-      print "obtain your 6-digit code, and then execute fbcmd AUTH XXXXXX\n\n";
+      print "obtain your 6-digit code (XXXXXX) and then execute fbcmd AUTH XXXXXX\n\n";
     }
     return;
   }
@@ -514,6 +525,12 @@
     $fbUser = $fbObject->api_client->users_getLoggedInUser();
   } catch (Exception $e) {
     FbcmdException($e,'Could not use session key / log in user');
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == '') {
+    ShowUsage();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3527,6 +3544,7 @@ function PrintCsvRow($rowIn) {
 
   function ShowUsage() { 
     global $fbcmdVersion;
+    global $fbcmd_include_newCommands;
 
     print "\n";
     print "fbcmd [v{$fbcmdVersion}] Facebook Command Line Interface\n\n";
@@ -3722,6 +3740,14 @@ function PrintCsvRow($rowIn) {
 
     print "  WALLPOST  flist message                                                      \n";
     print "            Post a message on the wall of friend(s)                            \n\n";
+    
+    if (isset($fbcmd_include_newCommands)) {
+      print "Additional Commands: \n\n";
+      foreach ($fbcmd_include_newCommands as $c) {
+        print "  $c\n";
+      }
+      print "\n";
+    }
 
     print "examples:\n\n";
 
@@ -3881,11 +3907,12 @@ function TagText($textToTag) {
 
   function VerifyOutputDir($fileName) {
     global $fbcmdPrefs;
+    $fileName = str_replace('\\', '/', $fileName);
     if (strrpos($fileName,'/')) {
       $filePath = CleanPath(substr($fileName,0,strrpos($fileName,'/')));
       if (!file_exists($filePath)) {
-        if ($fbcmdPrefs['pic_mkdir']) {
-          if (!mkdir($filePath,$fbcmdPrefs['pic_mkdir_mode'],true)) {
+        if ($fbcmdPrefs['auto_mkdir']) {
+          if (!mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
             FbcmdFatalError("Could Not Create Path: {$filePath}");
           }
         } else {
