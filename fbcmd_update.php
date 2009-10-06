@@ -61,7 +61,7 @@
     $fullPath = str_replace('/', '\\', $fullPath);
   }  
   print "Installation folder: {$fullPath}\n";  
-  CleanPath($installFolder);
+  $installFolder = CleanPath($installFolder);
   CheckPath($installFolder);
   
   $fbcmdBaseDir = getenv('FBCMD');
