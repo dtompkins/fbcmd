@@ -22,21 +22,31 @@
 
 // This is a Utility to update your version of fbcmd
 
-  print "\nFBCMD Update Utility -- version 2.2\n\n";
+  if (isset($argv[0])) {
+    $thisProgram = $argv[0];
+  } else {
+    $thisProgram = "./fbcmd_update.php";
+  }
+  $thisProgramFolder = dirname($thisProgram);
+  
+  print "\nFBCMD Update Utility -- version 2.3\n\n";
   print "http://fbcmd.dtompkins.com/update for help\n\n";
   
-  print "syntax:    php fbcmd_update.php [BRANCH] [DIRECTORY] [CONTINUE_ON_ERR]\n";
-  print "default:   php fbcmd_update.php master . 0\n\n";
+  print "syntax:    php fbcmd_update.php [branch: master|beta|dev] [folder] [ignore_err]\n";
+  print "default:   php fbcmd_update.php master \"{$thisProgramFolder}\" 0\n\n";
   
   $specifiedBranch = '';
   if (isset($argv[1])) {
     $specifiedBranch = strtolower($argv[1]);
+    if (($specifiedBranch=='-h')||($specifiedBranch=='help')||($specifiedBranch=='--help')) {
+      exit;
+    }
   }
-  
+
   if (isset($argv[2])) {
-    $installDir = CleanPath($argv[2]);
+    $installFolder = $argv[2];
   } else {
-    $installDir = CleanPath('.');
+    $installFolder = $thisProgramFolder;
   }
   
   $continueOnError = false;
@@ -45,13 +55,14 @@
       $continueOnError = true;
     }
   }
-
-  CheckPath($installDir);
-  $fullPath = realpath($installDir);
+  
+  $fullPath = realpath($installFolder);
   if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
     $fullPath = str_replace('/', '\\', $fullPath);
   }  
   print "Installation folder: {$fullPath}\n";  
+  CleanPath($installFolder);
+  CheckPath($installFolder);
   
   $fbcmdBaseDir = getenv('FBCMD');
   if ($fbcmdBaseDir) {
@@ -77,8 +88,7 @@
   $fbcmdPrefs['update_branch'] = 'master';
   
   if (file_exists("{$fbcmdBaseDir}prefs.php")) {
-    print "Found: preference file: {$fbcmdBaseDir}prefs.php\n";
-    print "Loading: preferences...\n";
+    print "Loading: preference file: {$fbcmdBaseDir}prefs.php\n";
     include("{$fbcmdBaseDir}prefs.php");
   } else {
     print "Not found: preference file: [{$fbcmdBaseDir}prefs.php] (using defaults)\n";
@@ -96,63 +106,65 @@
     $branch = $defaultBranch; 
     print "Using default branch: [$branch]\n";
   }
+  
+  if (!in_array($branch,array('master','beta','dev'))) {
+    print "Warning: [$branch] is not one of [master|beta|dev]\n";
+  }
 
   $oldVersion = 'none';
   $newVersion = '';
   
-  if (file_exists("{$installDir}fbcmd.php")) {
-    print "Found: existing fbcmd: {$installDir}fbcmd.php\n";
-    $oldFbcmdFile = @file_get_contents("{$installDir}fbcmd.php");
-    preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$oldFbcmdFile,$matches);
+  $mainFile = "{$installFolder}fbcmd.php";
+  $newProgram = "{$installFolder}fbcmd_update.php";
+  
+  if (file_exists($mainFile)) {
+    print "Found: existing fbcmd: {$mainFile}\n";
+    $oldFileContents = @file_get_contents($mainFile);
+    preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$oldFileContents,$matches);
     if (isset($matches[1])) {
       $oldVersion = $matches[1];
     } else {
       print "Non-fatal error: could not determine old version\n";
     }
-  } else {
-    print "Not found: existing fbcmd.php file (OK if new installation)\n";
   }
   
-  $currentUpdater = $argv[0];
   $contentsCurrentUpdater = '';  
-  if (file_exists("{$currentUpdater}")) {
-    print "Loading current updater: [{$currentUpdater}]... ";
-    $contentsCurrentUpdater = @file_get_contents($currentUpdater);
+  if (file_exists($thisProgram)) {
+    print "Loading current updater: [{$thisProgram}]... ";
+    $contentsCurrentUpdater = @file_get_contents($thisProgram);
     if ($contentsCurrentUpdater) {
       print "ok\n";
     } else {
       print "fail! (non-fatal)\n";
     }
-  } else {
-    print "Non-fatal error: can't locate current updater: [{$currentUpdater}]\n";
-    $localUpdater = "{$installDir}fbcmd_update.php";
-    if (file_exists("{$localUpdater}")) {
-      print "Loading local updater: [{$localUpdater}]... ";
-      $contentsCurrentUpdater = @file_get_contents($localUpdater);
-      if ($contentsCurrentUpdater) {
-        print "ok\n";
-      } else {
-        print "fail! (non-fatal)\n";
-      }
-    } else {
-      print "Non-fatal error: can't locate local updater: [{$currentUpdater}]\n";
-    }
   }
-  
+
   $contentsRemoteUpdater = GetGithub("fbcmd_update.php",false);
   
   if ($contentsCurrentUpdater == $contentsRemoteUpdater) {
-    print "Current or local updater is identical\n";
+    print "Current updater is up to date\n";
   } else {
-    print "Current or local updater does not match\n";
-    print "Saving new updater: [{$installDir}fbcmd_update.php]...";
-    if (@file_put_contents("{$installDir}fbcmd_update.php",$contentsRemoteUpdater)) {
+    print "Current updater does not match (is out of date)\n";
+    print "Saving new version: [$newProgram]...";
+    if (@file_put_contents("$newProgram",$contentsRemoteUpdater)) {
       print "ok\n";
-      print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
+      if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
+        print "Making new updater executable...";
+        if (chmod("$newProgram",0755)) {
+          print "ok\n";
+        } else {
+          print "fail (do it maually: chmod +x fbcmd_updater.php)\n";
+        }
+      }
+      if (realpath($thisProgram) == realpath($newProgram)) {
+        print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
+      } else {
+        print "\nUpdate INCOMPLETE: run the NEW updater: [$newProgram]\n\n";
+      }
       FatalError();
     } else {
       print "fail!\n";
-      print "Fatal error: could not save [{$installDir}fbcmd_update.php]\n\n";
+      print "Fatal error: could not save [$newProgram]\n\n";
       FatalError();
     }
   }
@@ -179,21 +191,21 @@
   $comment2 = "You should add the folder [{$fullPath}] to your PATH";
   $comment3 = "or copy this file to a pathed folder";  
 
-  $execPath = realpath("{$installDir}fbcmd.php");
+  $execPath = realpath($mainFile);
   if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
     $contentsBatch = "@echo off\n";
     $contentsBatch .= "REM *** {$comment1}\n";
     $contentsBatch .= "REM *** {$comment2}\n";
     $contentsBatch .= "REM *** {$comment3}\n";
-    $contentsBatch .= "php $execPath %*\n";
-    $batchName = "{$installDir}fbcmd.bat";
+    $contentsBatch .= "php \"$execPath\" %*\n";
+    $batchName = "{$installFolder}fbcmd.bat";
   } else {
     $contentsBatch = "#! /bin/bash\n";
     $contentsBatch .= "# *** {$comment1}\n";
     $contentsBatch .= "# *** {$comment2}\n";
     $contentsBatch .= "# *** {$comment3}\n";
-    $contentsBatch .= "php $execPath $* -print_wrap_width=$(tput cols)\n";
-    $batchName = "{$installDir}fbcmd";
+    $contentsBatch .= "php \"$execPath\" $* -print_wrap_width=$(tput cols)\n";
+    $batchName = "{$installFolder}fbcmd";
   }
   print "Generating script file: [{$batchName}]...";
   if (@file_put_contents("{$batchName}",$contentsBatch)) {
@@ -238,7 +250,7 @@
       print "\nNote: fbcmd is storing your key files and preferences in: {$fbcmdBaseDir}\n";
     } else {
       print "\nBy default, fbcmd will store your key files and preferences in: {$fbcmdBaseDir}\n";
-      print "\nYou can set the the environment variable FBCMD to change this location\n";
+      print "You can set the the environment variable FBCMD to change this location\n";
     }
   }
 
@@ -248,9 +260,9 @@
   
   function GetGithub($filename, $save = true) {
     global $branch;
-    global $installDir;
+    global $installFolder;
     $fileSrc = "http://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
-    $fileDest = "{$installDir}{$filename}";
+    $fileDest = "{$installFolder}{$filename}";
     print "Downloading: [$fileSrc]... ";
     $fileContents = @file_get_contents($fileSrc);
     if ($fileContents) {
