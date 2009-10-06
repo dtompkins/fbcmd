@@ -28,6 +28,7 @@ facebook/jsonwrapper/JSON/LICENSE
 # The following are misc. support files
 
 support/test_fb_connect.php        # Test to see if you can connect to FB
+support/test_php.php               # Test some basic PHP functionality
 support/my_fbcmd.php               # example for creating your own commands
 support/fbcmd_include.php          # Helper functions for my_fbcmd.php
 support/sample-loadinfo-img.php    # sample for the LOADINFO command
