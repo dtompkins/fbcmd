@@ -389,7 +389,7 @@
     'ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','COMMENT',
     'DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE',
     'FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL',
-    'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','INBOX','LIKE','LIMITS',
+    'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','HOME','INBOX','LIKE','LIMITS',
     'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTICES','NOTIFY','NSEND',
     'OPICS','MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
     'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS',
@@ -1135,6 +1135,12 @@
         PrintPostObject($fbcmdParams[1],$dataStream[0],$dataComments);
       }
     }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'HOME') {
+    LaunchBrowser("http://fbcmd.dtompkins.com");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2654,6 +2660,21 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function LaunchBrowser($url) {
+    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+      pclose(popen("start /B $url", "r"));  
+    } else { 
+      if (strtoupper(substr(PHP_OS, 0, 3)) === 'DAR') {
+        exec("open $url > /dev/null &");
+      } else {
+        exec("xdg-open $url > /dev/null &");
+      }
+    } 
+  } 
+  
+////////////////////////////////////////////////////////////////////////////////  
 ////////////////////////////////////////////////////////////////////////////////
 
   function LoadMailData() {
