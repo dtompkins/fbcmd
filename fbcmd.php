@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev4';
+  $fbcmdVersion = '1.0-beta3-dev5-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -83,7 +83,7 @@
   // You can set an environment variable FBCMD to specify the location of
   // your peronal files: sessionkeys.txt, prefs.php, postdata.txt, maildata.txt
   
-  // Defaults: Windows:          %USERPROFILE%\fbcmd\ (c:\Users\YOU\fbcmd\)
+  // Defaults: Windows:          %USERPROFILE%\fbcmd\ (c:\Users\YOURUSERNAME\fbcmd\)
   // Defaults: Mac/Linux/Other:  $HOME/.fbcmd/        (~/.fbcmd/)
 
   $fbcmdBaseDir = getenv('FBCMD');
@@ -1881,8 +1881,8 @@
   if ($fbcmdCommand == 'VERSION') { //todo wiki
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
-    PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH','UPDATE_INSTRUCTIONS');
-    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch'],'http://fbcmd.tompkins.com/update'); //todo wiki
+    PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH');
+    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch']); //todo wiki
   }
   
 ////////////////////////////////////////////////////////////////////////////////
