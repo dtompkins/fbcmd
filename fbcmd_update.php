@@ -24,7 +24,7 @@
 
   print "\nFBCMD Update Utility -- version 2.4\n\n";
   print "php fbcmd_update.php help for some basic syntax\n\n";  
-  print "http://fbcmd.dtompkins.com/update for additional support\n\n";
+  print "http://fbcmd.dtompkins.com/update for additional info\n\n";
   
   if (isset($argv[0])) {
     $thisProgram = $argv[0];
@@ -225,7 +225,7 @@
     $contentsBatch = "#! /bin/bash\n";
     $contentsBatch .= "# *** {$comment1}\n";
     $contentsBatch .= "# *** {$comment2}\n";
-    $contentsBatch .= "# *** {$comment3}\n";
+    $contentsBatch .= "# *** {$comment3} such as /usr/local/bin\n";
     $contentsBatch .= "php \"$execPath\" $* -print_wrap_width=$(tput cols)\n";
     $batchName = "{$installFolder}fbcmd";
   }
