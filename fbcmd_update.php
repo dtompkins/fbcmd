@@ -146,7 +146,9 @@
     print "Current updater is up to date\n";
   } else {
     print "Current updater does not match (is out of date)\n";
-    print "Saving new version: [$newProgram]...";
+  }
+  if (($contentsCurrentUpdater != $contentsRemoteUpdater)||(realpath($thisProgram) != realpath($newProgram))) {  
+    print "Saving: [$newProgram]...";    
     if (@file_put_contents("$newProgram",$contentsRemoteUpdater)) {
       print "ok\n";
       if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
@@ -157,12 +159,14 @@
           print "fail (do it maually: chmod +x fbcmd_updater.php)\n";
         }
       }
-      if (realpath($thisProgram) == realpath($newProgram)) {
-        print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
-      } else {
-        print "\nUpdate INCOMPLETE: run the NEW updater: [$newProgram]\n\n";
+      if ($contentsCurrentUpdater != $contentsRemoteUpdater) {
+        if (realpath($thisProgram) == realpath($newProgram)) {
+          print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
+        } else {
+          print "\nUpdate INCOMPLETE: run the NEW updater: [$newProgram]\n\n";
+        }
+        FatalError();
       }
-      FatalError();
     } else {
       print "fail!\n";
       print "Fatal error: could not save [$newProgram]\n\n";
