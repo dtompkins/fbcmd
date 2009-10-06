@@ -330,6 +330,8 @@
     'id' => 'show_id',
     'idle' => 'online_idle',
     'key' => 'keyfile',
+    'mfile' => 'mailfile',
+    'msave' => 'mail_save',
     'of' => 'opics_filename',
     'pd' => 'pic_show_date',
     'pdf' => 'pic_dateformat',
@@ -3607,7 +3609,7 @@ function PrintCsvRow($rowIn) {
     print "            List groups that friend(s) are members of                          \n\n";
 
     print "  FINBOX    [flist]                                                            \n";
-    print "            Display messages from friend(s)                                    \n\n";
+    print "            Display mail messages from friend(s)                               \n\n";
 
     print "  FINFO     fields [flist]                                                     \n";
     print "            List information fields for friend(s) (see UFIELDS)                \n\n";
@@ -3709,7 +3711,7 @@ function PrintCsvRow($rowIn) {
     print "            Save your current preferences / switch settings to a file          \n\n";
 
     print "  SENTMAIL  [count|unread|new]                                                 \n";
-    print "            Display the latest messages from your sent mail folder             \n\n";
+    print "            Display the latest messages from the sent mail folder              \n\n";
 
     print "  SFILTERS  <no parameters>                                                    \n";
     print "            Display available stream filters for the STREAM command            \n\n";
