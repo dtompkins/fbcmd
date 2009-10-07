@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev5';
+  $fbcmdVersion = '1.0-beta3-dev5-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -90,7 +90,7 @@
   if ($fbcmdBaseDir) {
     $fbcmdBaseDir = CleanPath($fbcmdBaseDir);
   } else {
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
+    if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
       if (getenv('USERPROFILE')) {
         $fbcmdBaseDir = CleanPath(getenv('USERPROFILE')) . 'fbcmd/';
       } else {
@@ -206,6 +206,7 @@
   $fbcmdPrefs['fevents_attend_mask'] = '1';
   $fbcmdPrefs['fgroups_show_id'] = '1';
   $fbcmdPrefs['flist_chunksize'] = '10';
+  $fbcmdPrefs['launch_exec'] = '';
   $fbcmdPrefs['mkdir_mode'] = 0777;  
   $fbcmdPrefs['online_idle'] = '1';
   $fbcmdPrefs['pic_size'] = '1';
@@ -384,18 +385,72 @@
   $GLOBALS['facebook_config']['debug'] = $fbcmdPrefs['facebook_debug'];
 
 ////////////////////////////////////////////////////////////////////////////////
-
-  $fbcmdCommandList = array(
-    'ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','COMMENT',
-    'DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE',
-    'FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL',
-    'FRIENDS','FSTATUS','FSTREAM','FULLPOST','HELP','HOME','INBOX','LIKE','LIMITS',
-    'LOADDISP','LOADINFO','LOADNOTE','MUTUAL','NOTICES','NOTIFY','NSEND',
-    'OPICS','MSG','POST','POSTIMG','POSTMP3','POSTVID','PPICS','RECENT','RESET',
-    'RESTATUS','SAVEDISP','SAVEINFO','SAVEPREF','SENTMAIL','SFILTERS',
-    'SHOWPREF','STATUS','STREAM','TAGPIC','UFIELDS','UPDATES','USAGE','VERSION',
-    'WALLPOST','WHOAMI'
-  );
+  $fbcmdCommandList = array();
+  
+  AddCommand('ADDALBUM',  'title [description] [location] [privacy]~Create a new photo album');
+  AddCommand('ADDPIC',    'filename [album_id|latest] [caption]~Upload (add) a photo to an album');
+  AddCommand('ADDPICD',   'dirname [album_id|latest]~Upload (add) all *.jpg files in a directory to an album');
+  AddCommand('ALBUMS',    '[flist]~List all photo albums for friend(s)');
+  AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
+  AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
+  AddCommand('AUTH',      'authcode~Sets your facebook authorization code');
+  AddCommand('COMMENT',   'post_id text~Add a comment to a story that appears in the stream');
+  AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
+  AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
+  AddCommand('EVENTS',    '[time]~Display your events');
+  AddCommand('FEED1',     'title~Add a one-line story to your news feed');
+  AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
+  AddCommand('FEEDLINK',  '[link] text~Share a link in your news feed');
+  AddCommand('FEEDNOTE',  'title body~Share a note in your news feed');
+  AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
+  AddCommand('FGROUPS',   '[flist]~List groups that friend(s) are members of');
+  AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
+  AddCommand('FINFO',     'fields [flist]~List information fields for friend(s) (see UFIELDS)');
+  AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
+  AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
+  AddCommand('FPICS',     'flist [savedir]~List [and optionally save] all photos where friend(s) are tagged');
+  AddCommand('FQL',       'statement [flist]~Perform a custom FQL Query');
+  AddCommand('FRIENDS',   '[flist]~Generate a list of all your friends');
+  AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
+  AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
+  AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
+  AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
+  AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
+  AddCommand('INBOX',     '[count|unread|new]~Display the latest messages from the inbox');
+  AddCommand('LIKE',      'post_ids~Like a story that appears in the stream');
+  AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
+  AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
+  AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
+  AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
+  AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
+  AddCommand('MUTUAL',    'flist~List friend(s) in common with other friend(s)');
+  AddCommand('NOTICES',   '[unread|markread]~See brief notifications from facebook, applications & users');
+  AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
+  AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
+  AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
+  AddCommand('POST',      'message [name] [link] [caption] [desc]~Post (share) a story in your stream');
+  AddCommand('POSTIMG',   'message img_src [img_link] [name] [link] [caption] [desc]~Post (share) an image in your stream');
+  AddCommand('POSTMP3',   'msg mp3_src [title] [artist] [album] [name] [link] [caption] [desc]~Post (share) an .mp3 file in your stream');
+  AddCommand('POSTVID',   'message vid_src img_src [name] [link] [caption] [desc]~Post (share) a video in your stream');
+  AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
+  AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
+  AddCommand('RESET',     '<no parameters>~Reset any authorization codes set by AUTH');
+  AddCommand('RESTATUS',  'message~Replace your status (deletes your status and adds a new status)');
+  AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
+  AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
+  AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
+  AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
+  AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
+  AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
+  AddCommand('STATUS',    '[message]~Set your status (or display current status if no parameter)');
+  AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
+  AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
+  AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
+  AddCommand('UPDATES',   '[count|unread|new]~Display the latest updates from pages you are a fan of');
+  AddCommand('USAGE',     '<no parameters>~Display this help message');
+  AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
+  AddCommand('WALLPOST',  'flist message~Post a message on the wall of friend(s)');
+  AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   if (isset($fbcmd_include_newCommands)) {
     array_merge_unique($fbcmdCommandList,$fbcmd_include_newCommands);
@@ -404,14 +459,27 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
-    ShowUsage();
+    ValidateParamCount(0,1);
+    if (ParamCount()==0) {
+      ShowUsage();
+    } else {
+      if (in_array(strtoupper($fbcmdParams[1]),$fbcmdCommandList)) {
+        LaunchBrowser('http://fbcmd.dtompkins.com/commands/' . strtolower($fbcmdParams[1]));
+        return;
+      }
+      if (isset($fbcmdPrefs[$fbcmdParams[1]])) {
+        LaunchBrowser('http://fbcmd.dtompkins.com/preferences/' . strtolower($fbcmdParams[1]));
+      }
+    }
   }
+  
+////////////////////////////////////////////////////////////////////////////////    
   
   if ($fbcmdCommand == 'HOME') {
-    LaunchBrowser("http://fbcmd.dtompkins.com");
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,'');
+    LaunchBrowser('http://fbcmd.dtompkins.com/' . strtolower($fbcmdParams[1]));
   }
-
-  
 
 ////////////////////////////////////////////////////////////////////////////////  
 
@@ -487,12 +555,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  // attempt to read in the keyfile
-
   if (!file_exists($fbcmdPrefs['keyfile'])) {
-    if ($fbcmdCommand != '') {
-      FbcmdFatalError("Could not locate keyfile {$fbcmdPrefs['keyfile']}");
-    }
     print "\n";
     print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
     print "It appears to be the first time you are running the application\n";
@@ -1141,12 +1204,6 @@
         PrintPostObject($fbcmdParams[1],$dataStream[0],$dataComments);
       }
     }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'HOME') {
-    LaunchBrowser("http://fbcmd.dtompkins.com");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1936,6 +1993,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function AddCommand($cmd,$help) {
+    global $fbcmdCommandList;
+    global $fbcmdCommandHelp;
+    $fbcmdCommandList[] = $cmd;
+    $fbcmdCommandHelp[$cmd] = $help;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
   function array_flatten($obj) {
     $ret = array();
     if (is_array($obj)) {
@@ -2669,13 +2736,17 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function LaunchBrowser($url) {
-    if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-      pclose(popen("start /B $url", "r"));  
+    if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+      pclose(popen("start /B {$url}", "r"));  
     } else { 
-      if (strtoupper(substr(PHP_OS, 0, 3)) === 'DAR') {
-        exec("open $url > /dev/null 2>&1 &");
+      if ($fbcmdPrefs['launch_exec']) {    
+        exec($fbcmdPrefs['launch_exec']);
       } else {
-        exec("xdg-open $url > /dev/null 2>&1 &");
+        if (strtoupper(substr(PHP_OS, 0, 6)) == 'DARWIN') {
+          exec("open {$url} > /dev/null 2>&1 &");
+        } else {
+          exec("xdg-open {$url} > /dev/null 2>&1 &");
+        }
       }
     } 
   } 
@@ -3573,207 +3644,26 @@ function PrintCsvRow($rowIn) {
 
   function ShowUsage() { 
     global $fbcmdVersion;
-    global $fbcmd_include_newCommands;
+    global $fbcmdCommandList;
+    global $fbcmdCommandHelp;
 
     print "\n";
     print "fbcmd [v{$fbcmdVersion}] Facebook Command Line Interface\n\n";
 
-    print "usage:\n\n";
+    print "syntax:\n\n";
 
     print "  fbcmd COMMAND required_parameter(s) [optional_parameter(s)] -switch=value\n\n";
 
     print "commands: (can be in lower case)\n\n";
-
-    print "  ADDALBUM  title [description] [location] [privacy]                           \n";
-    print "            Create a new photo album                                           \n\n";
-
-    print "  ADDPIC    filename [album_id|latest] [caption]                               \n";
-    print "            Upload (add) a photo to an album                                   \n\n";
-
-    print "  ADDPICD   dirname [album_id|latest]                                          \n";
-    print "            Upload (add) all *.jpg files in a directory to an album            \n\n";
-
-    print "  ALBUMS    [flist]                                                            \n";
-    print "            List all photo albums for friend(s)                                \n\n";
-
-    print "  ALLINFO   flist                                                              \n";
-    print "            List all available profile information for friend(s)               \n\n";
-
-    print "  APICS     album_id [savedir]                                                 \n";
-    print "            List [and optionally save] all photos from an album                \n\n";
-
-    print "  AUTH      authcode                                                           \n";
-    print "            Sets your facebook authorization code                              \n\n";
-
-    print "  COMMENT   post_id text                                                       \n";
-    print "            Add a comment to a story that appears in the stream                \n\n";
-
-    print "  DELPOST   post_id                                                            \n";
-    print "            Deletes a post from your stream                                    \n\n";
-
-    print "  DISPLAY   fbml                                                               \n";
-    print "            Sets the content of your FBCMD profile box                         \n\n";
-
-    print "  EVENTS    [time]                                                             \n";
-    print "            Display your events                                                \n\n";
-
-    print "  FEED1     title                                                              \n";
-    print "            Add a one-line story to your news feed                             \n\n";
-
-    print "  FEED2     title body [img_src img_link]                                      \n";
-    print "            Add a short story to your news feed with optional picture          \n\n";
-
-    print "  FEEDLINK  [link] text                                                        \n";
-    print "            Share a link in your news feed                                     \n\n";
-
-    print "  FEEDNOTE  title body                                                         \n";
-    print "            Share a note in your news feed                                     \n\n";
-
-    print "  FEVENTS   flist [time]                                                       \n";
-    print "            List events for friend(s)                                          \n\n";
-
-    print "  FGROUPS   [flist]                                                            \n";
-    print "            List groups that friend(s) are members of                          \n\n";
-
-    print "  FINBOX    [flist]                                                            \n";
-    print "            Display mail messages from friend(s)                               \n\n";
-
-    print "  FINFO     fields [flist]                                                     \n";
-    print "            List information fields for friend(s) (see UFIELDS)                \n\n";
-
-    print "  FLAST     flist [count]                                                      \n";
-    print "            See the last [count] status updates of friend(s)                   \n\n";
-
-    print "  FONLINE   [flist]                                                            \n";
-    print "            List any friends who are currently online                          \n\n";
-
-    print "  FPICS     flist [savedir]                                                    \n";
-    print "            List [and optionally save] all photos where friend(s) are tagged   \n\n";
-
-    print "  FQL       statement [flist]                                                  \n";
-    print "            Perform a custom FQL Query                                         \n\n";
-
-    print "  FRIENDS   [flist]                                                            \n";
-    print "            Generate a list of all your friends                                \n\n";
-
-    print "  FSTATUS   [flist]                                                            \n";
-    print "            List current status of friend(s)                                   \n\n";
-
-    print "  FSTREAM   [flist] [count|new]                                                \n";
-    print "            Show stream stories for friend(s)                                  \n\n";
-
-    print "  FULLPOST  post_id                                                            \n";
-    print "            Displays a stream post with all of the comments                    \n\n";
-
-    print "  HELP      <no parameters>                                                    \n";
-    print "            Display this help message                                          \n\n";
-
-    print "  INBOX     [count|unread|new]                                                 \n";
-    print "            Display the latest messages from the inbox                         \n\n";
-
-    print "  LIKE      post_ids                                                           \n";
-    print "            Like a story that appears in the stream                            \n\n";
-
-    print "  LIMITS    <no parameters>                                                    \n";
-    print "            Display current limits on FBCMD usage                              \n\n";
-
-    print "  LOADDISP  fbml_filename                                                      \n";
-    print "            Same as DISPLAY but loads the contents from a file                 \n\n";
-
-    print "  LOADINFO  info_filename                                                      \n";
-    print "            Sets the content of the FBCMD section on your Info Tab             \n\n";
-
-    print "  LOADNOTE  title filename                                                     \n";
-    print "            Same as FEEDNOTE but loads the contents from a file                \n\n";
-
-    print "  MSG       message_id                                                         \n";
-    print "            Displays a full message thread (e.g.: after an INBOX)              \n\n";
     
-    print "  MUTUAL    flist                                                              \n";
-    print "            List friend(s) in common with other friend(s)                      \n\n";
-
-    print "  NOTICES   [unread|markread]                                                  \n";
-    print "            See brief notifications from facebook, applications & users        \n\n";
-
-    print "  NOTIFY    <no parameters>                                                    \n";
-    print "            See (simple) notifications such as # of unread messages            \n\n";
-
-    print "  NSEND     flist message                                                      \n";
-    print "            Send a notification message to friend(s)                           \n\n";
-
-    print "  OPICS     flist [savedir]                                                    \n";
-    print "            List [and optionally save] all photos owned by friend(s)           \n\n";
-
-    print "  POST      message [name] [link] [caption] [desc]                             \n";
-    print "            Post (share) a story in your stream                                \n\n";
-
-    print "  POSTIMG   message img_src [img_link] [name] [link] [caption] [desc]          \n";
-    print "            Post (share) an image in your stream                               \n\n";
-
-    print "  POSTMP3   msg mp3_src [title] [artist] [album] [name] [link] [caption] [desc] \n";
-    print "            Post (share) an .mp3 file in your stream                           \n\n";
-
-    print "  POSTVID   message vid_src img_src [name] [link] [caption] [desc]             \n";
-    print "            Post (share) a video in your stream                                \n\n";
-
-    print "  PPICS     [flist] [savedir]                                                  \n";
-    print "            List [and optionally save] all profile photos of friend(s)         \n\n";
-
-    print "  RECENT    [flist] [count]                                                    \n";
-    print "            Shows the [count] most recent friend status updates                \n\n";
-
-    print "  RESET     <no parameters>                                                    \n";
-    print "            Reset any authorization codes set by AUTH                          \n\n";
-
-    print "  RESTATUS  message                                                            \n";
-    print "            Replace your status (deletes your status and adds a new status)    \n\n";
-
-    print "  SAVEDISP  fbml_filename                                                      \n";
-    print "            Saves the content of your FBCMD profile box to a file              \n\n";
-
-    print "  SAVEINFO  info_filename                                                      \n";
-    print "            Saves the content of the FBCMD section on your Info Tab to a file  \n\n";
-
-    print "  SAVEPREF  [filename]                                                         \n";
-    print "            Save your current preferences / switch settings to a file          \n\n";
-
-    print "  SENTMAIL  [count|unread|new]                                                 \n";
-    print "            Display the latest messages from the sent mail folder              \n\n";
-
-    print "  SFILTERS  <no parameters>                                                    \n";
-    print "            Display available stream filters for the STREAM command            \n\n";
-    
-    print "  SHOWPREF  [0|1]                                                              \n";
-    print "            Show your current preferences (and optionally defaults too)        \n\n";
-
-    print "  STATUS    [message]                                                          \n";
-    print "            Set your status (or display current status if no parameter)        \n\n";
-
-    print "  STREAM    [filter_rank|filter_key|#filter_name] [count|new]                  \n";
-    print "            Show stream stories (with optional filter -- see SFILTERS)         \n\n";
-
-    print "  TAGPIC    pic_id target [x y]                                                \n";
-    print "            Tag a photo                                                        \n\n";
-
-    print "  UPDATES   [count|unread|new]                                                 \n";
-    print "            Display the latest updates from pages you are a fan of             \n\n";
-
-    print "  UFIELDS   <no parameters>                                                    \n";
-    print "            List current user table fields (for use with FINFO)                \n\n";
-
-    print "  VERSION   [branch]                                                           \n";
-    print "            Check for the latest version of FBCMD available                    \n\n";
-
-    print "  WHOAMI    <no parameters>                                                    \n";
-    print "            Display the currently authorized user                              \n\n";
-
-    print "  WALLPOST  flist message                                                      \n";
-    print "            Post a message on the wall of friend(s)                            \n\n";
-    
-    if (isset($fbcmd_include_newCommands)) {
-      print "Additional Commands: \n\n";
-      foreach ($fbcmd_include_newCommands as $c) {
-        print "  $c\n";
+    foreach ($fbcmdCommandList as $cmd) {
+      if (!isset($fbcmdCommandHelp[$cmd])) {
+        $fbcmdCommandHelp[$cmd] = "[No Help Available]\n";
+      }
+      $helpText = explode('~',$fbcmdCommandHelp[$cmd]);
+      print "  " . str_pad($cmd, 10, ' ') . $helpText[0]. "\n";
+      for ($j=1; $j < count($helpText); $j++) {
+        print "            " . $helpText[$j] . "\n";
       }
       print "\n";
     }
