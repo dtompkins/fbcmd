@@ -53,12 +53,12 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev5-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev5-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
   // you can include fbcmd.php from another program
-  // see sample-mycmd.php for more information
+  // see support/sample-mycmd.php for more information
 
   if (isset($fbcmd_include)) {
     ob_end_clean(); // this avoids displaying the #!/usr/bin/php when included
@@ -73,7 +73,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   // set the default arguments to be empty
-
+  
   $fbcmdCommand = '';
   $fbcmdParams = Array();
   $fbcmdPrefs = Array();
@@ -110,256 +110,189 @@
   // STEP ONE: System Defaults
 
   // Do NOT change these System Default preference values here:
-  // Modify the prefs.php file instead
-
-  // File locations
-  $fbcmdPrefs['keyfile'] = "{$fbcmdBaseDir}sessionkeys.txt";
-  $fbcmdPrefs['prefs'] = ''; // (none)
-  $fbcmdPrefs['postfile'] = "{$fbcmdBaseDir}postdata.txt";
-  $fbcmdPrefs['stream_save'] = '1';  
-  $fbcmdPrefs['mailfile'] = "{$fbcmdBaseDir}maildata.txt";
-  $fbcmdPrefs['mail_save'] = '1';
-
-  // FBCMD Application Specific
-  $fbcmdPrefs['appkey'] = 'd96ea311638cf65f04b33c87eacf371e';
-  $fbcmdPrefs['appsecret'] = '88af69b7ab8d437bff783328781be79b';
-  $fbcmdPrefs['feed_template'] = '60736970450';
-
-  // Prefix Codes is FLISTs:
-  $fbcmdPrefs['prefix_friendlist'] = '_';
-  $fbcmdPrefs['prefix_group'] = '~';
-  $fbcmdPrefs['prefix_page'] = '+';
-  $fbcmdPrefs['prefix_username'] = '@';
-  $fbcmdPrefs['prefix_filter'] = '#';
-
-  // Output Formatting
-  $fbcmdPrefs['quiet'] = '0';
-  $fbcmdPrefs['print_blanks'] = '0';
-  $fbcmdPrefs['print_header'] = '1';
-  $fbcmdPrefs['print_clean'] = '1'; // todo wiki
-  $fbcmdPrefs['show_id'] = '0';
-  $fbcmdPrefs['trace'] = '0';
-  $fbcmdPrefs['facebook_debug'] = '0';
-  $fbcmdPrefs['print_wrap'] = '1'; //todo wiki
-  $fbcmdPrefs['print_wrap_env_var'] = 'COLUMNS';
-  $fbcmdPrefs['print_wrap_width'] = '80';
-  $fbcmdPrefs['print_wrap_min_width'] = '20';
-  $fbcmdPrefs['print_wrap_cut'] = '1';
-  $fbcmdPrefs['print_linefeed_subst'] = '  ';
-  $fbcmdPrefs['print_col_padding'] = '2';
-
-  // CSV Format
-  $fbcmdPrefs['print_csv'] = '0';
-  $fbcmdPrefs['csv_separator'] = ',';
-  $fbcmdPrefs['csv_bookend'] = '"';
-  $fbcmdPrefs['csv_escaped_bookend'] = '""';
-  $fbcmdPrefs['csv_force_bookends'] = '0';
-
-  // More Output Formatting
-  $fbcmdPrefs['event_dateformat'] = 'D M d H:i';
-  $fbcmdPrefs['status_show_date'] = '0';
-  $fbcmdPrefs['status_dateformat'] = 'D M d H:i';
-
-  $fbcmdPrefs['stream_show_date'] = '0';
-  $fbcmdPrefs['stream_dateformat'] = 'D H:i';
-  $fbcmdPrefs['stream_show_postid'] = '0';
-  $fbcmdPrefs['stream_show_appdata'] = '0';
-  $fbcmdPrefs['stream_show_attachments'] = '0';
-  $fbcmdPrefs['stream_show_likes'] = '1';
-  $fbcmdPrefs['stream_show_comments'] = '1';
-  $fbcmdPrefs['stream_blankrow'] = '1'; //todo wiki
+  // Modify your own prefs.php file instead
   
-  $fbcmdPrefs['folder_show_date'] = '0'; //todo wiki
-  $fbcmdPrefs['folder_dateformat'] = 'M d H:i';
-  $fbcmdPrefs['folder_show_threadid'] = '0';
-  $fbcmdPrefs['folder_show_snippet'] = '1';  
-  $fbcmdPrefs['folder_blankrow'] = '1';
+  AddPreference('apics_filename','[pid].jpg','af');
+  AddPreference('appkey','d96ea311638cf65f04b33c87eacf371e');
+  AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
+  AddPreference('auto_mkdir','1');
+  AddPreference('csv_bookend','"');
+  AddPreference('csv_escaped_bookend','""');
+  AddPreference('csv_force_bookends','0','csvf');
+  AddPreference('csv_separator',',');
+  AddPreference('delpost_comment_fail','1');
+  AddPreference('event_dateformat','D M d H:i','edf');
+  AddPreference('events_attend_mask','15','emask');
+  AddPreference('facebook_debug','0','debug');
+  AddPreference('feed_template','60736970450');
+  AddPreference('fevents_attend_mask','1','fmask');
+  AddPreference('fgroups_show_id','1','gid');
+  AddPreference('flist_chunksize','10','ch');
+  AddPreference('folder_blankrow','1','fbr');
+  AddPreference('folder_dateformat','M d H:i','fdf');
+  AddPreference('folder_show_date','0','fd');
+  AddPreference('folder_show_snippet','1','snip');
+  AddPreference('folder_show_threadid','0','tid');
+  AddPreference('fpics_filename','[pid].jpg','ff');
+  AddPreference('keyfile',"{$fbcmdBaseDir}sessionkeys.txt",'key');
+  AddPreference('launch_exec','');
+  AddPreference('mail_save','1','msave');
+  AddPreference('mailfile',"{$fbcmdBaseDir}maildata.txt",'mfile');
+  AddPreference('mkdir_mode',0777);
+  AddPreference('msg_blankrow','1','mbr');
+  AddPreference('msg_dateformat','M d H:i','mdf');
+  AddPreference('msg_show_date','0','md');
+  AddPreference('notices_blankrow','1','nbr');
+  AddPreference('notices_dateformat','M d H:i','ndf');
+  AddPreference('notices_show_date','0','nd');
+  AddPreference('notices_show_id','0','nid');
+  AddPreference('online_idle','1','idle');
+  AddPreference('opics_filename','[pid].jpg','of');
+  AddPreference('pic_dateformat','M d Y','pdf');
+  AddPreference('pic_retry_count','10','pr');
+  AddPreference('pic_retry_delay','2','prd');
+  AddPreference('pic_show_date','0','pd');
+  AddPreference('pic_show_links','0','plink');
+  AddPreference('pic_show_src','0','psrc');
+  AddPreference('pic_size','1','psize');
+  AddPreference('pic_skip_exists','1','pskip');
+  AddPreference('postfile',"{$fbcmdBaseDir}postdata.txt",'posts');
+  AddPreference('ppic_size','1','ppsize');
+  AddPreference('ppics_filename','[tid].jpg','pf');
+  AddPreference('prefix_filter','#');
+  AddPreference('prefix_friendlist','_');
+  AddPreference('prefix_group','~');
+  AddPreference('prefix_page','+');
+  AddPreference('prefix_username','@');
+  AddPreference('prefs','');
+  AddPreference('print_blanks','0','bl');
+  AddPreference('print_clean','1','clean');
+  AddPreference('print_col_padding','2','pad');
+  AddPreference('print_csv','0','csv');
+  AddPreference('print_header','1','hdr');
+  AddPreference('print_linefeed_subst',' ');
+  AddPreference('print_wrap','1','wrap');
+  AddPreference('print_wrap_cut','1','cut');
+  AddPreference('print_wrap_env_var','COLUMNS');
+  AddPreference('print_wrap_min_width','20');
+  AddPreference('print_wrap_width','80');
+  AddPreference('quiet','0','q');
+  AddPreference('restatus_comment_new','1');
+  AddPreference('savepref_include_files','0','spf');
+  AddPreference('show_id','0','id');
+  AddPreference('status_dateformat','D M d H:i','stdf');
+  AddPreference('status_show_date','0','std');
+  AddPreference('status_tag','1','tag');
+  AddPreference('status_tag_order','friends:username:0,friends:name:0,pages:username:0,pages:name:0,friends:name:1,pages:name:1,groups:name:0,groups:name:1');
+  AddPreference('status_tag_syntax','/@(\S+)/');
+  AddPreference('stream_blankrow','1','sbr');
+  AddPreference('stream_dateformat','D H:i','sdf');
+  AddPreference('stream_new_from','created_time');
+  AddPreference('stream_save','1','ssave');
+  AddPreference('stream_show_appdata','0','sapp');
+  AddPreference('stream_show_attachments','0','satt');
+  AddPreference('stream_show_comments','1','scom');
+  AddPreference('stream_show_date','0','sd');
+  AddPreference('stream_show_likes','1','slikes');
+  AddPreference('stream_show_postid','0','sid');
+  AddPreference('trace','0','t');
+  AddPreference('update_branch','master');
   
-  $fbcmdPrefs['msg_show_date'] = '0'; //todo wiki
-  $fbcmdPrefs['msg_dateformat'] = 'M d H:i';
-  $fbcmdPrefs['msg_blankrow'] = '1';
-  
-  $fbcmdPrefs['notices_show_date'] = '0'; //todo wiki
-  $fbcmdPrefs['notices_dateformat'] = 'M d H:i';
-  $fbcmdPrefs['notices_show_id'] = '0';
-  $fbcmdPrefs['notices_blankrow'] = '1';
-
-  // PIC Preferences
-  $fbcmdPrefs['pic_show_date'] = '0';
-  $fbcmdPrefs['pic_dateformat'] = 'M d Y';
-  $fbcmdPrefs['pic_show_links'] = '0';
-  $fbcmdPrefs['pic_show_src'] = '0';
-
-  $fbcmdPrefs['apics_filename'] = '[pid].jpg';
-  $fbcmdPrefs['ppics_filename'] = '[tid].jpg';
-  $fbcmdPrefs['fpics_filename'] = '[pid].jpg';
-  $fbcmdPrefs['opics_filename'] = '[pid].jpg';
-
-  $fbcmdPrefs['pic_skip_exists'] = '1';
-  $fbcmdPrefs['auto_mkdir'] = '1';
-  $fbcmdPrefs['pic_retry_count'] = '10';
-  $fbcmdPrefs['pic_retry_delay'] = '2';
-
-  //Misc. Behaviour
-  $fbcmdPrefs['delpost_comment_fail'] = '1';
-  $fbcmdPrefs['events_attend_mask'] = '15';
-  $fbcmdPrefs['fevents_attend_mask'] = '1';
-  $fbcmdPrefs['fgroups_show_id'] = '1';
-  $fbcmdPrefs['flist_chunksize'] = '10';
-  $fbcmdPrefs['launch_exec'] = '';
-  $fbcmdPrefs['mkdir_mode'] = 0777;  
-  $fbcmdPrefs['online_idle'] = '1';
-  $fbcmdPrefs['pic_size'] = '1';
-  $fbcmdPrefs['ppic_size'] = '1';
-  $fbcmdPrefs['restatus_comment_new'] = '1';
-  $fbcmdPrefs['savepref_include_files'] = '0';
-  $fbcmdPrefs['status_tag'] = '1'; //todo wiki 
-  $fbcmdPrefs['status_tag_syntax'] = '/@(\S+)/';
-  $fbcmdPrefs['status_tag_order'] = 'friends:username:0,friends:name:0,pages:username:0,pages:name:0,friends:name:1,pages:name:1,groups:name:0,groups:name:1';  
-  $fbcmdPrefs['stream_new_from'] = 'created_time';
-  $fbcmdPrefs['update_branch'] = 'master'; //todo wiki
-
   // Parameter Defaults
-  $fbcmdPrefs['default_addalbum_title'] = '';
-  $fbcmdPrefs['default_addalbum_description'] = '';
-  $fbcmdPrefs['default_addalbum_location'] = '';
-  $fbcmdPrefs['default_addalbum_privacy'] = 'everyone';
-  $fbcmdPrefs['default_addpic_filename'] = '';
-  $fbcmdPrefs['default_addpic_albumid'] = null;
-  $fbcmdPrefs['default_addpic_caption'] = '';
-  $fbcmdPrefs['default_addpicd_dirname'] = '';
-  $fbcmdPrefs['default_addpicd_albumid'] = null;
-  $fbcmdPrefs['default_albums_flist'] = '=ME';
-  $fbcmdPrefs['default_allinfo_flist'] = '=ME';
-  $fbcmdPrefs['default_apics_albumid'] = '';
-  $fbcmdPrefs['default_apics_savedir'] = false;
-  $fbcmdPrefs['default_comment_text'] = '';
-  $fbcmdPrefs['default_display_text'] = 'FBCMD: The Command Line Interface for Facebook';
-  $fbcmdPrefs['default_feed1_text'] = '';
-  $fbcmdPrefs['default_feed2_title'] = '';
-  $fbcmdPrefs['default_feed2_body'] = '';
-  $fbcmdPrefs['default_feed2_imgsrc'] = '';
-  $fbcmdPrefs['default_feed2_imglink'] = '';
-  $fbcmdPrefs['default_feedlink_link'] = '';
-  $fbcmdPrefs['default_feedlink_text'] = '';
-  $fbcmdPrefs['default_feednote_title'] = '';
-  $fbcmdPrefs['default_feednote_body'] = '';
-  $fbcmdPrefs['default_fevents_flist'] = '=ME';
-  $fbcmdPrefs['default_fgroups_flist'] = '=ME';
-  $fbcmdPrefs['default_finfo_fields'] = 'birthday_date';
-  $fbcmdPrefs['default_finfo_flist'] = '=ALL';
-  $fbcmdPrefs['default_flast_flist'] = '=ME';
-  $fbcmdPrefs['default_flast_count'] = '10';
-  $fbcmdPrefs['default_fonline_flist'] = '=ALL';
-  $fbcmdPrefs['default_fpics_flist'] = '=ME';
-  $fbcmdPrefs['default_fpics_savedir'] = false;
-  $fbcmdPrefs['default_friends_flist'] = '=ALL';
-  $fbcmdPrefs['default_fstatus_flist'] = '=ALL';
-  $fbcmdPrefs['default_fstream_flist'] = '=ALL';
-  $fbcmdPrefs['default_fstream_count'] = '10';
-  $fbcmdPrefs['default_inbox_count'] = '10';
-  $fbcmdPrefs['default_loaddisp_filename'] = '';
-  $fbcmdPrefs['default_loadinfo_filename'] = '';
-  $fbcmdPrefs['default_loadnote_title'] = '';
-  $fbcmdPrefs['default_loadnote_filename'] = '';
-  $fbcmdPrefs['default_mutual_flist'] = '=ALL';
-  $fbcmdPrefs['default_notices_type'] = '';
-  $fbcmdPrefs['default_nsend_flist'] = '=ME';
-  $fbcmdPrefs['default_nsend_message'] = '';
-  $fbcmdPrefs['default_opics_flist'] = '=ME';
-  $fbcmdPrefs['default_opics_savedir'] = false;
-  $fbcmdPrefs['default_post_message'] = '';
-  $fbcmdPrefs['default_post_name'] = null;
-  $fbcmdPrefs['default_post_link'] = null;
-  $fbcmdPrefs['default_post_caption'] = null;
-  $fbcmdPrefs['default_post_description'] = null;
-  $fbcmdPrefs['default_postimg_message'] = false;
-  $fbcmdPrefs['default_postimg_imgsrc'] = '';
-  $fbcmdPrefs['default_postimg_imglink'] = '0';
-  $fbcmdPrefs['default_postimg_name'] = null;
-  $fbcmdPrefs['default_postimg_link'] = null;
-  $fbcmdPrefs['default_postimg_caption'] = null;
-  $fbcmdPrefs['default_postimg_description'] = null;
-  $fbcmdPrefs['default_postmp3_message'] = false;
-  $fbcmdPrefs['default_postmp3_mp3src'] = '';
-  $fbcmdPrefs['default_postmp3_mp3title'] = '';
-  $fbcmdPrefs['default_postmp3_mp3artist'] = '';
-  $fbcmdPrefs['default_postmp3_mp3album'] = '';
-  $fbcmdPrefs['default_postmp3_name'] = null;
-  $fbcmdPrefs['default_postmp3_link'] = null;
-  $fbcmdPrefs['default_postmp3_caption'] = null;
-  $fbcmdPrefs['default_postmp3_description'] = null;
-  $fbcmdPrefs['default_postvid_message'] = false;
-  $fbcmdPrefs['default_postvid_vidsrc'] = '';
-  $fbcmdPrefs['default_postvid_preview'] = '';
-  $fbcmdPrefs['default_postvid_name'] = false;
-  $fbcmdPrefs['default_postvid_link'] = false;
-  $fbcmdPrefs['default_postvid_caption'] = false;
-  $fbcmdPrefs['default_postvid_description'] = false;
-  $fbcmdPrefs['default_ppics_flist'] = '=ALL';
-  $fbcmdPrefs['default_ppics_savedir'] = false;
-  $fbcmdPrefs['default_recent_flist'] = '=ALL';
-  $fbcmdPrefs['default_recent_count'] = '10';
-  $fbcmdPrefs['default_savedisp_filename'] = '';
-  $fbcmdPrefs['default_saveinfo_filename'] = '';
-  $fbcmdPrefs['default_sentmail_count'] = '10';    
-  $fbcmdPrefs['default_showpref_defaults'] = '0';
-  $fbcmdPrefs['default_stream_filter'] = '1';
-  $fbcmdPrefs['default_stream_count'] = '10';
-  $fbcmdPrefs['default_tagpic_pid'] = '';
-  $fbcmdPrefs['default_tagpic_target'] = '=ME';
-  $fbcmdPrefs['default_tagpic_x'] = '50';
-  $fbcmdPrefs['default_tagpic_y'] = '50';
-  $fbcmdPrefs['default_updates_count'] = '10';    
-  $fbcmdPrefs['default_wallpost_flist'] = '=ME';
-  $fbcmdPrefs['default_wallpost_message'] = '';
-
-  $fbcmdPrefAliases = array( //todo mailfile, new switches
-    'af' => 'apics_filename',
-    'bl' => 'print_blanks',
-    'ch' => 'flist_chunksize',
-    'clean' => 'print_clean', //todo    
-    'csv' => 'print_csv',
-    'csvf' => 'csv_force_bookends',
-    'debug' => 'facebook_debug',
-    'edf' => 'event_dateformat',
-    'emask' => 'events_attend_mask',
-    'ff' => 'fpics_filename',
-    'fmask' => 'fevents_attend_mask',
-    'gid' => 'fgroups_show_id',
-    'hdr' => 'print_header',
-    'id' => 'show_id',
-    'idle' => 'online_idle',
-    'key' => 'keyfile',
-    'mfile' => 'mailfile',
-    'msave' => 'mail_save',
-    'of' => 'opics_filename',
-    'pd' => 'pic_show_date',
-    'pdf' => 'pic_dateformat',
-    'pf' => 'ppics_filename',
-    'plink' => 'pic_show_links',
-    'posts' => 'postfile', 
-    'ppsize' => 'ppic_size',
-    'pr' => 'pic_retry_count',
-    'prd' => 'pic_retry_delay',
-    'psize' => 'pic_size',
-    'pskip' => 'pic_skip_exists',
-    'psrc' => 'pic_show_src',
-    'q' => 'quiet',
-    'sapp' => 'stream_show_appdata',
-    'satt' => 'stream_show_attachments',
-    'scom' => 'stream_show_comments',
-    'sd' => 'stream_show_date',
-    'sdf' => 'stream_dateformat',
-    'sid' => 'stream_show_postid',
-    'slikes' => 'stream_show_likes',
-    'spf' => 'savepref_include_files',
-    'ssave' => 'stream_save',
-    'std' => 'status_show_date',
-    'stdf' => 'status_dateformat',
-    't' => 'trace'
-  );
-
+  AddPreference('default_addalbum_title','');
+  AddPreference('default_addalbum_description','');
+  AddPreference('default_addalbum_location','');
+  AddPreference('default_addalbum_privacy','everyone');
+  AddPreference('default_addpic_filename','');
+  AddPreference('default_addpic_albumid',null);
+  AddPreference('default_addpic_caption','');
+  AddPreference('default_addpicd_dirname','');
+  AddPreference('default_addpicd_albumid',null);
+  AddPreference('default_albums_flist','=ME');
+  AddPreference('default_allinfo_flist','=ME');
+  AddPreference('default_apics_albumid','');
+  AddPreference('default_apics_savedir',false);
+  AddPreference('default_comment_text','');
+  AddPreference('default_display_text','FBCMD: The Command Line Interface for Facebook');
+  AddPreference('default_feed1_text','');
+  AddPreference('default_feed2_title','');
+  AddPreference('default_feed2_body','');
+  AddPreference('default_feed2_imgsrc','');
+  AddPreference('default_feed2_imglink','');
+  AddPreference('default_feedlink_link','');
+  AddPreference('default_feedlink_text','');
+  AddPreference('default_feednote_title','');
+  AddPreference('default_feednote_body','');
+  AddPreference('default_fevents_flist','=ME');
+  AddPreference('default_fgroups_flist','=ME');
+  AddPreference('default_finfo_fields','birthday_date');
+  AddPreference('default_finfo_flist','=ALL');
+  AddPreference('default_flast_flist','=ME');
+  AddPreference('default_flast_count','10');
+  AddPreference('default_fonline_flist','=ALL');
+  AddPreference('default_fpics_flist','=ME');
+  AddPreference('default_fpics_savedir',false);
+  AddPreference('default_friends_flist','=ALL');
+  AddPreference('default_fstatus_flist','=ALL');
+  AddPreference('default_fstream_flist','=ALL');
+  AddPreference('default_fstream_count','10');
+  AddPreference('default_inbox_count','10');
+  AddPreference('default_loaddisp_filename','');
+  AddPreference('default_loadinfo_filename','');
+  AddPreference('default_loadnote_title','');
+  AddPreference('default_loadnote_filename','');
+  AddPreference('default_mutual_flist','=ALL');
+  AddPreference('default_notices_type','');
+  AddPreference('default_nsend_flist','=ME');
+  AddPreference('default_nsend_message','');
+  AddPreference('default_opics_flist','=ME');
+  AddPreference('default_opics_savedir',false);
+  AddPreference('default_post_message','');
+  AddPreference('default_post_name',null);
+  AddPreference('default_post_link',null);
+  AddPreference('default_post_caption',null);
+  AddPreference('default_post_description',null);
+  AddPreference('default_postimg_message',false);
+  AddPreference('default_postimg_imgsrc','');
+  AddPreference('default_postimg_imglink','0');
+  AddPreference('default_postimg_name',null);
+  AddPreference('default_postimg_link',null);
+  AddPreference('default_postimg_caption',null);
+  AddPreference('default_postimg_description',null);
+  AddPreference('default_postmp3_message',false);
+  AddPreference('default_postmp3_mp3src','');
+  AddPreference('default_postmp3_mp3title','');
+  AddPreference('default_postmp3_mp3artist','');
+  AddPreference('default_postmp3_mp3album','');
+  AddPreference('default_postmp3_name',null);
+  AddPreference('default_postmp3_link',null);
+  AddPreference('default_postmp3_caption',null);
+  AddPreference('default_postmp3_description',null);
+  AddPreference('default_postvid_message',false);
+  AddPreference('default_postvid_vidsrc','');
+  AddPreference('default_postvid_preview','');
+  AddPreference('default_postvid_name',false);
+  AddPreference('default_postvid_link',false);
+  AddPreference('default_postvid_caption',false);
+  AddPreference('default_postvid_description',false);
+  AddPreference('default_ppics_flist','=ALL');
+  AddPreference('default_ppics_savedir',false);
+  AddPreference('default_recent_flist','=ALL');
+  AddPreference('default_recent_count','10');
+  AddPreference('default_savedisp_filename','');
+  AddPreference('default_saveinfo_filename','');
+  AddPreference('default_sentmail_count','10');
+  AddPreference('default_showpref_defaults','0');
+  AddPreference('default_stream_filter','1');
+  AddPreference('default_stream_count','10');
+  AddPreference('default_tagpic_pid','');
+  AddPreference('default_tagpic_target','=ME');
+  AddPreference('default_tagpic_x','50');
+  AddPreference('default_tagpic_y','50');
+  AddPreference('default_updates_count','10');
+  AddPreference('default_wallpost_flist','=ME');
+  AddPreference('default_wallpost_message','');
+  
   // STEP TWO: Load preferences from prefs.php in the base directory
 
   if (file_exists("{$fbcmdBaseDir}prefs.php")) {
@@ -367,6 +300,7 @@
   }
 
   // STEP THREE: Read switches set from the command line
+  // This also sets $fbcmdCommand & &fbcmdParams
 
   ParseArguments($fbcmd_argv,$fbcmd_argc);
 
@@ -379,12 +313,22 @@
       FbcmdWarning("Could not load Preferences file {$fbcmdPrefs['prefs']}");
     }
   }
+  
+////////////////////////////////////////////////////////////////////////////////
+  
+  if ($fbcmdCommand == 'SAVEPREF') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,"{$fbcmdBaseDir}prefs.php");
+    SavePrefs($fbcmdParams[1]);
+    return;
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 
   $GLOBALS['facebook_config']['debug'] = $fbcmdPrefs['facebook_debug'];
 
 ////////////////////////////////////////////////////////////////////////////////
+
   $fbcmdCommandList = array();
   
   AddCommand('ADDALBUM',  'title [description] [location] [privacy]~Create a new photo album');
@@ -414,6 +358,7 @@
   AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
   AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
   AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
+  AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
   AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
   AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
   AddCommand('INBOX',     '[count|unread|new]~Display the latest messages from the inbox');
@@ -447,7 +392,7 @@
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
   AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
   AddCommand('UPDATES',   '[count|unread|new]~Display the latest updates from pages you are a fan of');
-  AddCommand('USAGE',     '<no parameters>~Display this help message');
+  AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
   AddCommand('WALLPOST',  'flist message~Post a message on the wall of friend(s)');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
@@ -455,36 +400,11 @@
   if (isset($fbcmd_include_newCommands)) {
     array_merge_unique($fbcmdCommandList,$fbcmd_include_newCommands);
   }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
-    ValidateParamCount(0,1);
-    if (ParamCount()==0) {
-      ShowUsage();
-    } else {
-      if (in_array(strtoupper($fbcmdParams[1]),$fbcmdCommandList)) {
-        LaunchBrowser('http://fbcmd.dtompkins.com/commands/' . strtolower($fbcmdParams[1]));
-        return;
-      }
-      if (isset($fbcmdPrefs[$fbcmdParams[1]])) {
-        LaunchBrowser('http://fbcmd.dtompkins.com/preferences/' . strtolower($fbcmdParams[1]));
-      }
-    }
-  }
   
-////////////////////////////////////////////////////////////////////////////////    
-  
-  if ($fbcmdCommand == 'HOME') {
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,'');
-    LaunchBrowser('http://fbcmd.dtompkins.com/' . strtolower($fbcmdParams[1]));
-  }
-
 ////////////////////////////////////////////////////////////////////////////////  
 
   if (in_array($fbcmdCommand,array('DFILE','FEED','FEED3','FSTATUSID','FLSTATUS','PICS'))) {
-    FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
+    FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information"); // todo add go
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -495,11 +415,81 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SAVEPREF') {
+  if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
     ValidateParamCount(0,1);
-    SetDefaultParam(1,"{$fbcmdBaseDir}prefs.php");
-    SavePrefs($fbcmdParams[1]);
-    return;
+    SetDefaultParam(1,'');
+    if (ParamCount()==0) {
+      ShowUsage();
+    } 
+    if (in_array(strtoupper($fbcmdParams[1]),$fbcmdCommandList)) {
+      LaunchBrowser('http://fbcmd.dtompkins.com/commands/' . strtolower($fbcmdParams[1]));
+      return;
+    }
+    if (isset($fbcmdPrefs[$fbcmdParams[1]])) {
+      LaunchBrowser('http://fbcmd.dtompkins.com/preferences/' . strtolower($fbcmdParams[1]));
+      return;
+    }
+    FbcmdWarning("HELP: did not recognize [{$fbcmdParams[1]}]");
+    ShowUsage();
+  }
+  
+////////////////////////////////////////////////////////////////////////////////    
+  
+  if ($fbcmdCommand == 'HOME') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,'');
+    LaunchBrowser('http://fbcmd.dtompkins.com/' . strtolower($fbcmdParams[1]));
+  }
+
+////////////////////////////////////////////////////////////////////////////////    
+
+  $goDestination['app']         = "http://facebook.com/fbcmd";
+  $goDestination['auth']        = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
+  $goDestination['auth-ps']     = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream";
+  $goDestination['auth-rm']     = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox";
+  $goDestination['auth-rs']     = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream";  
+  $goDestination['contribute']  = 'http://fbcmd.dtompkins.com/contribute';
+  $goDestination['editapps']    = "http://www.facebook.com/editapps.php";
+  $goDestination['faq']         = 'http://fbcmd.dtompkins.com/faq';
+  $goDestination['github']      = 'http://github.com/dtompkins/fbcmd';
+  $goDestination['group']       = 'http://groups.google.com/group/fbcmd';
+  $goDestination['help']        = 'http://fbcmd.dtompkins.com/help';
+  $goDestination['home']        = 'http://fbcmd.dtompkins.com';
+  $goDestination['inbox']       = 'http://www.facebook.com/inbox/';
+  $goDestination['install']     = 'http://fbcmd.dtompkins.com/installation';
+  $goDestination['stream']      = 'http://www.facebook.com/home.php';
+  $goDestination['wiki']        = 'http://fbcmd.dtompkins.com';
+  
+  if ($fbcmdCommand == 'GO') {
+    ValidateParamCount(0,1);
+    if (ParamCount()==0) {
+      print "\nGO Destinations:\n\n";
+      foreach ($goDestination as $key => $dest) {
+        print str_pad("  go {$key}",19,' ') . "{$dest}\n";
+      }
+      print "\n";
+      print "  go wall          [todo]\n"; // http://www.facebook.com/inbox/?folder=[fb]messages&tid=THREADID
+      print "  go msg #         [todo]\n"; // http://www.facebook.com/inbox/?folder=[fb]messages&tid=THREADID
+      print "  go post #        [todo]\n";
+      print "  go friend.name   [todo]\n";
+      exit;
+    }
+    if (isset($goDestination[strtolower($fbcmdParams[1])])) {
+      LaunchBrowser($goDestination[strtolower($fbcmdParams[1])]);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+  if (!file_exists($fbcmdPrefs['keyfile'])) {
+    print "\n";
+    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
+    print "It appears to be the first time you are running the application\n";
+    print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
+    print "Note this current (default) location for your keyfile.  If you'd like to\n";
+    print "change this location, create an FBCMD environment variable to point to\n";
+    print "a folder where your personal keyfile and preferences will be stored.\n\n";
+    print "see http://fbcmd.dtompkins.com/installation [fbcmd go install] for more info.\n\n";
+    $fbcmdUserSessionKey = 'EMPTY';
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -548,39 +538,22 @@
       FbcmdException($e,'Invalid AUTH code / could not generate session key');
     }
     if (!$fbcmdPrefs['quiet']) {
-      print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD {$fbReturn[0]['name']}.  Try fbcmd HELP to begin\n";
+      print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD {$fbReturn[0]['name']}.  Try fbcmd help to begin\n"; //todo add go
     }
     return;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (!file_exists($fbcmdPrefs['keyfile'])) {
-    print "\n";
-    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
-    print "It appears to be the first time you are running the application\n";
-    print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
-    print "Note this current (default) location for your keyfile.  If you'd like to\n";
-    print "change this location, create an FBCMD environment variable to point to\n";
-    print "a folder where your personal keyfile and preferences will be stored.\n\n";
-    print "see http://fbcmd.dtompkins.com/installation for more info.\n\n";
-    $fbcmdUserSessionKey = 'EMPTY';
-  } else {
-    $fbcmdKeyFile = file($fbcmdPrefs['keyfile'],FILE_IGNORE_NEW_LINES);
-    if (count($fbcmdKeyFile) < 2) {
-      FbcmdFatalError("Invalid keyfile {$fbcmdPrefs['keyfile']}");
-    }
-    $fbcmdUserSessionKey = $fbcmdKeyFile[0];
-    $fbcmdUserSecretKey = $fbcmdKeyFile[1];
+  $fbcmdKeyFile = file($fbcmdPrefs['keyfile'],FILE_IGNORE_NEW_LINES);
+  if (count($fbcmdKeyFile) < 2) {
+    FbcmdFatalError("Invalid keyfile {$fbcmdPrefs['keyfile']}");
   }
+  $fbcmdUserSessionKey = $fbcmdKeyFile[0];
+  $fbcmdUserSecretKey = $fbcmdKeyFile[1];
+  
   if (strncmp($fbcmdUserSessionKey,'EMPTY',5)==0) {
-    if (!$fbcmdPrefs['quiet']) {
-      print "\n";
-      print "This application is not currently authorized.  To grant authorization,\n";
-      print "Generate an access code at this website:\n\n";
-      print "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}\n\n";
-      print "obtain your 6-digit code (XXXXXX) and then execute fbcmd AUTH XXXXXX\n\n";
-    }
+    ShowAuth();
     return;
   }
 
@@ -970,7 +943,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FINBOX') { //todo, wiki
+  if ($fbcmdCommand == 'FINBOX') {
     ValidateParamCount(1);
     GetFlistIds($fbcmdParams[1]);
     $matchInRecipients = "('" . implode("' in recipients OR '",$flistMatchArray) . "' in recipients)";
@@ -1208,7 +1181,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'INBOX') { //todo, wiki
+  if ($fbcmdCommand == 'INBOX') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
     if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
@@ -1338,7 +1311,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MSG') { //todo wiki 
+  if ($fbcmdCommand == 'MSG') {
     ValidateParamCount(1);
     $curThreadId = GetThreadId($fbcmdParams[1]);
     if ($curThreadId) {
@@ -1398,7 +1371,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'NOTICES') { //todo, wiki
+  if ($fbcmdCommand == 'NOTICES') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
     if ((strtoupper($fbcmdParams[1]) == 'UNREAD')||(strtoupper($fbcmdParams[1]) == 'MARKREAD')) {
@@ -1748,7 +1721,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SENTMAIL') { //todo, wiki
+  if ($fbcmdCommand == 'SENTMAIL') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_sentmail_count']);
     if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
@@ -1922,7 +1895,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'UPDATES') { //todo, wiki
+  if ($fbcmdCommand == 'UPDATES') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
     if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
@@ -1949,11 +1922,11 @@
   }
   
 ////////////////////////////////////////////////////////////////////////////////
-  if ($fbcmdCommand == 'VERSION') { //todo wiki
+  if ($fbcmdCommand == 'VERSION') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
     PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH');
-    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch']); //todo wiki
+    PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch']);
   }
   
 ////////////////////////////////////////////////////////////////////////////////
@@ -1998,6 +1971,18 @@
     global $fbcmdCommandHelp;
     $fbcmdCommandList[] = $cmd;
     $fbcmdCommandHelp[$cmd] = $help;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function AddPreference($pref, $value, $shortcut = '') {
+    global $fbcmdPrefs;
+    global $fbcmdPrefAliases;
+    $fbcmdPrefs[$pref] = $value;
+    if ($shortcut) {
+      $fbcmdPrefAliases[$shortcut] = $pref;
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2737,15 +2722,15 @@
 
   function LaunchBrowser($url) {
     if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
-      pclose(popen("start /B {$url}", "r"));  
+      pclose(popen("start \"\" /B \"{$url}\"", "r"));  
     } else { 
       if ($fbcmdPrefs['launch_exec']) {    
         exec($fbcmdPrefs['launch_exec']);
       } else {
         if (strtoupper(substr(PHP_OS, 0, 6)) == 'DARWIN') {
-          exec("open {$url} > /dev/null 2>&1 &");
+          exec("open \"{$url}\" > /dev/null 2>&1 &");
         } else {
-          exec("xdg-open {$url} > /dev/null 2>&1 &");
+          exec("xdg-open \"{$url}\" > /dev/null 2>&1 &");
         }
       }
     } 
@@ -3638,6 +3623,19 @@ function PrintCsvRow($rowIn) {
       }
     }
   }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function ShowAuth() {
+    global $fbcmdPrefs;
+    print "\n";
+    print "This application is not currently authorized.  To grant authorization,\n";
+    print "Generate an access code at this website:\n\n";
+    print "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}\n";
+    print "or execute: fbcmd go auth\n";
+    print "obtain your authorization code (XXXXXX) and then execute: fbcmd AUTH XXXXXX\n\n";
+  }  
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
