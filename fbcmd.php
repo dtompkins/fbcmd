@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev7';
+  $fbcmdVersion = '1.0-beta3-dev8-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2235,6 +2235,7 @@
   function FbcmdFatalError($err) {
     global $fbcmdVersion;
     error_log("fbcmd [v{$fbcmdVersion}] ERROR: {$err}");
+    PrintFinish();
     exit;
   }
 
