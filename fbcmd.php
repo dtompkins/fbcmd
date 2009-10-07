@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev5';
+  $fbcmdVersion = '1.0-beta3-dev6';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -461,7 +461,6 @@
   $goDestination['wiki']        = 'http://fbcmd.dtompkins.com';
   
   if ($fbcmdCommand == 'GO') {
-    ValidateParamCount(0,1);
     if (ParamCount()==0) {
       print "\nGO Destinations:\n\n";
       foreach ($goDestination as $key => $dest) {
@@ -477,19 +476,6 @@
     if (isset($goDestination[strtolower($fbcmdParams[1])])) {
       LaunchBrowser($goDestination[strtolower($fbcmdParams[1])]);
     }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-  if (!file_exists($fbcmdPrefs['keyfile'])) {
-    print "\n";
-    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
-    print "It appears to be the first time you are running the application\n";
-    print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
-    print "Note this current (default) location for your keyfile.  If you'd like to\n";
-    print "change this location, create an FBCMD environment variable to point to\n";
-    print "a folder where your personal keyfile and preferences will be stored.\n\n";
-    print "see http://fbcmd.dtompkins.com/installation [fbcmd go install] for more info.\n\n";
-    $fbcmdUserSessionKey = 'EMPTY';
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -540,6 +526,21 @@
     if (!$fbcmdPrefs['quiet']) {
       print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD {$fbReturn[0]['name']}.  Try fbcmd help to begin\n"; //todo add go
     }
+    return;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if (!file_exists($fbcmdPrefs['keyfile'])) {
+    print "\n";
+    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
+    print "It appears to be the first time you are running the application\n";
+    print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
+    print "Note this current (default) location for your keyfile.  If you'd like to\n";
+    print "change this location, create an FBCMD environment variable to point to\n";
+    print "a folder where your personal keyfile and preferences will be stored.\n\n";
+    print "see http://fbcmd.dtompkins.com/installation [fbcmd go install] for more info.\n\n";
+    ShowAuth();
     return;
   }
 
@@ -1178,6 +1179,21 @@
       }
     }
   }
+  
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'GO') {
+    ValidateParamCount(1,2); //todo 
+    SetDefaultParam(2,'');
+    $go = strtolower($fbcmdParams[1]);
+    
+    if ($go == 'msg') {
+      if ($fbcmdParams[2]) {
+        $curThreadId = GetThreadId($fbcmdParams[2]);
+        LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
+      }
+    }
+  }  
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2038,9 +2054,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function CheckMailTimeStamp() {
-    LoadMailData();
     global $fbcmdPrefs;
     global $lastMailData;
+    LoadMailData();    
     if (!isset($lastMailData['timestamp'])) {
       if ($fbcmdPrefs['mail_save']) {
         FbcmdFatalError("Unexpected: Could not determine timestamp from last folder command");
@@ -2054,9 +2070,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function CheckStreamTimeStamp() {
-    LoadPostData();
     global $fbcmdPrefs;
     global $lastPostData;
+    LoadPostData();    
     if (!isset($lastPostData['timestamp'])) {
       if ($fbcmdPrefs['stream_save']) {
         FbcmdFatalError("Unexpected: Could not determine timestamp from last stream command");
@@ -2721,6 +2737,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function LaunchBrowser($url) {
+    print "todo: debug: $url\n";
     if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
       pclose(popen("start \"\" /B \"{$url}\"", "r"));  
     } else { 
