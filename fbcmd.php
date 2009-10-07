@@ -1212,9 +1212,11 @@
             FbcmdException($e);
           }
           if (!empty($fbReturn)) {
-            if (isset($fbReturn[0]['attachment']['href'])) {
-              $permalink = false;
-              LaunchBrowser($fbReturn[0]['attachment']['href']);
+            if ($go == 'LINK') {
+              if (isset($fbReturn[0]['attachment']['href'])) {
+                $permalink = false;
+                LaunchBrowser($fbReturn[0]['attachment']['href']);
+              }
             }
             if (!$hasLaunched) {
               print "permalink\n";
