@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev6';
+  $fbcmdVersion = '1.0-beta3-dev7';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -443,38 +443,47 @@
 
 ////////////////////////////////////////////////////////////////////////////////    
 
-  $goDestination['app']         = "http://facebook.com/fbcmd";
-  $goDestination['auth']        = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
-  $goDestination['auth-ps']     = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream";
-  $goDestination['auth-rm']     = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox";
-  $goDestination['auth-rs']     = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream";  
-  $goDestination['contribute']  = 'http://fbcmd.dtompkins.com/contribute';
-  $goDestination['editapps']    = "http://www.facebook.com/editapps.php";
-  $goDestination['faq']         = 'http://fbcmd.dtompkins.com/faq';
-  $goDestination['github']      = 'http://github.com/dtompkins/fbcmd';
-  $goDestination['group']       = 'http://groups.google.com/group/fbcmd';
-  $goDestination['help']        = 'http://fbcmd.dtompkins.com/help';
-  $goDestination['home']        = 'http://fbcmd.dtompkins.com';
-  $goDestination['inbox']       = 'http://www.facebook.com/inbox/';
-  $goDestination['install']     = 'http://fbcmd.dtompkins.com/installation';
-  $goDestination['stream']      = 'http://www.facebook.com/home.php';
-  $goDestination['wiki']        = 'http://fbcmd.dtompkins.com';
+  AddGoDestination('app',         'The fbcmd page on facebook','http://facebook.com/fbcmd');
+  AddGoDestination('auth',        'Authorize fbcmd for login',"http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}");
+  AddGoDestination('auth-ps',     'Authorize fbcmd for post_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream");
+  AddGoDestination('auth-rm',     'Authorize fbcmd for read_mailbox',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox");
+  AddGoDestination('auth-rs',     'Authorize fbcmd for read_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream");  
+  AddGoDestination('contribute',  'The fbcmd contact page','http://fbcmd.dtompkins.com/contribute');
+  AddGoDestination('editapps',    'The facebook edit applications page','http://www.facebook.com/editapps.php');
+  AddGoDestination('faq',         'The fbcmd FAQ','http://fbcmd.dtompkins.com/faq');
+  AddGoDestination('friend.name', 'The facebook page of your friend...uses status tagging','http://fbcmd.dtompkins.com/faq');
+  AddGoDestination('github',      'The source repository at github','http://github.com/dtompkins/fbcmd');
+  AddGoDestination('group',       'The fbcmd discussion group','http://groups.google.com/group/fbcmd');
+  AddGoDestination('help',        'the fbcmd help page','http://fbcmd.dtompkins.com/help');
+  AddGoDestination('home',        'The fbcmd home page','http://fbcmd.dtompkins.com');
+  AddGoDestination('inbox',       'Your facebook inbox','http://www.facebook.com/inbox');
+  AddGoDestination('install',     'The fbcmd installation page','http://fbcmd.dtompkins.com/installation');
+  AddGoDestination('link',        '#A link from a post from he STREAM command');
+  AddGoDestination('msg',         '#A mail thread from he INBOX command');  
+  AddGoDestination('post',        '#A post from the STREAM command');
+  AddGoDestination('stream',      'Your facebook home page','http://www.facebook.com/home.php');
+  AddGoDestination('update',      'The fbcmd update page','http://fbcmd.dtompkins.com/update');
+  AddGoDestination('wall',        'Your facebook profile');
+  AddGoDestination('wiki',        'The fbcmd wiki','http://fbcmd.dtompkins.com');
   
   if ($fbcmdCommand == 'GO') {
     if (ParamCount()==0) {
       print "\nGO Destinations:\n\n";
-      foreach ($goDestination as $key => $dest) {
-        print str_pad("  go {$key}",19,' ') . "{$dest}\n";
+      foreach ($goDestinations as $key) {
+        $desc = $goDestinationsHelp[$key];
+        if (substr($desc,0,1) == "#") {
+          print str_pad("  go {$key} id",19,' ') . substr($desc,1) . "\n";
+        } else {
+          print str_pad("  go {$key}",19,' ') . $desc . "\n";
+        }
       }
       print "\n";
-      print "  go wall          [todo]\n"; // http://www.facebook.com/inbox/?folder=[fb]messages&tid=THREADID
-      print "  go msg #         [todo]\n"; // http://www.facebook.com/inbox/?folder=[fb]messages&tid=THREADID
-      print "  go post #        [todo]\n";
-      print "  go friend.name   [todo]\n";
-      exit;
-    }
-    if (isset($goDestination[strtolower($fbcmdParams[1])])) {
-      LaunchBrowser($goDestination[strtolower($fbcmdParams[1])]);
+      return;
+    } else {
+      if (isset($goDestinationsUrl[strtolower($fbcmdParams[1])])) {
+        LaunchBrowser($goDestinationsUrl[strtolower($fbcmdParams[1])]);
+        return;
+      }
     }
   }
 
@@ -1184,13 +1193,42 @@
 
   if ($fbcmdCommand == 'GO') {
     ValidateParamCount(1,2); //todo 
-    SetDefaultParam(2,'');
-    $go = strtolower($fbcmdParams[1]);
+    $go = strtoupper($fbcmdParams[1]);
     
-    if ($go == 'msg') {
+    if (in_array($go,$goDestinations)) {
+      $hasLaunched = false;
       if ($fbcmdParams[2]) {
-        $curThreadId = GetThreadId($fbcmdParams[2]);
-        LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
+        if ($go == 'MSG') {
+          $curThreadId = GetThreadId($fbcmdParams[2]);
+          LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
+        }
+        if (($go == 'POST')||($go == 'LINK')) {
+          $curPostId = GetPostId($fbcmdParams[2],true);
+          $fql = "SELECT permalink,attachment FROM stream WHERE post_id='{$curPostId}'";
+          try {
+            $fbReturn = $fbObject->api_client->fql_query($fql);
+            TraceReturn($fbReturn);
+          } catch(Exception $e) {
+            FbcmdException($e);
+          }
+          if (!empty($fbReturn)) {
+            if (isset($fbReturn[0]['attachment']['href'])) {
+              $permalink = false;
+              LaunchBrowser($fbReturn[0]['attachment']['href']);
+            }
+            if (!$hasLaunched) {
+              print "permalink\n";
+              LaunchBrowser($fbReturn[0]['permalink']);
+            }
+          }
+        }
+      }
+    } else {
+      $hackTodo = TagText("@$fbcmdParams[1]");
+      if (preg_match('/\[(\d+)\:/',$hackTodo, $matches)) {
+        if (isset($matches[1])) {
+          LaunchBrowser("http://www.facebook.com/profile.php?id=$matches[1]");
+        }
       }
     }
   }  
@@ -1990,6 +2028,18 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+
+  function AddGoDestination($goCmd,$display,$url = '') {
+    global $goDestinations;
+    global $goDestinationsHelp;
+    global $goDestinationsUrl;
+    $goDestinations[] = $goCmd;
+    $goDestinationsHelp[$goCmd] = $display;
+    if ($url) {
+      $goDestinationsUrl[$goCmd] = $url;
+    }
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 
   function AddPreference($pref, $value, $shortcut = '') {
@@ -2737,7 +2787,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function LaunchBrowser($url) {
-    print "todo: debug: $url\n";
+    global $hasLaunched;
+    $hasLaunched = true;
     if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
       pclose(popen("start \"\" /B \"{$url}\"", "r"));  
     } else { 
@@ -3727,7 +3778,7 @@ function TagText($textToTag) {
 
   $textToTag = str_replace('@@','[[AT]]',$textToTag);
   
-  if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches,PREG_SET_ORDER)) {
+  if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches, PREG_SET_ORDER)) {
     
     $fqlMatchFriends = "SELECT uid,name,username FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1={$fbUser} AND uid2=uid2)";
     $fqlMatchPages = "SELECT page_id,name,username FROM page WHERE page_id IN (SELECT page_id FROM page_fan WHERE uid={$fbUser})";
