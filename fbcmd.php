@@ -2667,9 +2667,9 @@
       pclose(popen("start /B $url", "r"));  
     } else { 
       if (strtoupper(substr(PHP_OS, 0, 3)) === 'DAR') {
-        exec("open $url > /dev/null &");
+        exec("open $url > /dev/null 2>&1 &");
       } else {
-        exec("xdg-open $url > /dev/null &");
+        exec("xdg-open $url > /dev/null 2>&1 &");
       }
     } 
   } 
