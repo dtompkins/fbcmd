@@ -406,6 +406,12 @@
   if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
     ShowUsage();
   }
+  
+  if ($fbcmdCommand == 'HOME') {
+    LaunchBrowser("http://fbcmd.dtompkins.com");
+  }
+
+  
 
 ////////////////////////////////////////////////////////////////////////////////  
 
