@@ -29,13 +29,15 @@
       <Component Id="componentFbcmdUpdate" Guid="D95DC5CC-B3F7-11DE-8F6D-DD9056D89593">
         <File Id="fbcmdUpdate" Name="fbcmd_update.php" DiskId="1" Source="../../fbcmd_update.php" />
       </Component>
+      <Component Id="componentAddPath" Guid="AA46399E-B407-11DE-84D0-E97A55D89593">
+        <Environment Id="envPath" Separator=";" Action="set" Name="PATH" System="yes" Part="last" Value="[FBCMDINSTALLDIR]"/>
+      </Component>
     </DirectoryRef>
-    
     <Feature Id="featureInstall" Title="fbcmd :: Command Line Interface for Facebook" Level="1"> 
       <ComponentRef Id="componentInstallDir" /> 
       <ComponentRef Id="componentFbcmdUpdate" />
+      <ComponentRef Id="componentAddPath" />
     </Feature> 
-    
     <UI Id="uiFbcmd">
         <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
         <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
