@@ -31,13 +31,14 @@
       </Component> 
       <Component Id="componentFbcmdUpdate" Guid="D95DC5CC-B3F7-11DE-8F6D-DD9056D89593">
         <File Id="fbcmdUpdate" Name="fbcmd_update.php" DiskId="1" Source="../../fbcmd_update.php" />
+        <File Id="fbcmdBatInstall" Name="fbcmd_install.bat" DiskId="1" Source="fbcmd_install.bat" />
       </Component>
       <Component Id="componentAddPath" Guid="AA46399E-B407-11DE-84D0-E97A55D89593">
         <Environment Id="envPath" Separator=";" Action="set" Name="PATH" System="yes" Part="last" Value="[FBCMDINSTALLDIR]"/>
         <CreateFolder />
       </Component>
       <Component Id="componentRemove" Guid="">
-        <RemoveFolder Id='removeInstallDir' On='uninstall' Directory="FBCMDINSTALLDIR" />
+        <RemoveFolder Id="removeInstallDir" On="uninstall" Directory="FBCMDINSTALLDIR" />
       </Component>      
     </DirectoryRef>
     <Feature Id="featureInstall" Title="fbcmd :: Command Line Interface for Facebook" Level="1"> 
@@ -46,6 +47,13 @@
       <ComponentRef Id="componentAddPath" />
       <ComponentRef Id="componentRemove" />
     </Feature> 
+
+    <CustomAction Id="RunFbcmdInstall" Directory="FBCMDINSTALLDIR" ExeCommand= "cmd.exe /k fbcmd_install.bat" Return="asyncNoWait" />
+    
+    <InstallExecuteSequence>
+       <Custom Action="RunFbcmdInstall" OnExit="success"/>
+    </InstallExecuteSequence>
+    
     <UI>
         <Dialog Id="fbmcdWelcomeDlg" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
             <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
