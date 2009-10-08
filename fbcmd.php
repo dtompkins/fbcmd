@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev8';
+  $fbcmdVersion = '1.0-beta3-dev9-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1192,10 +1192,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'GO') {
+    global $goDestinations;
     ValidateParamCount(1,2); //todo 
-    $go = strtoupper($fbcmdParams[1]);
-    
-    if (in_array($go,$goDestinations)) {
+    $go = $fbcmdParams[1];
+    if (in_array(strtolower($go),$goDestinations)) {
+      $go = strtoupper($go);
       $hasLaunched = false;
       if ($fbcmdParams[2]) {
         if ($go == 'MSG') {
