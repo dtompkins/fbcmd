@@ -252,8 +252,7 @@
     exit;
   }
   
-  $currentPath = getenv('PATH');  
-  if (stripos($currentPath,$fullPath)) {
+  if (stripos(getenv('PATH'),substr($fullPath,0,strlen($fullPath)-1))) {
     print "Found: current path appears to include {$fullPath}\n";
     $showPath = false;
   } else {

@@ -48,10 +48,10 @@
       <ComponentRef Id="componentRemove" />
     </Feature> 
 
-    <CustomAction Id="RunFbcmdInstall" Directory="FBCMDINSTALLDIR" ExeCommand= "cmd.exe /k fbcmd_install.bat" Return="asyncNoWait" />
+    <CustomAction Id="RunFbcmdInstall" Directory="FBCMDINSTALLDIR" ExeCommand= "cmd.exe /k 'php fbcmd_update.php install'" Return="asyncNoWait" />
     
     <InstallExecuteSequence>
-       <Custom Action="RunFbcmdInstall" OnExit="success"/>
+       <Custom Action="RunFbcmdInstall" After="InstallFinalized"/>
     </InstallExecuteSequence>
     
     <UI>
