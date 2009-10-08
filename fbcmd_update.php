@@ -21,8 +21,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 // This is a Utility to update your version of fbcmd
-
-  print "\nFBCMD Update Utility -- version 2.4\n\n";
+  
+  $fbcmdUpdateVersion = '2.5';
+  
+  print "\nFBCMD Update Utility -- version {$fbcmdUpdateVersion}\n\n";
   print "php fbcmd_update.php help for some basic syntax\n\n";  
   print "http://fbcmd.dtompkins.com/update for additional info\n\n";
   

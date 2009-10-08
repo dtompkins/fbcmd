@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"> 
+  <Product Id="B38E807A-B3F7-11DE-A211-188F56D89593" Name="fbcmd Test 5" Language="1033" Version="1.0.0.0" Manufacturer="http://fbcmd.dtompkins.com" UpgradeCode="774CA708-B3E4-11DE-9789-440956D89593"> 
+    <Package InstallerVersion="200" Compressed="yes" /> 
+    <Media Id="1" Cabinet="fbcmd.cab" EmbedCab="yes" />
+    <Directory Id="TARGETDIR" Name="SourceDir"> 
+      <Directory Id="ProgramFilesFolder" Name="PFiles">
+        <Directory Id="FBCMDINSTALLDIR" Name="fbcmd"> 
+        </Directory> 
+      </Directory> 
+    </Directory> 
+    <DirectoryRef Id="FBCMDINSTALLDIR">
+      <Component Id="componentInstallDir" Guid="D40F8650-B3F7-11DE-AD7C-D09056D89593"> 
+        <CreateFolder Directory="FBCMDINSTALLDIR"> 
+          <Permission User="Everyone" GenericAll="yes" /> 
+        </CreateFolder> 
+      </Component> 
+      <Component Id="componentFbcmdUpdate" Guid="D95DC5CC-B3F7-11DE-8F6D-DD9056D89593">
+        <File Id="fbcmdUpdate" Name="fbcmd_update.php" DiskId="1" Source="../../fbcmd_update.php" />
+      </Component>
+    </DirectoryRef>
+    
+    <Feature Id="featureInstall" Title="fbcmd Test 5" Level="1"> 
+      <ComponentRef Id="componentInstallDir" /> 
+      <ComponentRef Id="componentFbcmdUpdate" />
+    </Feature> 
+    
+    <Property Id="WIXUI_INSTALLDIR" Value="FBCMDINSTALLDIR" />
+    <UIRef Id="WixUI_InstallDir"/>    
+    
+  </Product> 
+</Wix>
