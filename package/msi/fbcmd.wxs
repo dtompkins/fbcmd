@@ -10,6 +10,9 @@
     
     You must not remove this notice, or any other, from this software.
 -->
+<!--
+    Modified by Dave Tompkins for fbcmd, 2009.
+-->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"> 
   <Product Id="B38E807A-B3F7-11DE-A211-188F56D89593" Name="fbcmd :: Command Line Interface for Facebook" Language="1033" Version="1.0.0.0" Manufacturer="http://fbcmd.dtompkins.com" UpgradeCode="774CA708-B3E4-11DE-9789-440956D89593"> 
     <Package InstallerVersion="200" Compressed="yes" /> 
@@ -33,11 +36,15 @@
         <Environment Id="envPath" Separator=";" Action="set" Name="PATH" System="yes" Part="last" Value="[FBCMDINSTALLDIR]"/>
         <CreateFolder />
       </Component>
+      <Component Id="componentRemove" Guid="">
+        <RemoveFolder Id='removeInstallDir' On='uninstall' Directory="FBCMDINSTALLDIR" />
+      </Component>      
     </DirectoryRef>
     <Feature Id="featureInstall" Title="fbcmd :: Command Line Interface for Facebook" Level="1"> 
       <ComponentRef Id="componentInstallDir" /> 
       <ComponentRef Id="componentFbcmdUpdate" />
       <ComponentRef Id="componentAddPath" />
+      <ComponentRef Id="componentRemove" />
     </Feature> 
     <UI Id="uiFbcmd">
         <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
@@ -59,12 +66,6 @@
         <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
         <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
         <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
-<!--
-        <Publish Dialog="WelcomeDlg" Control="Next" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
-        <Publish Dialog="LicenseAgreementDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
-        <Publish Dialog="LicenseAgreementDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">LicenseAccepted = "1"</Publish>
-        <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="LicenseAgreementDlg">1</Publish>
--->     
         <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="WelcomeDlg">1</Publish>
         <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
         <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
