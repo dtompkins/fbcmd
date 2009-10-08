@@ -11,10 +11,10 @@
     You must not remove this notice, or any other, from this software.
 -->
 <!--
-    Modified by Dave Tompkins for fbcmd, 2009.
+    Modifications by Dave Tompkins, 2009.
 -->
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"> 
-  <Product Id="B38E807A-B3F7-11DE-A211-188F56D89593" Name="fbcmd :: Command Line Interface for Facebook" Language="1033" Version="1.0.0.0" Manufacturer="http://fbcmd.dtompkins.com" UpgradeCode="774CA708-B3E4-11DE-9789-440956D89593"> 
+  <Product Id="B38E807A-B3F7-11DE-A211-188F56D89593" Name="fbcmd :: Command Line Interface for Facebook" Language="1033" Version="1.0.0.0" Manufacturer="fbcmd.dtompkins.com" UpgradeCode="774CA708-B3E4-11DE-9789-440956D89593"> 
     <Package InstallerVersion="200" Compressed="yes" /> 
     <Media Id="1" Cabinet="fbcmd.cab" EmbedCab="yes" />
     <Directory Id="TARGETDIR" Name="SourceDir"> 
@@ -31,29 +31,31 @@
       </Component> 
       <Component Id="componentFbcmdUpdate" Guid="D95DC5CC-B3F7-11DE-8F6D-DD9056D89593">
         <File Id="fbcmdUpdate" Name="fbcmd_update.php" DiskId="1" Source="../../fbcmd_update.php" />
-        <File Id="fbcmdBatInstall" Name="fbcmd_install.bat" DiskId="1" Source="fbcmd_install.bat" />
       </Component>
       <Component Id="componentAddPath" Guid="AA46399E-B407-11DE-84D0-E97A55D89593">
         <Environment Id="envPath" Separator=";" Action="set" Name="PATH" System="yes" Part="last" Value="[FBCMDINSTALLDIR]"/>
         <CreateFolder />
       </Component>
+<!-- 
       <Component Id="componentRemove" Guid="">
         <RemoveFolder Id="removeInstallDir" On="uninstall" Directory="FBCMDINSTALLDIR" />
       </Component>      
+-->      
     </DirectoryRef>
     <Feature Id="featureInstall" Title="fbcmd :: Command Line Interface for Facebook" Level="1"> 
+      <ComponentRef Id="componentAddPath" />    
       <ComponentRef Id="componentInstallDir" /> 
       <ComponentRef Id="componentFbcmdUpdate" />
-      <ComponentRef Id="componentAddPath" />
-      <ComponentRef Id="componentRemove" />
+<!--  
+      <ComponentRef Id="componentRemove" /> 
+-->
     </Feature> 
-
-    <CustomAction Id="RunFbcmdInstall" Directory="FBCMDINSTALLDIR" ExeCommand= "cmd.exe /k 'php fbcmd_update.php install'" Return="asyncNoWait" />
-    
+    <CustomAction Id="RunFbcmdInstall" Directory="FBCMDINSTALLDIR" ExeCommand= 'cmd.exe /k "php.exe fbcmd_update.php install"' Return="asyncNoWait" />
+    <CustomAction Id="RunFbcmdRemove" Directory="FBCMDINSTALLDIR" ExeCommand= 'cmd.exe /c "php.exe fbcmd_update.php remove"' Return="ignore" />
     <InstallExecuteSequence>
-       <Custom Action="RunFbcmdInstall" After="InstallFinalized"/>
+       <Custom Action="RunFbcmdInstall" After="InstallFinalize">NOT Installed</Custom>
+       <Custom Action="RunFbcmdRemove" After="InstallInitialize">Installed</Custom>
     </InstallExecuteSequence>
-    
     <UI>
         <Dialog Id="fbmcdWelcomeDlg" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
             <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
@@ -66,7 +68,6 @@
             <Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="*** WARNING *** You should install PHP _before_ you install fbcmd.  See http://fbcmd.dtompkins.com/installation for more details ***" />
             <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeDlgTitle)" />
         </Dialog>
-
         <InstallUISequence>
             <Show Dialog="fbmcdWelcomeDlg" Before="ProgressDlg">NOT Installed</Show>
         </InstallUISequence>
@@ -106,6 +107,7 @@
         <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
         <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
         <Property Id="ARPNOMODIFY" Value="1" />
+        <Property Id="ARPNOREPAIR" Value="1" />
     </UI>
     <UIRef Id="WixUI_Common" />
     <Property Id="WIXUI_INSTALLDIR" Value="FBCMDINSTALLDIR" />
