@@ -31,6 +31,7 @@
       </Component>
       <Component Id="componentAddPath" Guid="AA46399E-B407-11DE-84D0-E97A55D89593">
         <Environment Id="envPath" Separator=";" Action="set" Name="PATH" System="yes" Part="last" Value="[FBCMDINSTALLDIR]"/>
+        <CreateFolder />
       </Component>
     </DirectoryRef>
     <Feature Id="featureInstall" Title="fbcmd :: Command Line Interface for Facebook" Level="1"> 
