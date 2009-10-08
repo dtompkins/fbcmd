@@ -1,4 +1,5 @@
 set path=%path%;C:\Program Files\Windows Installer XML v3\bin
+del Install*.msi
 candle fbcmd.wxs 
 light -ext WixUIExtension fbcmd.wixobj
 del fbcmd.wixobj
