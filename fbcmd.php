@@ -373,6 +373,7 @@
   AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
+  AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');  
   AddCommand('POST',      'message [name] [link] [caption] [desc]~Post (share) a story in your stream');
   AddCommand('POSTIMG',   'message img_src [img_link] [name] [link] [caption] [desc]~Post (share) an image in your stream');
   AddCommand('POSTMP3',   'msg mp3_src [title] [artist] [album] [name] [link] [caption] [desc]~Post (share) an .mp3 file in your stream');
@@ -391,7 +392,6 @@
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
   AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
-  AddCommand('UPDATES',   '[count|unread|new]~Display the latest updates from pages you are a fan of');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
   AddCommand('WALLPOST',  'flist message~Post a message on the wall of friend(s)');
@@ -1540,6 +1540,34 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'PINBOX') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
+    if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
+      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND unread > 0";
+    } else {
+      if (strtoupper($fbcmdParams[1]) == 'NEW') {
+        CheckMailTimeStamp();
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND updated_time > {$lastMailData['timestamp']}";
+      } else {
+        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
+      }
+    }
+    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    $keyMessageNames = 'id';
+    MultiFQL(array('Thread','MessageNames'));
+    if (!empty($dataThread)) {
+      PrintFolderHeader();
+      $threadNum = 0;
+      foreach ($dataThread as $t) {
+        PrintFolderObject(++$threadNum,$t);
+      }
+      SaveMailData($dataThread);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'POST') {
     ValidateParamCount(1,5);
     SetDefaultParam(1,$fbcmdPrefs['default_post_message']);
@@ -1951,34 +1979,6 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'UPDATES') {
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
-    if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND unread > 0";
-    } else {
-      if (strtoupper($fbcmdParams[1]) == 'NEW') {
-        CheckMailTimeStamp();
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND updated_time > {$lastMailData['timestamp']}";
-      } else {
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
-      }
-    }
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-    $keyMessageNames = 'id';
-    MultiFQL(array('Thread','MessageNames'));
-    if (!empty($dataThread)) {
-      PrintFolderHeader();
-      $threadNum = 0;
-      foreach ($dataThread as $t) {
-        PrintFolderObject(++$threadNum,$t);
-      }
-      SaveMailData($dataThread);
-    }
-  }
-  
-////////////////////////////////////////////////////////////////////////////////
   if ($fbcmdCommand == 'VERSION') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
@@ -2216,7 +2216,7 @@
     }
     $eCode = $e->getCode();
     if ($eCode == 612) {
-      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MSG')||($defaultCommand == 'SENTMAIL')||($defaultCommand == 'UPDATES')) {
+      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MSG')||($defaultCommand == 'PINBOX')||($defaultCommand == 'SENTMAIL')) {
         FbcmdPermissions('read_mailbox');
       } else {
         FbcmdPermissions('read_stream');
