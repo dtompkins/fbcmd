@@ -78,6 +78,7 @@
   
   // Set the defaults for fbcmd... these can be overridden in prefs.php
   $fbcmdPrefs['update_branch'] = 'master';
+  $fbcmdPrefs['install_script_name'] = 'fbcmd';
   if ($isWindows) {
     $fbcmdPrefs['install_dir'] = CleanPath($thisProgramFolder);
     $fbcmdPrefs['install_copy_to_path'] = '0';
@@ -93,7 +94,8 @@
   TraceVar('defaultInstallDir');
   
 ////////////////////////////////////////////////////////////////////////////////  
-  
+
+  $isSudo = false;
   $envFbcmd = getenv('FBCMD');
   TraceVar('envFbcmd');
   if ($envFbcmd) {
@@ -106,10 +108,16 @@
         $fbcmdBaseDir = 'c:/fbcmd/';
       }
     } else {
-      $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
+      if (getenv('SUDO_USER')) {
+        $fbcmdBaseDir = '~' . getenv('SUDO_USER') . '/.fbcmd/';
+        $isSudo = true;
+      } else {
+        $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
+      }
     }
   }
   TraceVar('fbcmdBaseDir');
+  TraceVar('isSudo');  
   
 ////////////////////////////////////////////////////////////////////////////////  
 
@@ -185,7 +193,7 @@
   
 ////////////////////////////////////////////////////////////////////////////////  
   
-  if (($isIncludeFile == false)&&($specifiedBranch != 'remove')&&($specifiedBranch != 'clear')) {
+  if (($isIncludeFile == false)&&($specifiedBranch != 'remove')&&($specifiedBranch != 'clear')&&($isSudo == false)) {
     if (!file_exists($fbcmdBaseDir)) {
       if (mkdir($fbcmdBaseDir,0700,true)) {
         Trace("creating directory [{$fbcmdBaseDir}]");
@@ -199,7 +207,7 @@
   
 ////////////////////////////////////////////////////////////////////////////////    
 
-  if ($isSavePrefs) {
+  if (($isSavePrefs)&&($isSudo == false)) {
     $fileContents = SavePrefsContents();
     if (file_put_contents($prefsFile,$fileContents)) {
       Trace("creating file [{$prefsFile}]");
@@ -259,9 +267,9 @@
   if ($specifiedBranch == 'remove') {
     if ($fbcmdPrefs['install_copy_to_path']) {
       if ($isWindows) {
-        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . "fbcmd.bat";
+        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . $fbcmdPrefs['install_script_name'] . '.bat';
       } else {
-        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . "fbcmd";
+        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . $fbcmdPrefs['install_script_name'];
       }
       DeleteFileOrDirectory($pathShell);
     }
@@ -284,9 +292,9 @@
   $mainFile = "{$installFolder}fbcmd.php";
   $updateFile = "{$installFolder}fbcmd_update.php";  
   if ($isWindows) {
-    $scriptName = "fbcmd.bat";
+    $scriptName = $fbcmdPrefs['install_script_name'] . '.bat';
   } else {
-    $scriptName = "fbcmd";
+    $scriptName = $fbcmdPrefs['install_script_name'];
   }
   $fullScriptName = "{$installFolder}$scriptName";
   $fullPathScript = CleanPath($fbcmdPrefs['install_path_dir']) . $scriptName;
