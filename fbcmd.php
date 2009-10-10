@@ -175,7 +175,7 @@
   AddPreference('print_wrap_cut','1','cut');
   AddPreference('print_wrap_env_var','COLUMNS');
   AddPreference('print_wrap_min_width','20');
-  AddPreference('print_wrap_width','80');
+  AddPreference('print_wrap_width','80','col');
   AddPreference('quiet','0','q');
   AddPreference('restatus_comment_new','1');
   AddPreference('savepref_include_files','0','spf');
