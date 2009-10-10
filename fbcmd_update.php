@@ -203,7 +203,7 @@
   if ($isSavePrefs) {
     $fileContents = SavePrefsContents();
     if (file_put_contents($prefsFile,$fileContents)) {
-      Trace("creating file [{$fbcmdBaseDir}]");
+      Trace("creating file [{$prefsFile}]");
     } else {
       print "Error: cound not create file: [{$prefsFile}]\n";
       FatalError();
@@ -219,7 +219,7 @@
     print "Copy script to path?:            ";
     if ($fbcmdPrefs['install_copy_to_path']) {
       print "[Yes]\n";
-      print "Path location:                 [{$fbcmdPrefs['install_path_dir']}]\n\n";
+      print "Path location:                   [{$fbcmdPrefs['install_path_dir']}]\n\n";
     } else {
       print "[No]\n";
     }
@@ -308,7 +308,7 @@
   if (file_put_contents($fullScriptName,$contentsBatch)) {
     Trace ("created script: [{$fullScriptName}]");
     if (!$isWindows) {
-      if (chmod($scriptName,0777)) {
+      if (chmod($fullScriptName,0777)) {
         Trace ("chmod script: [{$fullScriptName}]");
       } else {
         print "error chmod: [{$fullScriptName}] (non-fatal)\n";
@@ -369,7 +369,7 @@
   
   if (($newUpdateVersion > $fbcmdUpdateVersion)||(!file_exists($updateFile))) {
     if (file_put_contents($updateFile,$contentsRemoteUpdater)) {
-      Trace("creating [{$updateFIle}]");
+      Trace("creating [{$updateFile}]");
       if ($newUpdateVersion > $fbcmdUpdateVersion) {
         if ($fbcmdPrefs['install_auto_restart']) {
           print "\nNewer update software downloaded [{$fbcmdUpdateVersion}] -> [{$newUpdateVersion}]\n";
