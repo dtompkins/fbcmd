@@ -220,7 +220,7 @@
     print "Copy script to path?:            ";
     if ($fbcmdPrefs['install_copy_to_path']) {
       print "[Yes]\n";
-      print "Path location:                   [{$fbcmdPrefs['install_path_dir']}]\n\n";
+      print "Path location:                   [{$fbcmdPrefs['install_path_dir']}]\n";
     } else {
       print "[No]\n";
     }
@@ -291,7 +291,9 @@
     $scriptName = "fbcmd";
   }
   $fullScriptName = "{$installFolder}$scriptName";
+  $fullPathScript = CleanPath($fbcmdPrefs['install_path_dir']) . $scriptName;
   TraceVar('fullScriptName');  
+  TraceVar('fullPathScript'); 
   
 ////////////////////////////////////////////////////////////////////////////////    
   
@@ -306,6 +308,7 @@
     $contentsBatch .= "# *** {$comment}\n";
     $contentsBatch .= "php \"$mainFile\" $* -col=$(tput cols)\n";
   }
+  
   if (file_put_contents($fullScriptName,$contentsBatch)) {
     Trace ("created script: [{$fullScriptName}]");
     if (!$isWindows) {
@@ -320,22 +323,32 @@
     FatalError();
   }
   
-////////////////////////////////////////////////////////////////////////////////          
+////////////////////////////////////////////////////////////////////////////////
+
+  $isCopyToPath = false
   
-  if (($fbcmdPrefs['install_copy_to_path'])&&(($specifiedBranch == 'install')||($specifiedBranch == 'script'))) {
-    $fullScriptName = CleanPath($fbcmdPrefs['install_path_dir']) . $scriptName;
-    TraceVar('fullScriptName');
-    if (file_put_contents($fullScriptName,$contentsBatch)) {
-      Trace ("created script: [{$fullScriptName}]");
+  if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
+    $isCopyToPath = true;
+  }
+  if ($fbcmdPrefs['install_copy_to_path']) {
+    if (!file_exists($fullPathScript)) {
+      $isCopyToPath = true;
+    }
+  }
+  TraceVar('isCopyToPath');
+  
+  if ($isCopyToPath) {
+    if (file_put_contents($fullPathScript,$contentsBatch)) {
+      Trace ("created script: [{$fullPathScript}]");
       if (!isWindows) {
         if (chmod($scriptName,0777)) {
-          Trace ("chmod script: [{$fullScriptName}]");
+          Trace ("chmod script: [{$fullPathScript}]");
         } else {
-          print "error chmod: [{$fullScriptName}] (non-fatal)\n";
+          print "error chmod: [{$fullPathScript}] (non-fatal)\n";
         }
       }
     } else {
-      print "Error: cound not create file: [{$fullScriptName}]\n";
+      print "Error: cound not create file: [{$fullPathScript}]\n";
       FatalError();
     }
   }
@@ -460,7 +473,7 @@
   exit;
   
   function DeleteFileOrDirectory($dir) { # snagged from http://ca3.php.net/rmdir
-    Trace('deleting [{$dir}]');
+    Trace("deleting [{$dir}]");
     if (!file_exists($dir)) return true;
     if (!is_dir($dir)) {
       if (unlink($dir)) {
