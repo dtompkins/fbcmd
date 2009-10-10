@@ -22,296 +22,489 @@
 
 // This is a Utility to update your version of fbcmd
   
-  $fbcmdUpdateVersion = '2.5';
+////////////////////////////////////////////////////////////////////////////////  
+
+  $isTrace = 0;
+  if (isset($argv[3])) {
+    if ($argv[3]) {
+      $isTrace = 1;
+    }
+  }
   
-  print "\nFBCMD Update Utility -- version {$fbcmdUpdateVersion}\n\n";
-  print "php fbcmd_update.php help for some basic syntax\n\n";  
-  print "http://fbcmd.dtompkins.com/update for additional info\n\n";
+////////////////////////////////////////////////////////////////////////////////    
+
+  $isContinueOnError = 0;
+  if (isset($argv[4])) {
+    if ($argv[4]) {
+      $isContinueOnError = 1;
+    }
+  }
+  TraceVar('isContinueOnError');
+  
+////////////////////////////////////////////////////////////////////////////////  
+
+// Note: The Installer version is independent of the fbcmd version
+
+  $fbcmdUpdateVersion = '2.6';
+  TraceVar('fbcmdUpdateVersion');
+  
+////////////////////////////////////////////////////////////////////////////////  
+  
+  print "\n";
+  print "fbcmd update utility [version {$fbcmdUpdateVersion}]\n";
+  print "http://fbcmd.dtompkins.com/update\n";
+  print "for basic syntax: php fbcmd_update.php help\n\n";  
+  
+////////////////////////////////////////////////////////////////////////////////  
   
   if (isset($argv[0])) {
     $thisProgram = $argv[0];
   } else {
     $thisProgram = "./fbcmd_update.php";
   }
-  $thisProgramFolder = dirname($thisProgram);
+  $thisProgramFolder = realpath(dirname($thisProgram));  
+  TraceVar('thisProgram');
+  TraceVar('thisProgramFolder');
   
+////////////////////////////////////////////////////////////////////////////////  
+  
+  if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
+    $isWindows = true;
+  } else {
+    $isWindows = false;
+  }
+  TraceVar('isWindows');
+  
+////////////////////////////////////////////////////////////////////////////////  
+  
+  // Set the defaults for fbcmd... these can be overridden in prefs.php
+  $fbcmdPrefs['update_branch'] = 'master';
+  if ($isWindows) {
+    $fbcmdPrefs['install_dir'] = CleanPath($thisProgramFolder);
+    $fbcmdPrefs['install_copy_to_path'] = '0';
+    $fbcmdPrefs['install_path_dir'] = '';
+  } else {
+    $fbcmdPrefs['install_dir'] = '/usr/local/lib/fbcmd/';
+    $fbcmdPrefs['install_copy_to_path'] = '1';
+    $fbcmdPrefs['install_path_dir'] = '/usr/local/bin/';
+  }
+  $fbcmdPrefs['mkdir_mode'] = 0777;
+  $fbcmdPrefs['install_auto_restart'] = '1';
+  $defaultInstallDir = $fbcmdPrefs['install_dir'];
+  TraceVar('defaultInstallDir');
+  
+////////////////////////////////////////////////////////////////////////////////  
+  
+  $envFbcmd = getenv('FBCMD');
+  TraceVar('envFbcmd');
+  if ($envFbcmd) {
+    $fbcmdBaseDir = CleanPath($envFbcmd);  
+  } else {
+    if ($isWindows) {
+      if (getenv('USERPROFILE')) {
+        $fbcmdBaseDir = CleanPath(getenv('USERPROFILE')) . 'fbcmd/';
+      } else {
+        $fbcmdBaseDir = 'c:/fbcmd/';
+      }
+    } else {
+      $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
+    }
+  }
+  TraceVar('fbcmdBaseDir');
+  
+////////////////////////////////////////////////////////////////////////////////  
+
+  $isSavePrefs = false;
+  $prefsFile = "{$fbcmdBaseDir}prefs.php";
+  if (file_exists($prefsFile)) {
+    include($prefsFile);
+    $isIncludeFile = true;
+  } else {
+    $isIncludeFile = false;
+  }
+  TraceVar('isIncludeFile');  
+  
+////////////////////////////////////////////////////////////////////////////////  
+
   $specifiedBranch = '';
   if (isset($argv[1])) {
     $specifiedBranch = strtolower($argv[1]);
-    if (($specifiedBranch=='-h')||($specifiedBranch=='help')||($specifiedBranch=='--help')) {
-      print "syntax: php fbcmd_update.php [branch|keyword] [folder] [ignore_err]\n\n";
-      print "  branch:      is typically master (default) but can be 'beta' or 'dev'\n";
-      print "               you can set this default with the update_branch preference\n";
-      print "  keyword:     instead of branch, you can specify keywords: 'help' or 'script'\n";
-      print "  folder:      defaults to the same folder as fbcmd_update.php\n";
-      print "  ignore_err:  set to 1 if you wish to ignore errors\n\n";
-      exit;
-    }
   }
+  TraceVar('specifiedBranch');
+  
+////////////////////////////////////////////////////////////////////////////////  
 
   if (isset($argv[2])) {
-    $installFolder = $argv[2];
+    $fbcmdPrefs['install_dir'] = $argv[2];
+    CheckPath($fbcmdPrefs['install_dir']);
+    $fbcmdPrefs['install_dir'] = CleanPath(realpath($fbcmdPrefs['install_dir']));
+    $isSavePrefs = true;
+  } 
+  
+////////////////////////////////////////////////////////////////////////////////    
+
+  $keywords = array('-h','help','--help','clear','install','remove','script');
+  
+  $isHelp = false;
+  $isKeyword = false;
+  if (in_array($specifiedBranch,$keywords)) {
+    if (($specifiedBranch=='-h')||($specifiedBranch=='help')||($specifiedBranch=='--help')) {
+      $isHelp = true;
+    }
+    $isKeyword = true;
+  }
+  TraceVar('isKeyword');
+  TraceVar('isHelp');
+  
+////////////////////////////////////////////////////////////////////////////////  
+  
+  if ((($specifiedBranch == '')||($isHelp))&&($isIncludeFile == false)) {
+    $isFirstInstall = true;
   } else {
-    $installFolder = $thisProgramFolder;
+    $isFirstInstall = false;
+  }
+  TraceVar('isFirstInstall');  
+  
+////////////////////////////////////////////////////////////////////////////////  
+  
+  if ($isHelp) {
+    print "\nphp fbcmd_update.php [branch|keyword] [folder] [trace] [ignore_err]\n\n";
+    print "branch:      Software development branch\n";
+    print "                 master   stable, not all features available\n";
+    print "                 beta     reaonably stable, subject to minor changes\n";
+    print "                 dev      latest features, expect changes\n\n";
+    print "keyword:     Instead of a branch, you can specify one of:\n";
+    print "                 help     display this message\n";
+    print "                 install  performa a full install\n";
+    print "                 script   regenerate the fbcmd script\n";
+    print "                 clear    clear your personal user settings\n";    
+    print "                 remove   removes fbcmd from your system\n\n";
+    print "folder:      Specify a destination installtion directory\n\n";
+    print "trace:       Defaults to 0.  Set to 1 for verbose output\n\n";
+    print "ignore_err:  Defaults to 0.  Set to 1 to ignore fatal errors\n\n\n";
   }
   
-  $continueOnError = false;
-  if (isset($argv[3])) {
-    if ($argv[3]) {
-      $continueOnError = true;
-    }
-  }
+////////////////////////////////////////////////////////////////////////////////  
   
-  $installFolder = CleanPath($installFolder);
-  CheckPath($installFolder);
-  $fullPath = realpath($installFolder);
-  if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
-    $fullPath = str_replace('/', '\\', $fullPath);
-  }  
-  print "Installation folder: {$fullPath}\n";
-  
-  $mainFile = "{$installFolder}fbcmd.php";
-  $newProgram = "{$installFolder}fbcmd_update.php";  
-  
-  if ($specifiedBranch != 'script') {
-  
-    $fbcmdBaseDir = getenv('FBCMD');
-    if ($fbcmdBaseDir) {
-      $isFbcmdSet = true;
-      print "Found: environment variable FBCMD={$fbcmdBaseDir}\n";
-      $fbcmdBaseDir = CleanPath($fbcmdBaseDir);
-    } else {
-      $isFbcmdSet = false;
-      if (strtoupper(substr(PHP_OS, 0, 3)) === 'WIN') {
-        if (getenv('USERPROFILE')) {
-          $fbcmdBaseDir = CleanPath(getenv('USERPROFILE')) . 'fbcmd/';
-        } else {
-          $fbcmdBaseDir = 'c:/fbcmd/';
-        }
+  if (($isIncludeFile == false)&&($specifiedBranch != 'remove')&&($specifiedBranch != 'clear')) {
+    if (!file_exists($fbcmdBaseDir)) {
+      if (mkdir($fbcmdBaseDir,0700,true)) {
+        Trace("creating directory [{$fbcmdBaseDir}]");
       } else {
-        $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
-      }
-      print "Not found: environment variable FBCMD (default is {$fbcmdBaseDir})\n";
-    }
-
-    // set some simple defaults:
-    $fbcmdPrefs['mkdir_mode'] = 0777;
-    $fbcmdPrefs['update_branch'] = 'master';
-    
-    if (file_exists("{$fbcmdBaseDir}prefs.php")) {
-      print "Loading: preference file: {$fbcmdBaseDir}prefs.php\n";
-      include("{$fbcmdBaseDir}prefs.php");
-    } else {
-      print "Not found: preference file: [{$fbcmdBaseDir}prefs.php] (using defaults)\n";
-    }
-    
-    $defaultBranch = strtolower($fbcmdPrefs['update_branch']);
-    if ($specifiedBranch) {
-      $branch = $specifiedBranch;
-      if ($defaultBranch != $branch) {
-        print "Overriding default branch: [$defaultBranch] with [$branch]\n";
-      } else {
-        print "Specified and default branch are both: [$branch]\n";
-      }
-    } else {
-      $branch = $defaultBranch; 
-      print "Using default branch: [$branch]\n";
-    }
-    
-    if (!in_array($branch,array('master','beta','dev'))) {
-      print "Warning: [$branch] is not one of [master|beta|dev]\n";
-    }
-
-    $oldVersion = 'none';
-    $newVersion = '';
-    
-    if (file_exists($mainFile)) {
-      print "Found: existing fbcmd: {$mainFile}\n";
-      $oldFileContents = @file_get_contents($mainFile);
-      preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$oldFileContents,$matches);
-      if (isset($matches[1])) {
-        $oldVersion = $matches[1];
-      } else {
-        print "Non-fatal error: could not determine old version\n";
-      }
-    }
-    
-    $contentsCurrentUpdater = '';  
-    if (file_exists($thisProgram)) {
-      print "Loading current updater: [{$thisProgram}]... ";
-      $contentsCurrentUpdater = @file_get_contents($thisProgram);
-      if ($contentsCurrentUpdater) {
-        print "ok\n";
-      } else {
-        print "fail! (non-fatal)\n";
-      }
-    }
-
-    $contentsRemoteUpdater = GetGithub("fbcmd_update.php",false);
-    
-    if ($contentsCurrentUpdater == $contentsRemoteUpdater) {
-      print "Current updater is up to date\n";
-    } else {
-      print "Current updater does not match (is out of date)\n";
-    }
-    if (($contentsCurrentUpdater != $contentsRemoteUpdater)||(realpath($thisProgram) != realpath($newProgram))) {  
-      print "Saving: [$newProgram]...";    
-      if (@file_put_contents("$newProgram",$contentsRemoteUpdater)) {
-        print "ok\n";
-        if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-          print "Making new updater executable...";
-          if (chmod("$newProgram",0755)) {
-            print "ok\n";
-          } else {
-            print "fail (do it maually: chmod +x fbcmd_updater.php)\n";
-          }
-        }
-        if ($contentsCurrentUpdater != $contentsRemoteUpdater) {
-          if (realpath($thisProgram) == realpath($newProgram)) {
-            print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
-          } else {
-            print "\nUpdate INCOMPLETE: run the NEW updater: [$newProgram]\n\n";
-          }
-          FatalError();
-        }
-      } else {
-        print "fail!\n";
-        print "Fatal error: could not save [$newProgram]\n\n";
+        print "Error: cound not create directory: [{$fbcmdBaseDir}]\n";
         FatalError();
       }
     }
-    
-    $fileList = GetGithub("filelist.txt");
-    $files = explode("\n",$fileList);
-    foreach ($files as $f) {
-      $g = preg_replace('/\s*\#.*$/','',$f);
-      if ($g) {
-        $contents = GetGithub($g);
-        if ($g == 'fbcmd.php') {
-          preg_match("/fbcmdVersion\s=\s'([^']+)'/",$contents,$matches);
-          if (isset($matches[1])) {
-            $newVersion = $matches[1];
-          } else {
-            print "Non-fatal error: could not determine new version\n";
-            $newVersion = '???';
-          }
-        }      
-      }
-    }
+    $isSavePrefs = true;
   }
   
-  $comment1 = "This script file was auto-generated by fbcmd_update.php";
-  $comment2 = "You should add the folder [{$fullPath}] to your PATH";
-  $comment3 = "or copy this file to a pathed folder";  
+////////////////////////////////////////////////////////////////////////////////    
 
-  $execPath = realpath($mainFile);
-  
-  if (file_exists($mainFile)) {
-    if ($execPath == '') {
-      print "Unexpected Error: can't resolve [{$mainFile}]\n";
+  if ($isSavePrefs) {
+    $fileContents = SavePrefsContents();
+    if (file_put_contents($prefsFile,$fileContents)) {
+      Trace("creating file [{$fbcmdBaseDir}]");
+    } else {
+      print "Error: cound not create file: [{$prefsFile}]\n";
       FatalError();
     }
-  } else {
-    print "Unexpected Error: can't find [{$mainFile}]\n";
-    FatalError();
   }
   
-  if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
-    $contentsBatch = "@echo off\n";
-    $contentsBatch .= "REM *** {$comment1}\n";
-    $contentsBatch .= "REM *** {$comment2}\n";
-    $contentsBatch .= "REM *** {$comment3}\n";
-    $contentsBatch .= "php \"$execPath\" %*\n";
-    $batchName = "{$installFolder}fbcmd.bat";
-  } else {
-    $contentsBatch = "#! /bin/bash\n";
-    $contentsBatch .= "# *** {$comment1}\n";
-    $contentsBatch .= "# *** {$comment2}\n";
-    $contentsBatch .= "# *** {$comment3} such as /usr/local/bin\n";
-    $contentsBatch .= "php \"$execPath\" $* -print_wrap_width=$(tput cols)\n";
-    $batchName = "{$installFolder}fbcmd";
-  }
-  print "Generating script file: [{$batchName}]...";
-  if (@file_put_contents("{$batchName}",$contentsBatch)) {
-    print "ok\n";
-    if (strtoupper(substr(PHP_OS, 0, 3)) != 'WIN') {
-      print "Making script file executable: [{$batchName}]...";
-      if (chmod($batchName,0755)) {
-        print "ok\n";
+////////////////////////////////////////////////////////////////////////////////  
+  
+  if (($isHelp)||($isFirstInstall)) {
+    print "Preference file:                 [{$prefsFile}]\n\n";
+    print "Software development branch:     [{$fbcmdPrefs['update_branch']}]\n";
+    print "Software library destination:    [{$fbcmdPrefs['install_dir']}]\n";
+    print "Copy script to path?:            ";
+    if ($fbcmdPrefs['install_copy_to_path']) {
+      print "[Yes]\n";
+      print "Path location:                 [{$fbcmdPrefs['install_path_dir']}]\n\n";
+    } else {
+      print "[No]\n";
+    }
+    print "Auto-restart when necessary:     ";
+    if ($fbcmdPrefs['install_auto_restart']) {
+      print "[Yes]\n\n";
+    } else {
+      print "[No]\n\n";
+    }
+    
+    
+    if ($isFirstInstall) {
+      print "\n\n";
+      print "Welcome!  This appears to be the first time running fbcmd_update.\n";
+      print "\n";
+      print "To change any of the above settings, modify your preferences file\n";
+      print "To change your preferences file location, set an FBCMD environment var.\n\n";
+      print "Otherwise, The above default settings are fine for most users\n\n";      
+      print "To finish the installation, re-execute this command\n";
+      if ($isWindows) {
+        print "\n   php fbcmd_update.php\n\n";
       } else {
-        print "fail (do it maually: chmod +x fbcmd)\n";
+        print "\n   $ sudo php fbcmd_update.php\n\n";
       }
     }
-  } else {
-    print "fail!\n";
-    FatalError();  
-  }
-  
-  if ($specifiedBranch == 'script') {
-    print "\n";
     exit;
   }
   
-  if (stripos(getenv('PATH'),substr($fullPath,0,strlen($fullPath)-1))) {
-    print "Found: current path appears to include {$fullPath}\n";
-    $showPath = false;
-  } else {
-    $showPath = true;
+////////////////////////////////////////////////////////////////////////////////    
+
+  if (($specifiedBranch == 'clear')||($specifiedBranch == 'remove')) {
+    DeleteFileOrDirectory($fbcmdBaseDir);
+    if ($specifiedBranch == 'clear') {
+      exit;
+    }
   }
+  
+  if ($specifiedBranch == 'remove') {
+    if ($fbcmdPrefs['install_copy_to_path']) {
+      if ($isWindows) {
+        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . "fbcmd.bat";
+      } else {
+        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . "fbcmd";
+      }
+      DeleteFileOrDirectory($pathShell);
+    }
+    DeleteFileOrDirectory($fbcmdPrefs['install_dir']);
+    exit;
+  }
+  
+////////////////////////////////////////////////////////////////////////////////      
+
+  $installFolder = $fbcmdPrefs['install_dir'];
+  CheckPath($installFolder);  
+  $installFolder = CleanPath(realpath($installFolder));
+  $installFolderOS = $installFolder;
+  if ($isWindows) {
+    $installFolderOS = str_replace('/', '\\', $installFolderOS);
+  }
+  TraceVar('installFolder');  
+  TraceVar('installFolderOS');
+  
+  $mainFile = "{$installFolder}fbcmd.php";
+  $updateFile = "{$installFolder}fbcmd_update.php";  
+  if ($isWindows) {
+    $scriptName = "fbcmd.bat";
+  } else {
+    $scriptName = "fbcmd";
+  }
+  $fullScriptName = "{$installFolder}$scriptName";
+  TraceVar('fullScriptName');  
+  
+////////////////////////////////////////////////////////////////////////////////    
+  
+  $comment = "This script file was auto-generated by [{$updateFile}]";
+  
+  if ($isWindows) {
+    $contentsBatch = "@echo off\n";
+    $contentsBatch .= "REM *** {$comment}\n";
+    $contentsBatch .= "php \"$mainFile\" %*\n";
+  } else {
+    $contentsBatch = "#! /bin/bash\n";
+    $contentsBatch .= "# *** {$comment}\n";
+    $contentsBatch .= "php \"$mainFile\" $* -col=$(tput cols)\n";
+  }
+  if (file_put_contents($fullScriptName,$contentsBatch)) {
+    Trace ("created script: [{$fullScriptName}]");
+    if (!$isWindows) {
+      if (chmod($scriptName,0777)) {
+        Trace ("chmod script: [{$fullScriptName}]");
+      } else {
+        print "error chmod: [{$fullScriptName}] (non-fatal)\n";
+      }
+    }
+  } else {
+    print "Error: cound not create file: [{$fullScriptName}]\n";
+    FatalError();
+  }
+  
+////////////////////////////////////////////////////////////////////////////////          
+  
+  if (($fbcmdPrefs['install_copy_to_path'])&&(($specifiedBranch == 'install')||($specifiedBranch == 'script'))) {
+    $fullScriptName = CleanPath($fbcmdPrefs['install_path_dir']) . $scriptName;
+    TraceVar('fullScriptName');
+    if (file_put_contents($fullScriptName,$contentsBatch)) {
+      Trace ("created script: [{$fullScriptName}]");
+      if (!isWindows) {
+        if (chmod($scriptName,0777)) {
+          Trace ("chmod script: [{$fullScriptName}]");
+        } else {
+          print "error chmod: [{$fullScriptName}] (non-fatal)\n";
+        }
+      }
+    } else {
+      print "Error: cound not create file: [{$fullScriptName}]\n";
+      FatalError();
+    }
+  }
+  
+  if ($specifiedBranch == 'script') {
+    exit;
+  }
+  
+////////////////////////////////////////////////////////////////////////////////        
+  
+  $defaultBranch = strtolower($fbcmdPrefs['update_branch']);
+  $branch = $defaultBranch;
+  if (($specifiedBranch)||($specifiedBranch != 'install')) {
+    $branch = $specifiedBranch;
+    Trace("overriding default branch: [{$defaultBranch}]");
+  }
+  TraceVar('defaultBranch');
+  TraceVar('branch');
+  
+////////////////////////////////////////////////////////////////////////////////          
+
+  print "...";
+  $contentsRemoteUpdater = GetGithub("fbcmd_update.php",false);
+  preg_match ("/fbcmdUpdateVersion\s=\s'([^']+)'/",$contentsRemoteUpdater,$matches);
+  $newUpdateVersion = 0;
+  if (isset($matches[1])) {
+    $newUpdateVersion = $matches[1];
+  }
+  TraceVar('newUpdateVersion');
+  
+////////////////////////////////////////////////////////////////////////////////          
+  
+  if (($newUpdateVersion > $fbcmdUpdateVersion)||(!file_exists($updateFile))) {
+    if (file_put_contents($updateFile,$contentsRemoteUpdater)) {
+      Trace("creating [{$updateFIle}]");
+      if ($newUpdateVersion > $fbcmdUpdateVersion) {
+        if ($fbcmdPrefs['install_auto_restart']) {
+          print "\nNewer update software downloaded [{$fbcmdUpdateVersion}] -> [{$newUpdateVersion}]\n";
+          print "\nattempting to restart...\n";
+          $execString = "php {$updateFile} \"{$specifiedBranch}\" \"{$installFolder}\" $isTrace $isContinueOnError";
+          exec ($execString);
+          exit;
+        } else {
+          if (realpath($thisProgram) == realpath($updateFile)) {
+            print "\nUpdate INCOMPLETE: Restart this program (it has updated itself)\n\n";
+          } else {
+            print "\nUpdate INCOMPLETE: run the NEW updater: [$updateFile]\n";
+            print "(you might want to remove this old one to avoid confusion)\n\n";
+          }
+          FatalError();
+        }
+      }
+    } else {
+      print "Fatal error: could not save [$updateFile]\n\n";
+      FatalError();
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////          
+  
+  $oldMainVersion = 'none';
+  $newMainVersion = '';
+  if (file_exists($mainFile)) {
+    $oldFileContents = @file_get_contents($mainFile);
+    preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$oldFileContents,$matches);
+    if (isset($matches[1])) {
+      $oldMainVersion = $matches[1];
+    } else {
+      $oldMainVersion = '???';
+    }
+  }
+  TraceVar('oldMainVersion');
+  
+////////////////////////////////////////////////////////////////////////////////          
+
+  print ".";
+  $fileList = GetGithub("filelist.txt");
+  $files = explode("\n",$fileList);
+  foreach ($files as $f) {
+    $g = preg_replace('/\s*\#.*$/','',$f);
+    if ($g) {
+      print ".";
+      $contents = GetGithub($g);
+      if ($g == 'fbcmd.php') {
+        preg_match("/fbcmdVersion\s=\s'([^']+)'/",$contents,$matches);
+        if (isset($matches[1])) {
+          $newMainVersion = $matches[1];
+        } else {
+          print "Non-fatal error: could not determine new version\n";
+          $newMainVersion = '???';
+        }
+      }      
+    }
+  }
+  print "\n";  
+  
+////////////////////////////////////////////////////////////////////////////////          
   
   print "\nUpdate: COMPLETE!\n\n";
-  print "FBCMD Version: [{$oldVersion}] --> [{$newVersion}]\n";
+  print "fbcmd version: [{$oldMainVersion}] --> [{$newMainVersion}]\n";
   
-  if ($showPath) {
-    print "\nNote: Your PATH does not appear to include {$fullPath}\n";
-    if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
-      print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
-      print "Edit the PATH entry and add: ;{$fullPath}\n";
-    } else {
-      print "Add the following line to your ~/.bash_profile file:\n";
-      print "  PATH=\$PATH:{$fullPath}; export PATH\n";
+  if (!$fbcmdPrefs['install_copy_to_path']) {
+    if (stripos(getenv('PATH'),substr($installFolderOS,0,strlen($installFolderOS)-1)) === false) {
+      print "\nNote: Your PATH does not appear to include {$installFolderOS}\n";
+      if ($isWindows) {
+        print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
+        print "Edit the PATH entry and add: ;{$installFolderOS}\n";
+      } else {
+        print "Add the following line to your ~/.bash_profile file:\n";
+        print "  PATH=\$PATH:{$installFolderOS}; export PATH\n";
+      }
     }
   }
   
-  if (!$isFbcmdSet) {
-    if (file_exists("{$fbcmdBaseDir}sessionkeys.txt")) {    
-      print "\nNote: fbcmd is storing your key files and preferences in: {$fbcmdBaseDir}\n";
-    } else {
-      print "\nBy default, fbcmd will store your key files and preferences in: {$fbcmdBaseDir}\n";
-      print "You can set the the environment variable FBCMD to change this location\n";
-    }
-  }
+  if (realpath($thisProgram) != realpath($updateFile)) {
+    print "\nNote: fbcmd_update.php is now at [{$updateFile}]\n";
+    print "so you can remove the old one at [{$thisProgram}]\n\n";
+  }  
 
   print "\n";
   
   exit;
+  
+  function DeleteFileOrDirectory($dir) { # snagged from http://ca3.php.net/rmdir
+    Trace('deleting [{$dir}]');
+    if (!file_exists($dir)) return true;
+    if (!is_dir($dir)) {
+      if (unlink($dir)) {
+        return true;
+      } else {
+        print "Could Not Delete File: [{$dir}]\n";
+        FatalError();      
+      }
+    }
+    foreach (scandir($dir) as $item) {
+      if ($item == '.' || $item == '..') continue;
+      if (!DeleteFileOrDirectory($dir.DIRECTORY_SEPARATOR.$item)) return false;
+    }
+    if (rmdir($dir)) {
+      return true;
+    } else {
+      print "Could Not Delete Directory: [{$dir}]\n";
+      FatalError();      
+    }
+  }
   
   function GetGithub($filename, $save = true) {
     global $branch;
     global $installFolder;
     $fileSrc = "http://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
     $fileDest = "{$installFolder}{$filename}";
-    print "Downloading: [$fileSrc]... ";
     $fileContents = @file_get_contents($fileSrc);
     if ($fileContents) {
-      print "ok\n";
+      Trace("downloading: [$fileSrc}]");
     } else {
-      print "fail!\n";
+      print "Could not download: [{$fileSrc}]\n";
       FatalError();
     }
     if ($save) {
       CheckPath(dirname($fileDest));
-      print "Saving: [{$fileDest}]... ";
       if (@file_put_contents($fileDest,$fileContents)) {
-        print "ok\n";
+        Trace("saving: [{$fileDest}]");
       } else {
-        print "fail!\n";
+        print "Could not save: [{$fileDest}]\n";
         FatalError();
       }
     }
     return $fileContents;
   }
-
+  
   function CleanPath($curPath) {
     $path = $curPath;
     if ($path == '') {
@@ -327,23 +520,70 @@
   function CheckPath($filePath) {
     global $fbcmdPrefs;
     if (!file_exists($filePath)) {
-      print "Creating Directory: [{$filePath}]... ";
       if (mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
-        print "ok\n";
+        Trace('creating [{$filePath}]');
       } else {
-        print "fail!\n";
+        print "Error creating [{$filePath}]\n";
         FatalError();
       }
     }
   }
   
   function FatalError() {
-    global $continueOnError;
-    if ($continueOnError) {
+    global $isContinueOnError;
+    if ($isContinueOnError) {
       print "Ignoring Error...\n";
       return;
     }
     exit;
+  }
+
+  function PrintPref($key) {
+    global $fbcmdPrefs;
+    if ($key == 'mkdir_mode') {
+      print str_pad($key,25,' ') . '[' . decoct($fbcmdPrefs[$key]) . "]\n";
+    } else {
+      print str_pad($key,25,' ') . '[' . $fbcmdPrefs[$key] . "]\n";
+    }
+  }
+  
+  function Trace($line) {
+    global $isTrace;
+    if ($isTrace) {
+      print "$line\n";
+    }
+  }
+  
+  function TraceVar($varName) {
+    Trace("$varName = [" . $GLOBALS[$varName] . "]");
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  // Copied Directly from fbcmd.php
+
+  function SavePrefsContents() {
+    global $fbcmdPrefs;
+    if (isset($fbcmdPrefs['savepref_include_files'])) {
+      $includeFiles = $fbcmdPrefs['savepref_include_files'];
+    } else {
+      $includeFiles = false;
+    }
+    $fileContents = "<?php\n";
+    foreach ($fbcmdPrefs as $switchKey => $switchValue) {
+      if ($switchKey != 'prefs') {
+        if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
+          if ($switchKey == 'mkdir_mode') {
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
+          } else {
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";        
+          }
+        }
+      }
+    }
+    $fileContents .= "?>\n";
+    return $fileContents;
   }
   
 ?>
