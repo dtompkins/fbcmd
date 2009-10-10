@@ -390,7 +390,7 @@
           print "\nNewer update software downloaded [{$fbcmdUpdateVersion}] -> [{$newUpdateVersion}]\n";
           print "\nattempting to restart...\n";
           $execString = "php {$updateFile} \"{$specifiedBranch}\" \"{$installFolder}\" $isTrace $isContinueOnError";
-          passtrhu($execString);
+          passthru($execString);
           exit;
         } else {
           if (realpath($thisProgram) == realpath($updateFile)) {
