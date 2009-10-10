@@ -3666,19 +3666,37 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 
   function SavePrefs($fileName) {
+    $fileContents = SavePrefsContents();
+    if (@file_put_contents($fileName,$fileContents) == false) {
+      FbcmdFatalError("Could not write {$fileName}");
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  // If you modify this, copy it to fbcmd_update.php
+  function SavePrefsContents() {
     global $fbcmdPrefs;
+    if (isset($fbcmdPrefs['savepref_include_files'])) {
+      $includeFiles = $fbcmdPrefs['savepref_include_files'];
+    } else {
+      $includeFiles = false;
+    }
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (($fbcmdPrefs['savepref_include_files'])||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
-          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
+        if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
+          if ($switchKey == 'mkdir_mode') {
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
+          } else {
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";        
+          }
         }
       }
     }
     $fileContents .= "?>\n";
-    if (@file_put_contents($fileName,$fileContents) == false) {
-      FbcmdFatalError("Could not write {$fileName}");
-    }
+    return $fileContents;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
