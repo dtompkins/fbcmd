@@ -30,6 +30,7 @@
       $isTrace = 1;
     }
   }
+  $isTrace = 1;
   
 ////////////////////////////////////////////////////////////////////////////////    
 
@@ -521,7 +522,7 @@
     global $fbcmdPrefs;
     if (!file_exists($filePath)) {
       if (mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
-        Trace('creating [{$filePath}]');
+        Trace("creating [{$filePath}]");
       } else {
         print "Error creating [{$filePath}]\n";
         FatalError();
