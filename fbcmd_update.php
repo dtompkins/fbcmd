@@ -340,7 +340,7 @@
     if (file_put_contents($fullPathScript,$contentsBatch)) {
       Trace ("created script: [{$fullPathScript}]");
       if (!$isWindows) {
-        if (chmod($scriptName,0777)) {
+        if (chmod($fullPathScript,0777)) {
           Trace ("chmod script: [{$fullPathScript}]");
         } else {
           print "error chmod: [{$fullPathScript}] (non-fatal)\n";
