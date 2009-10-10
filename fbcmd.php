@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev10';
+  $fbcmdVersion = '1.0-beta3-dev11-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -156,7 +156,7 @@
   AddPreference('pic_show_src','0','psrc');
   AddPreference('pic_size','1','psize');
   AddPreference('pic_skip_exists','1','pskip');
-  AddPreference('postfile',"{$fbcmdBaseDir}postdata.txt",'posts');
+  AddPreference('postfile',"{$fbcmdBaseDir}postdata.txt",'pfile');
   AddPreference('ppic_size','1','ppsize');
   AddPreference('ppics_filename','[tid].jpg','pf');
   AddPreference('prefix_filter','#');
@@ -418,7 +418,6 @@
 
   if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
     ValidateParamCount(0,1);
-    SetDefaultParam(1,'');
     if (ParamCount()==0) {
       ShowUsage();
     } 
