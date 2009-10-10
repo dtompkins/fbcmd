@@ -341,7 +341,7 @@
     CheckPath($fbcmdPrefs['install_path_dir']);  
     if (file_put_contents($fullPathScript,$contentsBatch)) {
       Trace ("created script: [{$fullPathScript}]");
-      if (!isWindows) {
+      if (!$isWindows) {
         if (chmod($scriptName,0777)) {
           Trace ("chmod script: [{$fullPathScript}]");
         } else {
@@ -390,7 +390,7 @@
           print "\nNewer update software downloaded [{$fbcmdUpdateVersion}] -> [{$newUpdateVersion}]\n";
           print "\nattempting to restart...\n";
           $execString = "php {$updateFile} \"{$specifiedBranch}\" \"{$installFolder}\" $isTrace $isContinueOnError";
-          exec ($execString);
+          passtrhu($execString);
           exit;
         } else {
           if (realpath($thisProgram) == realpath($updateFile)) {
