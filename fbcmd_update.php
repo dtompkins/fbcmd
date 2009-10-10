@@ -338,6 +338,7 @@
   TraceVar('isCopyToPath');
   
   if ($isCopyToPath) {
+    CheckPath($fbcmdPrefs['install_path_dir']);  
     if (file_put_contents($fullPathScript,$contentsBatch)) {
       Trace ("created script: [{$fullPathScript}]");
       if (!isWindows) {
