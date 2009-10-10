@@ -348,7 +348,7 @@
   
   $defaultBranch = strtolower($fbcmdPrefs['update_branch']);
   $branch = $defaultBranch;
-  if (($specifiedBranch)||($specifiedBranch != 'install')) {
+  if (($specifiedBranch)&&($specifiedBranch != 'install')) {
     $branch = $specifiedBranch;
     Trace("overriding default branch: [{$defaultBranch}]");
   }
