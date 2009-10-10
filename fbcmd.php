@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev9-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev10';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -392,6 +392,7 @@
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
   AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
+  AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
   AddCommand('WALLPOST',  'flist message~Post a message on the wall of friend(s)');
@@ -431,6 +432,36 @@
     }
     FbcmdWarning("HELP: did not recognize [{$fbcmdParams[1]}]");
     ShowUsage();
+  }
+  
+////////////////////////////////////////////////////////////////////////////////    
+
+  if ($fbcmdCommand == 'UPDATE') {
+    ValidateParamCount(0,4);
+    $updatePhp = CleanPath(realpath(dirname($argv[0]))) . 'fbcmd_update.php';
+    if (!file_exists($updatePhp)) {
+      $updatePhpAlt = CleanPath(realpath($fbcmdPrefs['install_dir'])) . 'fbcmd_update.php';
+      if (file_exists($updatePhpAlt)) {
+        $updatePhp = $updatePhpAlt;
+      } else {
+        FbcmdFatalError("Could not locate [{$updatePhp}]");
+      }
+    }
+    $execCmd = "php \"$updatePhp\"";
+    if (ParamCount() >= 1) {
+      $execCmd .= " \"{$fbcmdParams[1]}\"";
+    }
+    if (ParamCount() >= 2) {
+      $execCmd .= " \"{$fbcmdParams[2]}\"";
+    }
+    if (ParamCount() >= 3) {
+      $execCmd .= " {$fbcmdParams[3]}";
+    }
+    if (ParamCount() >= 4) {
+      $execCmd .= " {$fbcmdParams[4]}";
+    }
+    passthru($execCmd);
+    return;
   }
   
 ////////////////////////////////////////////////////////////////////////////////    

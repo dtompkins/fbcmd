@@ -30,7 +30,6 @@
       $isTrace = 1;
     }
   }
-  $isTrace = 1;
   
 ////////////////////////////////////////////////////////////////////////////////    
 
@@ -46,15 +45,14 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.6';
+  $fbcmdUpdateVersion = '2.7';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
   
   print "\n";
   print "fbcmd update utility [version {$fbcmdUpdateVersion}]\n";
-  print "http://fbcmd.dtompkins.com/update\n";
-  print "for basic syntax: php fbcmd_update.php help\n\n";  
+  print "http://fbcmd.dtompkins.com/update\n\n";
   
 ////////////////////////////////////////////////////////////////////////////////  
   
@@ -169,18 +167,18 @@
 ////////////////////////////////////////////////////////////////////////////////  
   
   if ($isHelp) {
-    print "\nphp fbcmd_update.php [branch|keyword] [folder] [trace] [ignore_err]\n\n";
+    print "\nParameters:  [branch|keyword] [folder] [trace] [ignore_err]\n\n";
     print "branch:      Software development branch\n";
     print "                 master   stable, not all features available\n";
     print "                 beta     reaonably stable, subject to minor changes\n";
-    print "                 dev      latest features, expect changes\n\n";
+    print "                 dev      latest features (experimental)\n\n";
     print "keyword:     Instead of a branch, you can specify one of:\n";
     print "                 help     display this message\n";
     print "                 install  performa a full install\n";
     print "                 script   regenerate the fbcmd script\n";
     print "                 clear    clear your personal user settings\n";    
     print "                 remove   removes fbcmd from your system\n\n";
-    print "folder:      Specify a destination installtion directory\n\n";
+    print "folder:      Specify a destination installation directory\n\n";
     print "trace:       Defaults to 0.  Set to 1 for verbose output\n\n";
     print "ignore_err:  Defaults to 0.  Set to 1 to ignore fatal errors\n\n\n";
   }
@@ -327,11 +325,11 @@
 
   $isCopyToPath = false;
   
-  if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
-    $isCopyToPath = true;
-  }
   if ($fbcmdPrefs['install_copy_to_path']) {
     if (!file_exists($fullPathScript)) {
+      $isCopyToPath = true;
+    }
+    if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
       $isCopyToPath = true;
     }
   }
@@ -389,7 +387,7 @@
         if ($fbcmdPrefs['install_auto_restart']) {
           print "\nNewer update software downloaded [{$fbcmdUpdateVersion}] -> [{$newUpdateVersion}]\n";
           print "\nattempting to restart...\n";
-          $execString = "php {$updateFile} \"{$specifiedBranch}\" \"{$installFolder}\" $isTrace $isContinueOnError";
+          $execString = "php \"{$updateFile}\" \"{$specifiedBranch}\" \"{$installFolder}\" $isTrace $isContinueOnError";
           passthru($execString);
           exit;
         } else {
