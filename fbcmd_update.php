@@ -325,7 +325,7 @@
   
 ////////////////////////////////////////////////////////////////////////////////
 
-  $isCopyToPath = false
+  $isCopyToPath = false;
   
   if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
     $isCopyToPath = true;
