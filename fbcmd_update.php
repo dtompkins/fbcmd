@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.71';
+  $fbcmdUpdateVersion = '2.72';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -80,18 +80,19 @@
   $fbcmdPrefs['update_branch'] = 'master';
   $fbcmdPrefs['install_script_name'] = 'fbcmd';
   if ($isWindows) {
-    $fbcmdPrefs['install_dir'] = CleanPath($thisProgramFolder);
-    $fbcmdPrefs['install_copy_to_path'] = '0';
-    $fbcmdPrefs['install_path_dir'] = '';
+    $fbcmdPrefs['install_lib_dir'] = CleanPath($thisProgramFolder);
+    $fbcmdPrefs['install_copy_to_bin'] = '0';
+    $fbcmdPrefs['install_bin_dir'] = 'c:\\windows';
   } else {
-    $fbcmdPrefs['install_dir'] = '/usr/local/lib/fbcmd/';
-    $fbcmdPrefs['install_copy_to_path'] = '1';
-    $fbcmdPrefs['install_path_dir'] = '/usr/local/bin/';
+    $fbcmdPrefs['install_lib_dir'] = '/usr/local/lib/fbcmd/';
+    $fbcmdPrefs['install_copy_to_bin'] = '1';
+    $fbcmdPrefs['install_bin_dir'] = '/usr/local/bin/';
   }
-  $fbcmdPrefs['mkdir_mode'] = 0777;
+  $fbcmdPrefs['install_lib_mkdir_mode'] = 0777;  
+  $fbcmdPrefs['install_data_mkdir_mode'] = 0700;  
   $fbcmdPrefs['install_auto_restart'] = '1';
-  $defaultInstallDir = $fbcmdPrefs['install_dir'];
-  TraceVar('defaultInstallDir');
+  $defaultLibDir = $fbcmdPrefs['install_lib_dir'];
+  TraceVar('defaultLibDir');
   
 ////////////////////////////////////////////////////////////////////////////////  
 
@@ -109,8 +110,9 @@
       }
     } else {
       if (getenv('SUDO_USER')) {
+        $isSudo = true;      
+        $sudoUser = getenv('SUDO_USER');
         $fbcmdBaseDir = '~' . getenv('SUDO_USER') . '/.fbcmd/';
-        $isSudo = true;
       } else {
         $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
       }
@@ -142,15 +144,17 @@
 ////////////////////////////////////////////////////////////////////////////////  
 
   if (isset($argv[2])) {
-    $fbcmdPrefs['install_dir'] = $argv[2];
-    CheckPath($fbcmdPrefs['install_dir']);
-    $fbcmdPrefs['install_dir'] = CleanPath(realpath($fbcmdPrefs['install_dir']));
-    $isSavePrefs = true;
-  } 
+    if ($argv[2]) {
+      $fbcmdPrefs['install_lib_dir'] = $argv[2];
+      MakeLibDir();
+      $fbcmdPrefs['install_lib_dir'] = CleanPath(realpath($fbcmdPrefs['install_lib_dir']));
+      $isSavePrefs = true;
+    }
+  }
   
 ////////////////////////////////////////////////////////////////////////////////    
 
-  $keywords = array('-h','help','--help','clear','install','remove','script');
+  $keywords = array('-h','help','--help','clear','install','remove','script','sudo');
   
   $isHelp = false;
   $isKeyword = false;
@@ -181,12 +185,13 @@
     print "                 beta     reaonably stable, subject to minor changes\n";
     print "                 dev      latest features (experimental)\n\n";
     print "keyword:     Instead of a branch, you can specify one of:\n";
+    print "                 clear    clear your personal user settings\n";        
     print "                 help     display this message\n";
-    print "                 install  performa a full install\n";
-    print "                 script   regenerate the fbcmd script\n";
-    print "                 clear    clear your personal user settings\n";    
-    print "                 remove   removes fbcmd from your system\n\n";
-    print "folder:      Specify a destination installation directory\n\n";
+    print "                 install  (Windows) full install with defaults\n";
+    print "                 remove   removes fbcmd from your system\n";    
+    print "                 script   generate the fbcmd script only\n";
+    print "                 sudo     (Mac/Linux) create lib_dir & script only\n\n";
+    print "folder:      Specify a destination installation directory (0 for default)\n\n";
     print "trace:       Defaults to 0.  Set to 1 for verbose output\n\n";
     print "ignore_err:  Defaults to 0.  Set to 1 to ignore fatal errors\n\n\n";
   }
@@ -195,13 +200,20 @@
   
   if (($isIncludeFile == false)&&($specifiedBranch != 'remove')&&($specifiedBranch != 'clear')&&($isSudo == false)) {
     if (!file_exists($fbcmdBaseDir)) {
-      if (mkdir($fbcmdBaseDir,0700,true)) {
+      if (mkdir($fbcmdBaseDir,$fbcmdPrefs['install_data_mkdir_mode'],true)) {
         Trace("creating directory [{$fbcmdBaseDir}]");
       } else {
         print "Error: cound not create directory: [{$fbcmdBaseDir}]\n";
         FatalError();
       }
-    }
+      if (!$isWindows) {
+        if (chmod($fbcmdBaseDir,$fbcmdPrefs['install_data_mkdir_mode'])) {
+          Trace("chmod [{$fbcmdBaseDir}]");
+        } else {
+          Trace("Error: chmod [{$fbcmdBaseDir}] (non-fatal)");
+        }
+      }
+    }  
     $isSavePrefs = true;
   }
   
@@ -212,8 +224,7 @@
     if (file_put_contents($prefsFile,$fileContents)) {
       Trace("creating file [{$prefsFile}]");
     } else {
-      print "Error: cound not create file: [{$prefsFile}]\n";
-      FatalError();
+      print "Error: cound not create file: [{$prefsFile}] (non-fatal)\n";
     }
   }
   
@@ -222,14 +233,15 @@
   if (($isHelp)||($isFirstInstall)) {
     print "Preference file:                 [{$prefsFile}]\n\n";
     print "Software development branch:     [{$fbcmdPrefs['update_branch']}]\n";
-    print "Software library destination:    [{$fbcmdPrefs['install_dir']}]\n";
-    print "Copy script to path?:            ";
-    if ($fbcmdPrefs['install_copy_to_path']) {
+    print "Software library destination:    [{$fbcmdPrefs['install_lib_dir']}]\n";
+    print "Copy script to bin dir?:         ";
+    if ($fbcmdPrefs['install_copy_to_bin']) {
       print "[Yes]\n";
-      print "Path location:                   [{$fbcmdPrefs['install_path_dir']}]\n";
+      print "Bin dir location:                [{$fbcmdPrefs['install_bin_dir']}]\n";
     } else {
       print "[No]\n";
     }
+    print "Script name:                     [{$fbcmdPrefs['install_script_name']}]\n";
     print "Auto-restart when necessary:     ";
     if ($fbcmdPrefs['install_auto_restart']) {
       print "[Yes]\n\n";
@@ -245,11 +257,12 @@
       print "To change any of the above settings, modify your preferences file\n";
       print "To change your preferences file location, set an FBCMD environment var.\n\n";
       print "Otherwise, The above default settings are fine for most users\n\n";      
-      print "To finish the installation, re-execute this command\n";
+      print "To finish the installation:\n\n";
       if ($isWindows) {
-        print "\n   php fbcmd_update.php\n\n";
+        print "   php fbcmd_update.php\n\n";
       } else {
-        print "\n   $ sudo php fbcmd_update.php\n\n";
+        print "   $ sudo php fbcmd_update.php sudo\n";
+        print "   $ php fbcmd_update.php\n\n";
       }
     }
     exit;
@@ -265,41 +278,41 @@
   }
   
   if ($specifiedBranch == 'remove') {
-    if ($fbcmdPrefs['install_copy_to_path']) {
+    if ($fbcmdPrefs['install_copy_to_bin']) {
       if ($isWindows) {
-        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . $fbcmdPrefs['install_script_name'] . '.bat';
+        $pathShell = CleanPath($fbcmdPrefs['install_bin_dir']) . $fbcmdPrefs['install_script_name'] . '.bat';
       } else {
-        $pathShell = CleanPath($fbcmdPrefs['install_path_dir']) . $fbcmdPrefs['install_script_name'];
+        $pathShell = CleanPath($fbcmdPrefs['install_bin_dir']) . $fbcmdPrefs['install_script_name'];
       }
       DeleteFileOrDirectory($pathShell);
     }
-    DeleteFileOrDirectory($fbcmdPrefs['install_dir']);
+    DeleteFileOrDirectory($fbcmdPrefs['install_lib_dir']);
     exit;
   }
   
 ////////////////////////////////////////////////////////////////////////////////      
 
-  $installFolder = $fbcmdPrefs['install_dir'];
-  CheckPath($installFolder);  
-  $installFolder = CleanPath(realpath($installFolder));
-  $installFolderOS = $installFolder;
+  $installLibDir = $fbcmdPrefs['install_lib_dir'];
+  MakeLibDir();
+  $installLibDir = CleanPath(realpath($installLibDir));
+  $installLibDirOS = $installLibDir;
   if ($isWindows) {
-    $installFolderOS = str_replace('/', '\\', $installFolderOS);
+    $installLibDirOS = str_replace('/', '\\', $installLibDirOS);
   }
-  TraceVar('installFolder');  
-  TraceVar('installFolderOS');
+  TraceVar('installLibDir');  
+  TraceVar('installLibDirOS');
   
-  $mainFile = "{$installFolder}fbcmd.php";
-  $updateFile = "{$installFolder}fbcmd_update.php";  
+  $mainFile = "{$installLibDir}fbcmd.php";
+  $updateFile = "{$installLibDir}fbcmd_update.php";  
   if ($isWindows) {
     $scriptName = $fbcmdPrefs['install_script_name'] . '.bat';
   } else {
     $scriptName = $fbcmdPrefs['install_script_name'];
   }
-  $fullScriptName = "{$installFolder}$scriptName";
-  $fullPathScript = CleanPath($fbcmdPrefs['install_path_dir']) . $scriptName;
+  $fullScriptName = "{$installLibDir}$scriptName";
+  $fullBinScript = CleanPath($fbcmdPrefs['install_bin_dir']) . $scriptName;
   TraceVar('fullScriptName');  
-  TraceVar('fullPathScript'); 
+  TraceVar('fullBinScript'); 
   
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -316,11 +329,14 @@
   }
 
   $isMakeScript = false;
-  if (!file_exists($fullPathScript)) {
+  if (!file_exists($fullBinScript)) {
     $isMakeScript = true;
   }
   if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
     $isMakeScript = true;
+  }
+  if ($isSudo) {
+    $isMakeScript = false;
   }
   TraceVar('isMakeScript');
   
@@ -328,7 +344,7 @@
     if (file_put_contents($fullScriptName,$contentsBatch)) {
       Trace ("created script: [{$fullScriptName}]");
       if (!$isWindows) {
-        if (chmod($fullScriptName,0777)) {
+        if (chmod($fullScriptName,$fbcmdPrefs['install_lib_mkdir_mode'])) {
           Trace ("chmod script: [{$fullScriptName}]");
         } else {
           print "error chmod: [{$fullScriptName}] (non-fatal)\n";
@@ -339,38 +355,45 @@
       FatalError();
     }
   }  
+  
 ////////////////////////////////////////////////////////////////////////////////
 
-  $isCopyToPath = false;
-  
-  if ($fbcmdPrefs['install_copy_to_path']) {
-    if (!file_exists($fullPathScript)) {
-      $isCopyToPath = true;
+  $isCopyToBin = false;
+  if ($fbcmdPrefs['install_copy_to_bin']) {
+    if (!file_exists($fullBinScript)) {
+      $isCopyToBin = true;
     }
-    if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
-      $isCopyToPath = true;
+    if (($specifiedBranch == 'script')||($specifiedBranch == 'install')||($isSudo == true)) {
+      $isCopyToBin = true;
     }
   }
-  TraceVar('isCopyToPath');
+  TraceVar('isCopyToBin');
   
-  if ($isCopyToPath) {
-    CheckPath($fbcmdPrefs['install_path_dir']);  
-    if (file_put_contents($fullPathScript,$contentsBatch)) {
-      Trace ("created script: [{$fullPathScript}]");
+  if ($isCopyToBin) {
+    CheckPath($fbcmdPrefs['install_bin_dir']);
+    if (file_put_contents($fullBinScript,$contentsBatch)) {
+      Trace ("created script: [{$fullBinScript}]");
       if (!$isWindows) {
-        if (chmod($fullPathScript,0777)) {
-          Trace ("chmod script: [{$fullPathScript}]");
+        if (isset($sudoUser)) {
+          if (chown($fullBinScript,$sudoUser)) {
+            Trace ("chown script: [{$fullBinScript}] [{$sudoUser}]");
+          } else {
+            print "error chown: [{$fullBinScript}] [{$sudoUser}] (non-fatal)\n";
+          }
+        }
+        if (chmod($fullBinScript,$fbcmdPrefs['install_lib_mkdir_mode'])) {
+          Trace ("chmod script: [{$fullBinScript}]");
         } else {
-          print "error chmod: [{$fullPathScript}] (non-fatal)\n";
+          print "error chmod: [{$fullBinScript}] (non-fatal)\n";
         }
       }
     } else {
-      print "Error: cound not create file: [{$fullPathScript}]\n";
+      print "Error: cound not create file: [{$fullBinScript}]\n";
       FatalError();
     }
   }
   
-  if ($specifiedBranch == 'script') {
+  if (($specifiedBranch == 'script')||($specifiedBranch == 'sudo')) {
     exit;
   }
   
@@ -405,7 +428,7 @@
         if ($fbcmdPrefs['install_auto_restart']) {
           print "\nNewer update software downloaded [{$fbcmdUpdateVersion}] -> [{$newUpdateVersion}]\n";
           print "\nattempting to restart...\n";
-          $execString = "php \"{$updateFile}\" \"{$specifiedBranch}\" \"{$installFolder}\" $isTrace $isContinueOnError";
+          $execString = "php \"{$updateFile}\" \"{$specifiedBranch}\" \"{$installLibDir}\" $isTrace $isContinueOnError";
           passthru($execString);
           exit;
         } else {
@@ -467,15 +490,15 @@
   print "\nUpdate: COMPLETE!\n\n";
   print "fbcmd version: [{$oldMainVersion}] --> [{$newMainVersion}]\n";
   
-  if (!$fbcmdPrefs['install_copy_to_path']) {
-    if (stripos(getenv('PATH'),substr($installFolderOS,0,strlen($installFolderOS)-1)) === false) {
-      print "\nNote: Your PATH does not appear to include {$installFolderOS}\n";
+  if (!$fbcmdPrefs['install_copy_to_bin']) {
+    if (stripos(getenv('PATH'),substr($installLibDirOS,0,strlen($installLibDirOS)-1)) === false) {
+      print "\nNote: Your PATH does not appear to include {$installLibDirOS}\n";
       if ($isWindows) {
         print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
-        print "Edit the PATH entry and add: ;{$installFolderOS}\n";
+        print "Edit the PATH entry and add: ;{$installLibDirOS}\n";
       } else {
         print "Add the following line to your ~/.bash_profile file:\n";
-        print "  PATH=\$PATH:{$installFolderOS}; export PATH\n";
+        print "  PATH=\$PATH:{$installLibDirOS}; export PATH\n";
       }
     }
   }
@@ -514,9 +537,9 @@
   
   function GetGithub($filename, $save = true) {
     global $branch;
-    global $installFolder;
+    global $installLibDir;
     $fileSrc = "http://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
-    $fileDest = "{$installFolder}{$filename}";
+    $fileDest = "{$installLibDir}{$filename}";
     $fileContents = @file_get_contents($fileSrc);
     if ($fileContents) {
       Trace("downloading: [$fileSrc}]");
@@ -559,6 +582,38 @@
       }
     }
   }
+  
+  function MakeLibDir() {
+    global $fbcmdPrefs;
+    global $isWindows;
+    global $isSudo;
+    global $sudoUser;
+    
+    $dir = $fbcmdPrefs['install_lib_dir'];
+    
+    if (!file_exists($dir)) {
+      if (mkdir($dir,$fbcmdPrefs['install_lib_mkdir_mode'],true)) {
+        Trace("creating directory [{$dir}]");
+      } else {
+        print "Error: cound not create directory: [{$dir}]\n";
+        FatalError();
+      }
+    }
+    if (!$isWindows) {
+      if (isset($sudoUser)) {
+        if (chown($dir,$sudoUser)) {
+          Trace ("chown [{$dir}] [{$sudoUser}]");
+        } else {
+          print "error chown: [{$dir}] [{$sudoUser}] (non-fatal)\n";
+        }
+      }
+      if (chmod($dir,$fbcmdPrefs['install_lib_mkdir_mode'])) {
+        Trace ("chmod [{$dir}]");
+      } else {
+        print "error chmod: [{$dir}] (non-fatal)\n";
+      }
+    }
+  }  
   
   function FatalError() {
     global $isContinueOnError;
@@ -605,10 +660,10 @@
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
         if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
-          if ($switchKey == 'mkdir_mode') {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
-          } else {
+          if (strpos($switchKey,'mkdir_mode') === false) {
             $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";        
+          } else {
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";          
           }
         }
       }
