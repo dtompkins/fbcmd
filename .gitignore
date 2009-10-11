@@ -1,3 +1,8 @@
-sessionkeys.txt
-prefs.php
+fbcmd
+fbcmd.bat
+maildata.txt
 postdata.txt
+prefs.php
+sessionkeys.txt
+package/msi/*.msi
+support/test_php_output.txt

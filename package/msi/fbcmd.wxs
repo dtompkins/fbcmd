@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<!--
+    Copyright (c) Microsoft Corporation.  All rights reserved.
+    
+    The use and distribution terms for this software are covered by the
+    Common Public License 1.0 (http://opensource.org/licenses/cpl.php)
+    which can be found in the file CPL.TXT at the root of this distribution.
+    By using this software in any fashion, you are agreeing to be bound by
+    the terms of this license.
+    
+    You must not remove this notice, or any other, from this software.
+-->
+<!--
+    Modifications by Dave Tompkins, 2009.
+-->
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"> 
+  <Product Id="B38E807A-B3F7-11DE-A211-188F56D89593" Name="fbcmd :: Command Line Interface for Facebook" Language="1033" Version="1.0.0.0" Manufacturer="fbcmd.dtompkins.com" UpgradeCode="774CA708-B3E4-11DE-9789-440956D89593"> 
+    <Package InstallerVersion="200" Compressed="yes" /> 
+    <Media Id="1" Cabinet="fbcmd.cab" EmbedCab="yes" />
+    <Directory Id="TARGETDIR" Name="SourceDir"> 
+      <Directory Id="ProgramFilesFolder" Name="PFiles">
+        <Directory Id="FBCMDINSTALLDIR" Name="fbcmd"> 
+        </Directory> 
+      </Directory> 
+    </Directory> 
+    <DirectoryRef Id="FBCMDINSTALLDIR">
+      <Component Id="componentInstallDir" Guid="D40F8650-B3F7-11DE-AD7C-D09056D89593"> 
+        <CreateFolder Directory="FBCMDINSTALLDIR"> 
+          <Permission User="Everyone" GenericAll="yes" /> 
+        </CreateFolder> 
+      </Component> 
+      <Component Id="componentFbcmdUpdate" Guid="D95DC5CC-B3F7-11DE-8F6D-DD9056D89593">
+        <File Id="fbcmdUpdate" Name="fbcmd_update.php" DiskId="1" Source="../../fbcmd_update.php" />
+      </Component>
+      <Component Id="componentAddPath" Guid="AA46399E-B407-11DE-84D0-E97A55D89593">
+        <Environment Id="envPath" Separator=";" Action="set" Name="PATH" System="yes" Part="last" Value="[FBCMDINSTALLDIR]"/>
+        <CreateFolder />
+      </Component>
+<!-- 
+      <Component Id="componentRemove" Guid="">
+        <RemoveFolder Id="removeInstallDir" On="uninstall" Directory="FBCMDINSTALLDIR" />
+      </Component>      
+-->      
+    </DirectoryRef>
+    <Feature Id="featureInstall" Title="fbcmd :: Command Line Interface for Facebook" Level="1"> 
+      <ComponentRef Id="componentAddPath" />    
+      <ComponentRef Id="componentInstallDir" /> 
+      <ComponentRef Id="componentFbcmdUpdate" />
+<!--  
+      <ComponentRef Id="componentRemove" /> 
+-->
+    </Feature> 
+    <CustomAction Id="RunFbcmdInstall" Directory="FBCMDINSTALLDIR" ExeCommand= 'cmd.exe /k "php.exe fbcmd_update.php install"' Return="asyncNoWait" />
+    <CustomAction Id="RunFbcmdRemove" Directory="FBCMDINSTALLDIR" ExeCommand= 'cmd.exe /c "php.exe fbcmd_update.php remove"' Return="ignore" />
+    <InstallExecuteSequence>
+       <Custom Action="RunFbcmdInstall" After="InstallFinalize">NOT Installed</Custom>
+       <Custom Action="RunFbcmdRemove" After="InstallInitialize">Installed</Custom>
+    </InstallExecuteSequence>
+    <UI>
+        <Dialog Id="fbmcdWelcomeDlg" Width="370" Height="270" Title="!(loc.WelcomeDlg_Title)">
+            <Control Id="Next" Type="PushButton" X="236" Y="243" Width="56" Height="17" Default="yes" Text="!(loc.WixUINext)" />
+            <Control Id="Cancel" Type="PushButton" X="304" Y="243" Width="56" Height="17" Cancel="yes" Text="!(loc.WixUICancel)">
+                <Publish Event="SpawnDialog" Value="CancelDlg">1</Publish>
+            </Control>
+            <Control Id="Bitmap" Type="Bitmap" X="0" Y="0" Width="370" Height="234" TabSkip="no" Text="!(loc.WelcomeDlgBitmap)" />
+            <Control Id="Back" Type="PushButton" X="180" Y="243" Width="56" Height="17" Disabled="yes" Text="!(loc.WixUIBack)" />
+            <Control Id="BottomLine" Type="Line" X="0" Y="234" Width="370" Height="0" />
+            <Control Id="Description" Type="Text" X="135" Y="80" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="*** WARNING *** You should install PHP _before_ you install fbcmd.  See http://fbcmd.dtompkins.com/installation for more details ***" />
+            <Control Id="Title" Type="Text" X="135" Y="20" Width="220" Height="60" Transparent="yes" NoPrefix="yes" Text="!(loc.WelcomeDlgTitle)" />
+        </Dialog>
+        <InstallUISequence>
+            <Show Dialog="fbmcdWelcomeDlg" Before="ProgressDlg">NOT Installed</Show>
+        </InstallUISequence>
+    </UI>
+        
+    <UI Id="uiFbcmd">
+        <TextStyle Id="WixUI_Font_Normal" FaceName="Tahoma" Size="8" />
+        <TextStyle Id="WixUI_Font_Bigger" FaceName="Tahoma" Size="12" />
+        <TextStyle Id="WixUI_Font_Title" FaceName="Tahoma" Size="9" Bold="yes" />
+        <Property Id="DefaultUIFont" Value="WixUI_Font_Normal" />
+        <Property Id="WixUI_Mode" Value="InstallDir" />
+        <DialogRef Id="BrowseDlg" />
+        <DialogRef Id="DiskCostDlg" />
+        <DialogRef Id="ErrorDlg" />
+        <DialogRef Id="FatalError" />
+        <DialogRef Id="FilesInUse" />
+        <DialogRef Id="MsiRMFilesInUse" />
+        <DialogRef Id="PrepareDlg" />
+        <DialogRef Id="ProgressDlg" />
+        <DialogRef Id="ResumeDlg" />
+        <DialogRef Id="UserExit" />
+        <Publish Dialog="BrowseDlg" Control="OK" Event="DoAction" Value="WixUIValidatePath" Order="3">1</Publish>
+        <Publish Dialog="BrowseDlg" Control="OK" Event="SpawnDialog" Value="InvalidDirDlg" Order="4"><![CDATA[WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+        <Publish Dialog="ExitDialog" Control="Finish" Event="EndDialog" Value="Return" Order="999">1</Publish>
+        <Publish Dialog="fbmcdWelcomeDlg" Control="Next" Event="NewDialog" Value="InstallDirDlg">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Back" Event="NewDialog" Value="fbmcdWelcomeDlg">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="SetTargetPath" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="DoAction" Value="WixUIValidatePath" Order="2">NOT WIXUI_DONTVALIDATEPATH</Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="SpawnDialog" Value="InvalidDirDlg" Order="3"><![CDATA[NOT WIXUI_DONTVALIDATEPATH AND WIXUI_INSTALLDIR_VALID<>"1"]]></Publish>
+        <Publish Dialog="InstallDirDlg" Control="Next" Event="NewDialog" Value="VerifyReadyDlg" Order="4">WIXUI_DONTVALIDATEPATH OR WIXUI_INSTALLDIR_VALID="1"</Publish>
+        <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Property="_BrowseProperty" Value="[WIXUI_INSTALLDIR]" Order="1">1</Publish>
+        <Publish Dialog="InstallDirDlg" Control="ChangeFolder" Event="SpawnDialog" Value="BrowseDlg" Order="2">1</Publish>
+        <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="InstallDirDlg" Order="1">NOT Installed</Publish>
+        <Publish Dialog="VerifyReadyDlg" Control="Back" Event="NewDialog" Value="MaintenanceTypeDlg" Order="2">Installed</Publish>
+        <Publish Dialog="MaintenanceWelcomeDlg" Control="Next" Event="NewDialog" Value="MaintenanceTypeDlg">1</Publish>
+        <Publish Dialog="MaintenanceTypeDlg" Control="RepairButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+        <Publish Dialog="MaintenanceTypeDlg" Control="RemoveButton" Event="NewDialog" Value="VerifyReadyDlg">1</Publish>
+        <Publish Dialog="MaintenanceTypeDlg" Control="Back" Event="NewDialog" Value="MaintenanceWelcomeDlg">1</Publish>
+        <Property Id="ARPNOMODIFY" Value="1" />
+        <Property Id="ARPNOREPAIR" Value="1" />
+    </UI>
+    <UIRef Id="WixUI_Common" />
+    <Property Id="WIXUI_INSTALLDIR" Value="FBCMDINSTALLDIR" />
+    <UIRef Id="uiFbcmd"/>    
+  </Product> 
+</Wix>
