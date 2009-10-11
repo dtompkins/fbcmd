@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.74';
+  $fbcmdUpdateVersion = '2.75';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -494,23 +494,29 @@
   print "\nUpdate: COMPLETE!\n\n";
   print "fbcmd version: [{$oldMainVersion}] --> [{$newMainVersion}]\n";
   
-  if (!$fbcmdPrefs['install_copy_to_bin']) {
-    if (stripos(getenv('PATH'),substr($installLibDirOS,0,strlen($installLibDirOS)-1)) === false) {
-      print "\nNote: Your PATH does not appear to include {$installLibDirOS}\n";
-      if ($isWindows) {
-        print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
-        print "Edit the PATH entry and add: ;{$installLibDirOS}\n";
-      } else {
-        print "Add the following line to your ~/.bash_profile file:\n";
-        print "  PATH=\$PATH:{$installLibDirOS}; export PATH\n";
+  if ($specifiedBranch != 'install') {
+    if (!$fbcmdPrefs['install_copy_to_bin']) {
+      if (stripos(getenv('PATH'),substr($installLibDirOS,0,strlen($installLibDirOS)-1)) === false) {
+        print "\nNote: Your PATH does not appear to include {$installLibDirOS}\n";
+        if ($isWindows) {
+          print "(right click) My Computer -> Properties -> Advanced -> Environment Variables\n";
+          print "Edit the PATH entry and add: ;{$installLibDirOS}\n";
+        } else {
+          print "Add the following line to your ~/.bash_profile file:\n";
+          print "  PATH=\$PATH:{$installLibDirOS}; export PATH\n";
+        }
       }
     }
   }
   
   if (realpath($thisProgram) != realpath($updateFile)) {
     print "\nNote: fbcmd_update.php is now at [{$updateFile}]\n";
-    print "so you can remove the old one at [{$thisProgram}]\n\n";
+    print "so you can remove the old one at [" . realpath($thisProgram) . "]\n\n";
   }  
+  
+  if ($oldMainVersion == 'none') {
+    print "type " . $fbcmdPrefs['install_script_name'] . " to begin\n\n";
+  }
 
   print "\n";
   
