@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.72';
+  $fbcmdUpdateVersion = '2.74';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -163,6 +163,9 @@
       $isHelp = true;
     }
     $isKeyword = true;
+    if ($specifiedBranch=='sudo') {
+      $isSudo = true;
+    }
   }
   TraceVar('isKeyword');
   TraceVar('isHelp');
@@ -600,17 +603,19 @@
       }
     }
     if (!$isWindows) {
-      if (isset($sudoUser)) {
-        if (chown($dir,$sudoUser)) {
-          Trace ("chown [{$dir}] [{$sudoUser}]");
-        } else {
-          print "error chown: [{$dir}] [{$sudoUser}] (non-fatal)\n";
+      if ($isSudo) {
+        if (isset($sudoUser)) {
+          if (chown($dir,$sudoUser)) {
+            Trace ("chown [{$dir}] [{$sudoUser}]");
+          } else {
+            print "error chown: [{$dir}] [{$sudoUser}] (non-fatal)\n";
+          }
         }
-      }
-      if (chmod($dir,$fbcmdPrefs['install_lib_mkdir_mode'])) {
-        Trace ("chmod [{$dir}]");
-      } else {
-        print "error chmod: [{$dir}] (non-fatal)\n";
+        if (chmod($dir,$fbcmdPrefs['install_lib_mkdir_mode'])) {
+          Trace ("chmod [{$dir}]");
+        } else {
+          print "error chmod: [{$dir}] (non-fatal)\n";
+        }
       }
     }
   }  
