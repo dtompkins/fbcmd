@@ -3717,7 +3717,7 @@ function PrintCsvRow($rowIn) {
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
         if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
-          if (strpos($switchKey,'mkdir_mode') === false {
+          if (strpos($switchKey,'mkdir_mode') === false) {
             $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";        
           } else {
             $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";          
