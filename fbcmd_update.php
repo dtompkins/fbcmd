@@ -92,6 +92,7 @@
   $fbcmdPrefs['install_data_mkdir_mode'] = 0700;  
   $fbcmdPrefs['install_auto_restart'] = '1';
   $defaultLibDir = $fbcmdPrefs['install_lib_dir'];
+  $fbcmdPrefs['mkdir_mode'] = 0777;
   TraceVar('defaultLibDir');
   
 ////////////////////////////////////////////////////////////////////////////////  
