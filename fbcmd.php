@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev12-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev12-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -680,9 +680,7 @@
     if (!file_exists($fbcmdParams[1])) {
       FbcmdFatalError("Could not find file {$fbcmdParams[1]}");
     }
-    if ((strtoupper($fbcmdParams[2])=='1')||(strtoupper($fbcmdParams[2])=='LATEST')) {
-      $fbcmdParams[2] = GetLatestAID();
-    }
+    $fbcmdParams[2] = GetAlbumId($fbcmdParams[2]);
     try {
       $fbReturn = $fbObject->api_client->photos_upload($fbcmdParams[1], $fbcmdParams[2], $fbcmdParams[3], $fbUser);
       TraceReturn($fbReturn);
@@ -700,9 +698,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_addpicd_dirname']);
     SetDefaultParam(2,$fbcmdPrefs['default_addpicd_albumid']);
     $fileList = FileMatches($fbcmdParams[1],'jpg');
-    if (($fbcmdParams[2]=='1')||(strtoupper($fbcmdParams[2])=='LATEST')) {
-      $fbcmdParams[2] = GetLatestAID();
-    }
+    $fbcmdParams[2] = GetAlbumId($fbcmdParams[2]);
     if (count($fileList) > 0) {
       PrintHeaderQuiet('PID',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
       foreach ($fileList as $fileName) {
@@ -733,10 +729,13 @@
       FbcmdException($e);
     }
     if (!empty($fbReturn)) {
-      PrintHeader(PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME','AID',PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
+      PrintHeader(PrintIfPref('album_save','[#]'),PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME','AID',PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
+      $albumNum = 0;
       foreach ($fbReturn as $a) {
-        PrintRow(PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),$a['aid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
+        $albumNum++;
+        PrintRow(PrintIfPref('album_save',$albumNum),PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),$a['aid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
       }
+      SaveAlbumData($fbReturn);
     }
   }
 
@@ -769,9 +768,7 @@
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_apics_albumid']);
     SetDefaultParam(2,$fbcmdPrefs['default_apics_savedir']);
-    if ((strtoupper($fbcmdParams[1])=='1')||(strtoupper($fbcmdParams[1])=='LATEST')) {
-      $fbcmdParams[1] = GetLatestAID();
-    }
+    $fbcmdParams[1] = GetAlbumId($fbcmdParams[1]);
     $fql = "SELECT pid,aid,owner,src_small,src_big,src,link,caption,created FROM photo WHERE aid IN ({$fbcmdParams[1]})";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
@@ -2377,6 +2374,45 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function GetAlbumId($a) { //, $allowSpecial = false) {
+    global $lastMailData;
+    global $userStatus;
+    global $fbUser;
+    global $fbObject;
+    
+    
+    if (strtoupper($a) == 'LATEST') {
+      $fql = "SELECT aid,name FROM album WHERE owner={$fbUser} ORDER BY created DESC LIMIT 1";
+      try {
+        $fbReturn = $fbObject->api_client->fql_query($fql);
+        TraceReturn($fbReturn);
+      } catch(Exception $e) {
+        FbcmdException($e,'LATEST-AID');
+      }
+      if (isset($fbReturn[0]['aid'])) {
+        return $fbReturn[0]['aid'];
+      } else {
+        FbcmdFatalError("Could not retrieve latest album_id");
+      }
+    } else {
+      if ($a < 1001) {
+        LoadAlbumData();
+        if (isset($lastMailData['ids'][$a])) {
+          return $lastMailData['ids'][$a];
+        } else {
+          FbcmdWarning ("Invalid Album ID: {$a}");
+          return false;
+        }
+      } else {
+        return $a;
+      }
+      // }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
   function GetCommentCount($p, $warn = true) {
     global $fbUser;
     global $fbObject;
@@ -2659,26 +2695,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function GetLatestAID() {
-    global $fbUser;
-    global $fbObject;
-    $fql = "SELECT aid,name FROM album WHERE owner={$fbUser} ORDER BY created DESC LIMIT 1";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e,'LATEST-AID');
-    }
-    if (isset($fbReturn[0]['aid'])) {
-      return $fbReturn[0]['aid'];
-    } else {
-      return null;
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
   function GetNextChunkIds() {
     global $fbcmdPrefs;
     global $flistChunkCounter;
@@ -2846,6 +2862,26 @@
   
 ////////////////////////////////////////////////////////////////////////////////  
 ////////////////////////////////////////////////////////////////////////////////
+
+  function LoadAlbumData() {
+    global $fbcmdPrefs;
+    global $lastAlbumData;
+    if (isset($lastAlbumData)) {
+      return;
+    } else {
+      $lastAlbumData = array('0');
+      if ($fbcmdPrefs['album_save']) {
+        if (!file_exists($fbcmdPrefs['albumfile'])) {
+          FbcmdWarning("Could not locate file {$fbcmdPrefs['albumfile']}");
+        } else {
+          $lastAlbumData = unserialize(@file_get_contents($fbcmdPrefs['albumfile']));
+        }
+      }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////// 
 
   function LoadMailData() {
     global $fbcmdPrefs;
@@ -3613,6 +3649,22 @@ function PrintCsvRow($rowIn) {
     return 'unknown';
   }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveAlbumData($obj) {
+    global $fbcmdPrefs;
+    if ($fbcmdPrefs['album_save']) {
+      $saveAlbumData = array ('ids' => array('0'), 'timestamp' => time());
+      foreach ($obj as $album) {
+        $saveAlbumData['ids'][] = $album['aid'];
+      }
+      if (@file_put_contents($fbcmdPrefs['albumfile'],serialize($saveAlbumData)) == false) {
+        FbcmdWarning("Could not generate albumfile {$fbcmdPrefs['albumfile']}");
+      }
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
