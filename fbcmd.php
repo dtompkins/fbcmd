@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev11';
+  $fbcmdVersion = '1.0-beta3-dev12-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -115,6 +115,7 @@
   AddPreference('apics_filename','[pid].jpg','af');
   AddPreference('appkey','d96ea311638cf65f04b33c87eacf371e');
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
+  AddPreference('auth_auto_launch','1');
   AddPreference('auto_mkdir','1');
   AddPreference('csv_bookend','"');
   AddPreference('csv_escaped_bookend','""');
@@ -575,10 +576,10 @@
     print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
     print "It appears to be the first time you are running the application\n";
     print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
-    print "Note this current (default) location for your keyfile.  If you'd like to\n";
-    print "change this location, create an FBCMD environment variable to point to\n";
-    print "a folder where your personal keyfile and preferences will be stored.\n\n";
-    print "see http://fbcmd.dtompkins.com/installation [fbcmd go install] for more info.\n\n";
+    // print "Note this current (default) location for your keyfile.  If you'd like to\n";
+    // print "change this location, create an FBCMD environment variable to point to\n";
+    // print "a folder where your personal keyfile and preferences will be stored.\n\n";
+    // print "see http://fbcmd.dtompkins.com/installation [fbcmd go install] for more info.\n\n";
     ShowAuth();
     return;
   }
@@ -2278,7 +2279,11 @@
   function FbcmdPermissions($fbPermissionName) {
     global $fbcmdCommand;
     global $fbcmdPrefs;
-    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\nhttp://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}\nto grant permission\n");
+    $url = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}";
+    if ($fbcmdPrefs['auth_auto_launch']) {
+      LaunchBrowser($url);
+    }
+    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3750,6 +3755,10 @@ function PrintCsvRow($rowIn) {
 
   function ShowAuth() {
     global $fbcmdPrefs;
+    $url = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
+    if ($fbcmdPrefs['auth_auto_launch']) {
+      LaunchBrowser($url);
+    }
     print "\n";
     print "This application is not currently authorized.  To grant authorization,\n";
     print "Generate an access code at this website:\n\n";
