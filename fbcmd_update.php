@@ -277,6 +277,7 @@
   if (($specifiedBranch == 'clear')||($specifiedBranch == 'remove')) {
     DeleteFileOrDirectory($fbcmdBaseDir);
     if ($specifiedBranch == 'clear') {
+      print "Success: [{$fbcmdBaseDir}] has been removed\n\n";
       exit;
     }
   }
@@ -291,6 +292,7 @@
       DeleteFileOrDirectory($pathShell);
     }
     DeleteFileOrDirectory($fbcmdPrefs['install_lib_dir']);
+    print "Success: fbcmd has been removed\n\n";
     exit;
   }
   
@@ -398,6 +400,7 @@
   }
   
   if (($specifiedBranch == 'script')||($specifiedBranch == 'sudo')) {
+    print "Success\n\n";
     exit;
   }
   
