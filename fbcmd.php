@@ -53,8 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-
-  $fbcmdVersion = '1.0-beta3-dev11';
+  $fbcmdVersion = '1.0-beta3-dev12';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -74,7 +73,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   // set the default arguments to be empty
-  
+
   $fbcmdCommand = '';
   $fbcmdParams = Array();
   $fbcmdPrefs = Array();
@@ -83,7 +82,7 @@
 
   // You can set an environment variable FBCMD to specify the location of
   // your peronal files: sessionkeys.txt, prefs.php, postdata.txt, maildata.txt
-  
+
   // Defaults: Windows:          %USERPROFILE%\fbcmd\ (c:\Users\YOURUSERNAME\fbcmd\)
   // Defaults: Mac/Linux/Other:  $HOME/.fbcmd/        (~/.fbcmd/)
 
@@ -101,7 +100,7 @@
       $fbcmdBaseDir = CleanPath(getenv('HOME')) . '.fbcmd/';
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   // This section sets your preferences
@@ -112,17 +111,22 @@
 
   // Do NOT change these System Default preference values here:
   // Modify your own prefs.php file instead
-  
+
+  AddPreference('albumfile',"{$fbcmdBaseDir}albumdata.txt",'afile');
+  AddPreference('album_save','1','asave');
   AddPreference('apics_filename','[pid].jpg','af');
   AddPreference('appkey','d96ea311638cf65f04b33c87eacf371e');
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
+  AddPreference('auth_auto_launch','1');
   AddPreference('auto_mkdir','1');
   AddPreference('csv_bookend','"');
   AddPreference('csv_escaped_bookend','""');
   AddPreference('csv_force_bookends','0','csvf');
   AddPreference('csv_separator',',');
   AddPreference('delpost_comment_fail','1');
+  AddPreference('eventfile',"{$fbcmdBaseDir}eventdata.txt",'efile');
   AddPreference('event_dateformat','D M d H:i','edf');
+  AddPreference('event_save','1','esave');
   AddPreference('events_attend_mask','15','emask');
   AddPreference('facebook_debug','0','debug');
   AddPreference('feed_template','60736970450');
@@ -135,6 +139,7 @@
   AddPreference('folder_show_snippet','1','snip');
   AddPreference('folder_show_threadid','0','tid');
   AddPreference('fpics_filename','[pid].jpg','ff');
+  AddPreference('go_default_numeric','link');
   AddPreference('keyfile',"{$fbcmdBaseDir}sessionkeys.txt",'key');
   AddPreference('launch_exec','');
   AddPreference('mail_save','1','msave');
@@ -143,8 +148,10 @@
   AddPreference('msg_blankrow','1','mbr');
   AddPreference('msg_dateformat','M d H:i','mdf');
   AddPreference('msg_show_date','0','md');
+  AddPreference('noticefile',"{$fbcmdBaseDir}noticedata.txt",'nfile');
   AddPreference('notices_blankrow','1','nbr');
   AddPreference('notices_dateformat','M d H:i','ndf');
+  AddPreference('notices_save','1','nsave');
   AddPreference('notices_show_date','0','nd');
   AddPreference('notices_show_id','0','nid');
   AddPreference('online_idle','1','idle');
@@ -152,6 +159,7 @@
   AddPreference('pic_dateformat','M d Y','pdf');
   AddPreference('pic_retry_count','10','pr');
   AddPreference('pic_retry_delay','2','prd');
+  AddPreference('pic_show_albumid','0','paid');
   AddPreference('pic_show_date','0','pd');
   AddPreference('pic_show_links','0','plink');
   AddPreference('pic_show_src','0','psrc');
@@ -164,7 +172,8 @@
   AddPreference('prefix_friendlist','_');
   AddPreference('prefix_group','~');
   AddPreference('prefix_page','+');
-  AddPreference('prefix_username','@');
+  AddPreference('prefix_tag','@');
+  AddPreference('prefix_username','!');
   AddPreference('prefs','');
   AddPreference('print_blanks','0','bl');
   AddPreference('print_clean','1','clean');
@@ -198,7 +207,7 @@
   AddPreference('stream_show_postid','0','sid');
   AddPreference('trace','0','t');
   AddPreference('update_branch','master');
-  
+
   // Parameter Defaults
   AddPreference('default_addalbum_title','');
   AddPreference('default_addalbum_description','');
@@ -293,7 +302,7 @@
   AddPreference('default_updates_count','10');
   AddPreference('default_wallpost_flist','=ME');
   AddPreference('default_wallpost_message','');
-  
+
   // STEP TWO: Load preferences from prefs.php in the base directory
 
   if (file_exists("{$fbcmdBaseDir}prefs.php")) {
@@ -314,9 +323,9 @@
       FbcmdWarning("Could not load Preferences file {$fbcmdPrefs['prefs']}");
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   if ($fbcmdCommand == 'SAVEPREF') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,"{$fbcmdBaseDir}prefs.php");
@@ -331,7 +340,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdCommandList = array();
-  
+
   AddCommand('ADDALBUM',  'title [description] [location] [privacy]~Create a new photo album');
   AddCommand('ADDPIC',    'filename [album_id|latest] [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id|latest]~Upload (add) all *.jpg files in a directory to an album');
@@ -374,7 +383,7 @@
   AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
-  AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');  
+  AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
   AddCommand('POST',      'message [name] [link] [caption] [desc]~Post (share) a story in your stream');
   AddCommand('POSTIMG',   'message img_src [img_link] [name] [link] [caption] [desc]~Post (share) an image in your stream');
   AddCommand('POSTMP3',   'msg mp3_src [title] [artist] [album] [name] [link] [caption] [desc]~Post (share) an .mp3 file in your stream');
@@ -402,11 +411,11 @@
   if (isset($fbcmd_include_newCommands)) {
     array_merge_unique($fbcmdCommandList,$fbcmd_include_newCommands);
   }
-  
-////////////////////////////////////////////////////////////////////////////////  
+
+////////////////////////////////////////////////////////////////////////////////
 
   if (in_array($fbcmdCommand,array('DFILE','FEED','FEED3','FSTATUSID','FLSTATUS','PICS'))) {
-    FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information"); // todo add go
+    FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -419,9 +428,9 @@
 
   if (($fbcmdCommand == 'HELP')||($fbcmdCommand == 'USAGE')) {
     ValidateParamCount(0,1);
-    if (ParamCount()==0) {
+    if (ParamCount() == 0) {
       ShowUsage();
-    } 
+    }
     if (in_array(strtoupper($fbcmdParams[1]),$fbcmdCommandList)) {
       LaunchBrowser('http://fbcmd.dtompkins.com/commands/' . strtolower($fbcmdParams[1]));
       return;
@@ -433,8 +442,8 @@
     FbcmdWarning("HELP: did not recognize [{$fbcmdParams[1]}]");
     ShowUsage();
   }
-  
-////////////////////////////////////////////////////////////////////////////////    
+
+////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'UPDATE') {
     ValidateParamCount(0,4);
@@ -463,24 +472,26 @@
     passthru($execCmd);
     return;
   }
-  
-////////////////////////////////////////////////////////////////////////////////    
-  
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'HOME') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,'');
     LaunchBrowser('http://fbcmd.dtompkins.com/' . strtolower($fbcmdParams[1]));
   }
 
-////////////////////////////////////////////////////////////////////////////////    
+////////////////////////////////////////////////////////////////////////////////
 
+  AddGoDestination('album',       '#An album from the ALBUM command');
   AddGoDestination('app',         'The fbcmd page on facebook','http://facebook.com/fbcmd');
   AddGoDestination('auth',        'Authorize fbcmd for login',"http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}");
   AddGoDestination('auth-ps',     'Authorize fbcmd for post_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream");
   AddGoDestination('auth-rm',     'Authorize fbcmd for read_mailbox',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox");
-  AddGoDestination('auth-rs',     'Authorize fbcmd for read_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream");  
+  AddGoDestination('auth-rs',     'Authorize fbcmd for read_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream");
   AddGoDestination('contribute',  'The fbcmd contact page','http://fbcmd.dtompkins.com/contribute');
   AddGoDestination('editapps',    'The facebook edit applications page','http://www.facebook.com/editapps.php');
+  AddGoDestination('event',       '#An event from the EVENT command');
   AddGoDestination('faq',         'The fbcmd FAQ','http://fbcmd.dtompkins.com/faq');
   AddGoDestination('friend.name', 'The facebook page of your friend...uses status tagging','http://fbcmd.dtompkins.com/faq');
   AddGoDestination('github',      'The source repository at github','http://github.com/dtompkins/fbcmd');
@@ -489,16 +500,24 @@
   AddGoDestination('home',        'The fbcmd home page','http://fbcmd.dtompkins.com');
   AddGoDestination('inbox',       'Your facebook inbox','http://www.facebook.com/inbox');
   AddGoDestination('install',     'The fbcmd installation page','http://fbcmd.dtompkins.com/installation');
-  AddGoDestination('link',        '#A link from a post from he STREAM command');
-  AddGoDestination('msg',         '#A mail thread from he INBOX command');  
+  AddGoDestination('link',        '#A link from a post from the STREAM command');
+  AddGoDestination('msg',         '#A mail thread from he INBOX command');
+  AddGoDestination('notice',      '#A notice from the NOTICES command');
   AddGoDestination('post',        '#A post from the STREAM command');
   AddGoDestination('stream',      'Your facebook home page','http://www.facebook.com/home.php');
   AddGoDestination('update',      'The fbcmd update page','http://fbcmd.dtompkins.com/update');
   AddGoDestination('wall',        'Your facebook profile');
   AddGoDestination('wiki',        'The fbcmd wiki','http://fbcmd.dtompkins.com');
-  
+  AddGoDestination('a',           '#shortcut for [album]');
+  AddGoDestination('e',           '#shortcut for [event]');
+  AddGoDestination('m',           '#shortcut for [msg]');
+  AddGoDestination('n',           '#shortcut for [notice]');
+  AddGoDestination('p',           '#shortcut for [post]');
+  AddGoDestination('l',           '#shortcut for [link]');
+
+
   if ($fbcmdCommand == 'GO') {
-    if (ParamCount()==0) {
+    if (ParamCount() == 0) {
       print "\nGO Destinations:\n\n";
       foreach ($goDestinations as $key) {
         $desc = $goDestinationsHelp[$key];
@@ -522,13 +541,13 @@
 
   require_once('facebook/facebook.php');
   require_once('facebook/facebook_desktop.php');
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'RESET') {
     ValidateParamCount(0);
     VerifyOutputDir($fbcmdPrefs['keyfile']);
-    if (@file_put_contents($fbcmdPrefs['keyfile'],"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n")==false) {
+    if (@file_put_contents($fbcmdPrefs['keyfile'],"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
       FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
     }
     if (!$fbcmdPrefs['quiet']) {
@@ -550,7 +569,7 @@
     $fbcmdUserSessionKey = $session['session_key'];
     $fbcmdUserSecretKey = $session['secret'];
     VerifyOutputDir($fbcmdPrefs['keyfile']);
-    if (@file_put_contents ($fbcmdPrefs['keyfile'],"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n")==false) {
+    if (@file_put_contents ($fbcmdPrefs['keyfile'],"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
       FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
     }
     try {
@@ -564,7 +583,7 @@
       FbcmdException($e,'Invalid AUTH code / could not generate session key');
     }
     if (!$fbcmdPrefs['quiet']) {
-      print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD {$fbReturn[0]['name']}.  Try fbcmd help to begin\n"; //todo add go
+      print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD {$fbReturn[0]['name']}.\n";
     }
     return;
   }
@@ -573,13 +592,9 @@
 
   if (!file_exists($fbcmdPrefs['keyfile'])) {
     print "\n";
-    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";    
+    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";
     print "It appears to be the first time you are running the application\n";
     print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
-    print "Note this current (default) location for your keyfile.  If you'd like to\n";
-    print "change this location, create an FBCMD environment variable to point to\n";
-    print "a folder where your personal keyfile and preferences will be stored.\n\n";
-    print "see http://fbcmd.dtompkins.com/installation [fbcmd go install] for more info.\n\n";
     ShowAuth();
     return;
   }
@@ -592,8 +607,8 @@
   }
   $fbcmdUserSessionKey = $fbcmdKeyFile[0];
   $fbcmdUserSecretKey = $fbcmdKeyFile[1];
-  
-  if (strncmp($fbcmdUserSessionKey,'EMPTY',5)==0) {
+
+  if (strncmp($fbcmdUserSessionKey,'EMPTY',5) == 0) {
     ShowAuth();
     return;
   }
@@ -680,9 +695,7 @@
     if (!file_exists($fbcmdParams[1])) {
       FbcmdFatalError("Could not find file {$fbcmdParams[1]}");
     }
-    if ((strtoupper($fbcmdParams[2])=='1')||(strtoupper($fbcmdParams[2])=='LATEST')) {
-      $fbcmdParams[2] = GetLatestAID();
-    }
+    $fbcmdParams[2] = GetAlbumId($fbcmdParams[2]);
     try {
       $fbReturn = $fbObject->api_client->photos_upload($fbcmdParams[1], $fbcmdParams[2], $fbcmdParams[3], $fbUser);
       TraceReturn($fbReturn);
@@ -700,9 +713,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_addpicd_dirname']);
     SetDefaultParam(2,$fbcmdPrefs['default_addpicd_albumid']);
     $fileList = FileMatches($fbcmdParams[1],'jpg');
-    if (($fbcmdParams[2]=='1')||(strtoupper($fbcmdParams[2])=='LATEST')) {
-      $fbcmdParams[2] = GetLatestAID();
-    }
+    $fbcmdParams[2] = GetAlbumId($fbcmdParams[2]);
     if (count($fileList) > 0) {
       PrintHeaderQuiet('PID',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
       foreach ($fileList as $fileName) {
@@ -733,16 +744,19 @@
       FbcmdException($e);
     }
     if (!empty($fbReturn)) {
-      PrintHeader(PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME','AID',PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
+      PrintHeader(PrintIfPref('album_save','[#]'),PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME',PrintIfPref('pic_show_albumid','AID'),PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
+      $albumNum = 0;
       foreach ($fbReturn as $a) {
-        PrintRow(PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),$a['aid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
+        $albumNum++;
+        PrintRow(PrintIfPref('album_save','[' . $albumNum. ']'),PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),PrintIfPref('pic_show_albumid',$a['aid']),PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
       }
+      SaveAlbumData($fbReturn);
     }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $allUserInfoFields = "about_me,activities,affiliations,allowed_restrictions,birthday,birthday_date,books,current_location,education_history,email_hashes,family,first_name,has_added_app,hometown_location,hs_info,interests,is_app_user,last_name,locale,meeting_for,meeting_sex,movies,music,name,notes_count,online_presence,pic,pic_big,pic_big_with_logo,pic_small,pic_small_with_logo,pic_square,pic_square_with_logo,pic_with_logo,political,profile_blurb,profile_update_time,profile_url,proxied_email,quotes,relationship_status,religion,sex,significant_other_id,status,timezone,tv,uid,username,wall_count,work_history";
+  $allUserInfoFields = "about_me,activities,affiliations,allowed_restrictions,birthday,birthday_date,books,current_location,education_history,email_hashes,family,first_name,has_added_app,hometown_location,hs_info,interests,is_app_user,is_blocked,last_name,locale,meeting_for,meeting_sex,movies,music,name,notes_count,online_presence,pic,pic_big,pic_big_with_logo,pic_small,pic_small_with_logo,pic_square,pic_square_with_logo,pic_with_logo,political,profile_blurb,profile_update_time,profile_url,proxied_email,quotes,relationship_status,religion,sex,significant_other_id,status,timezone,tv,uid,username,verified,wall_count,website,work_history";
 
   if ($fbcmdCommand == 'ALLINFO') {
     ValidateParamCount(0,1);
@@ -769,9 +783,7 @@
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_apics_albumid']);
     SetDefaultParam(2,$fbcmdPrefs['default_apics_savedir']);
-    if ((strtoupper($fbcmdParams[1])=='1')||(strtoupper($fbcmdParams[1])=='LATEST')) {
-      $fbcmdParams[1] = GetLatestAID();
-    }
+    $fbcmdParams[1] = GetAlbumId($fbcmdParams[1]);
     $fql = "SELECT pid,aid,owner,src_small,src_big,src,link,caption,created FROM photo WHERE aid IN ({$fbcmdParams[1]})";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
@@ -780,9 +792,9 @@
       FbcmdException($e);
     }
     if (!empty($fbReturn)) {
-      PrintHeader('AID','PID',PrintIfPref('pic_show_date','CREATED'),'CAPTION',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
+      PrintHeader(PrintIfPref('pic_show_albumid','AID'),'PID',PrintIfPref('pic_show_date','CREATED'),'CAPTION',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
       foreach ($fbReturn as $pic) {
-        PrintRow($pic['aid'],$pic['pid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$pic['created'])),$pic['caption'],PrintIfPref('pic_show_links',$pic['link']),PrintIfPref('pic_show_src',PhotoSrc($pic)));
+        PrintRow(PrintIfPref('pic_show_albumid',$pic['aid']),$pic['pid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$pic['created'])),$pic['caption'],PrintIfPref('pic_show_links',$pic['link']),PrintIfPref('pic_show_src',PhotoSrc($pic)));
         if ($fbcmdParams[2]) {
           SavePhoto(PhotoSrc($pic),$pic,'0',$fbcmdParams[2],$fbcmdPrefs['apics_filename']);
         }
@@ -862,10 +874,13 @@
       FbcmdException($e);
     }
     if (!empty($fbReturn)) {
-      PrintHeader('START_TIME','EVENT');
+      PrintHeader(PrintIfPref('event_save','[#]'),'START_TIME','EVENT');
+      $eventNum = 0;
       foreach ($fbReturn as $event) {
-        PrintRow(date($fbcmdPrefs['event_dateformat'],$event['start_time']),$event['name']);
+        $eventNum++;
+        PrintRow(PrintIfPref('event_save','[' . $eventNum . ']'),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$event['name']);
       }
+      SaveEventData($fbReturn);
     }
   }
 
@@ -1077,7 +1092,7 @@
     GetFlistIds($fbcmdParams[1]);
     PrintHeader(PrintIfPref('show_id','ID'),'NAME','ONLINE_PRESENCE');
     foreach ($flistMatchArray as $id) {
-      if (($indexFriendBaseInfo[$id]['online_presence'] == 'active')||(($indexFriendBaseInfo[$id]['online_presence']=='idle')&&($fbcmdPrefs['online_idle']))) {
+      if (($indexFriendBaseInfo[$id]['online_presence'] == 'active')||(($indexFriendBaseInfo[$id]['online_presence'] == 'idle')&&($fbcmdPrefs['online_idle']))) {
         PrintRow(PrintIfPref('show_id',$id),ProfileName($id),$indexFriendBaseInfo[$id]['online_presence']);
       }
     }
@@ -1179,11 +1194,11 @@
     SetDefaultParam(1,$fbcmdPrefs['default_fstream_flist']);
     SetDefaultParam(2,$fbcmdPrefs['default_fstream_count']);
     GetFlistIds($fbcmdParams[1],true);
-    if (strtoupper($fbcmdParams[2])=='NEW') {
+    if (strtoupper($fbcmdParams[2]) == 'NEW') {
       CheckStreamTimeStamp();
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE source_id IN ({$flistMatchIdString}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id IN ({$flistMatchIdString}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
     } else {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE source_id IN ({$flistMatchIdString}) LIMIT {$fbcmdParams[2]}";
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id IN ({$flistMatchIdString}) LIMIT {$fbcmdParams[2]}";
     }
     $queries = array('Stream');
     if ($fbcmdPrefs['stream_show_comments']) {
@@ -1193,12 +1208,12 @@
     }
     MultiFQL($queries);
     if (!empty($dataStream)) {
-      SavePostData($dataStream);
       PrintPostHeader();
       $postNum = 0;
       foreach ($dataStream as $a) {
         PrintPostObject(++$postNum,$a);
       }
+      SavePostData($dataStream);
     }
   }
 
@@ -1208,7 +1223,7 @@
     ValidateParamCount(1);
     $curPostId = GetPostId($fbcmdParams[1],true);
     if ($curPostId) {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE post_id='{$curPostId}'";
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE post_id='{$curPostId}'";
       $fqlComments = "SELECT fromid, time, text FROM comment WHERE post_id='{$curPostId}' ORDER BY time";
       $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream) OR id IN (SELECT fromid FROM #fqlComments)';
       $keyStreamNames = 'id';
@@ -1219,53 +1234,78 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'GO') {
     global $goDestinations;
-    ValidateParamCount(1,2); //todo 
+    $hasLaunched = false;
+    ValidateParamCount(1,2);
+    if ((ParamCount() == 1) && (is_numeric($fbcmdParams[1]))) {
+      $fbcmdParams[2] = $fbcmdParams[1];
+      $fbcmdParams[1] = $fbcmdPrefs['go_default_numeric'];
+    }
     $go = $fbcmdParams[1];
-    if (in_array(strtolower($go),$goDestinations)) {
-      $go = strtoupper($go);
-      $hasLaunched = false;
-      if ($fbcmdParams[2]) {
-        if ($go == 'MSG') {
-          $curThreadId = GetThreadId($fbcmdParams[2]);
-          LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
+    if (ParamCount() == 1) {
+      if (in_array(strtolower($go),$goDestinations)) {
+        $go = strtoupper($go);
+        if ($go == 'WALL') {
+          LaunchBrowser("http://www.facebook.com/profile.php?id={$fbUser}");
         }
-        if (($go == 'POST')||($go == 'LINK')) {
-          $curPostId = GetPostId($fbcmdParams[2],true);
-          $fql = "SELECT permalink,attachment FROM stream WHERE post_id='{$curPostId}'";
-          try {
-            $fbReturn = $fbObject->api_client->fql_query($fql);
-            TraceReturn($fbReturn);
-          } catch(Exception $e) {
-            FbcmdException($e);
-          }
-          if (!empty($fbReturn)) {
-            if ($go == 'LINK') {
-              if (isset($fbReturn[0]['attachment']['href'])) {
-                $permalink = false;
-                LaunchBrowser($fbReturn[0]['attachment']['href']);
-              }
-            }
-            if (!$hasLaunched) {
-              print "permalink\n";
-              LaunchBrowser($fbReturn[0]['permalink']);
-            }
-          }
+      } else {
+        MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
+        $tagList = MatchTag($fbcmdParams[1]);
+        if ($tagList) {
+          LaunchBrowser("http://www.facebook.com/profile.php?id={$tagList[0][0]}");
         }
       }
     } else {
-      $hackTodo = TagText("@$fbcmdParams[1]");
-      if (preg_match('/\[(\d+)\:/',$hackTodo, $matches)) {
-        if (isset($matches[1])) {
-          LaunchBrowser("http://www.facebook.com/profile.php?id=$matches[1]");
+      $go = strtoupper($go);
+      if ($fbcmdParams[2]) {
+        if (($go == 'ALBUM')||($go == 'A')) {
+          $lastNoticeData = LoadDataFile('album_save','albumfile');
+          if (isset($lastNoticeData['link'][$fbcmdParams[2]])) {
+            LaunchBrowser($lastNoticeData['link'][$fbcmdParams[2]]);
+          }
+        }
+        if (($go == 'EVENT')||($go == 'E')) {
+          $lastEventData = LoadDataFile('event_save','eventfile');
+          if (isset($lastEventData['ids'][$fbcmdParams[2]])) {
+            LaunchBrowser('http://www.facebook.com/event.php?eid=' . $lastEventData['ids'][$fbcmdParams[2]]);
+          }
+        }
+        if (($go == 'LINK')||($go == 'L')) {
+          $lastPostData = LoadDataFile('stream_save','postfile');
+          if (isset($lastPostData['link'][$fbcmdParams[2]])) {
+            LaunchBrowser($lastPostData['link'][$fbcmdParams[2]]);
+          } else {
+            $go = 'POST';
+          }
+        }
+        if (($go == 'NOTICE')||($go == 'N')) {
+          $lastNoticeData = LoadDataFile('notices_save','noticefile');
+          if (isset($lastNoticeData['href'][$fbcmdParams[2]])) {
+            LaunchBrowser($lastNoticeData['href'][$fbcmdParams[2]]);
+          }
+        }
+        if (($go == 'MSG')||($go == 'M')) {
+          $curThreadId = GetThreadId($fbcmdParams[2]);
+          if ($curThreadId) {
+            LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
+          }
+        }
+        if (($go == 'POST')||($go == 'P')) {
+          $lastPostData = LoadDataFile('stream_save','postfile');
+          if (isset($lastPostData['url'][$fbcmdParams[2]])) {
+            LaunchBrowser($lastPostData['url'][$fbcmdParams[2]]);
+          }
         }
       }
     }
-  }  
+    if (!$hasLaunched) {
+      FbcmdWarning("Problem with your GO requeset");
+    }
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1294,7 +1334,7 @@
       SaveMailData($dataThread);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'LIKE') {
@@ -1426,7 +1466,6 @@
             $displayDate = date($fbcmdPrefs['msg_dateformat'],$m['created_time']);
           }
           PrintRow(PrintIfPref('show_id',$m['author_id']),ProfileName($m['author_id']),PrintIfPref('msg_show_date',$displayDate),$m['body']);
-          //todo: attachments?
           if ($fbcmdPrefs['msg_blankrow']) {
             PrintRow('');
           }
@@ -1434,7 +1473,7 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'MUTUAL') {
@@ -1472,7 +1511,7 @@
     $fqlApplicationNames = 'SELECT app_id,display_name FROM application WHERE app_id IN (SELECT app_id FROM #fqlNotification)';
     $keyApplicationNames = 'app_id';
     MultiFQL(array('Notification','MessageNames','ApplicationNames'));
-    
+
     if (!empty($dataNotification)) {
       PrintNotificationHeader();
       $threadNum = 0;
@@ -1489,16 +1528,8 @@
           TraceReturn($fbReturn);
         }
       }
+      SaveNoticeData($dataNotification);
     }
-  }
-  
-  function MarkRead($notificationId) {
-    global $fbObject;
-    print "MARKING: $notificationId \n";
-    
-    $fbReturn = $fbObject->api_client->call_method('facebook.Notifications.markRead',array('notification_ids' => $notificationId));
-    TraceReturn($fbReturn);
-
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1550,7 +1581,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_opics_flist']);
     SetDefaultParam(2,$fbcmdPrefs['default_opics_savedir']);
     GetFlistIds($fbcmdParams[1],true);
-    PrintHeader(PrintIfPref('show_id','ID'),'NAME','AID','PID',PrintIfPref('pic_show_date','CREATED'),'CAPTION',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
+    PrintHeader(PrintIfPref('show_id','ID'),'NAME',PrintIfPref('pic_show_albumid','AID'),'PID',PrintIfPref('pic_show_date','CREATED'),'CAPTION',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
     do {
       $curChunkIds = GetNextChunkIds();
       if ($curChunkIds) {
@@ -1558,7 +1589,7 @@
         foreach ($curChunkIds as $id) {
           if ($results[$id]) {
             foreach ($results[$id] as $pic) {
-              PrintRow(PrintIfPref('show_id',$id),ProfileName($id),$pic['aid'],$pic['pid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$pic['created'])),$pic['caption'],PrintIfPref('pic_show_links',$pic['link']),PrintIfPref('pic_show_src',PhotoSrc($pic)));
+              PrintRow(PrintIfPref('show_id',$id),ProfileName($id),PrintIfPref('pic_show_albumid',$pic['aid']),$pic['pid'],PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$pic['created'])),$pic['caption'],PrintIfPref('pic_show_links',$pic['link']),PrintIfPref('pic_show_src',PhotoSrc($pic)));
               if ($fbcmdParams[2]) {
                 SavePhoto(PhotoSrc($pic),$pic,'',$fbcmdParams[2],$fbcmdPrefs['opics_filename']);
               }
@@ -1596,7 +1627,7 @@
       SaveMailData($dataThread);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'POST') {
@@ -1789,8 +1820,13 @@
         }
       }
     }
+    if ($fbcmdPrefs['status_tag']) {
+      $statusText = TagText($fbcmdParams[1]);
+    } else {
+      $statusText = $fbcmdParams[1];
+    }
     try {
-      $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $fbcmdParams[1],'status_includes_verb' => true));
+      $fbReturn = $fbObject->api_client->stream_publish($statusText);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
       FbcmdException($e);
@@ -1862,7 +1898,7 @@
       SaveMailData($dataThread);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'SFILTERS') {
@@ -1881,7 +1917,7 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'SHOWPREF') {
@@ -1895,7 +1931,7 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'STATUS') {
@@ -1938,28 +1974,28 @@
       }
       $filterKeyQuery = "SELECT filter_key FROM stream_filter WHERE uid={$fbUser} AND rank={$fbcmdParams[1]}";
     } else {
-      if (substr($fbcmdParams[1],0,1)== $fbcmdPrefs['prefix_filter']) {
+      if (substr($fbcmdParams[1],0,1) == $fbcmdPrefs['prefix_filter']) {
         $filterKeyQuery = "'" . GetFilterByName($fbcmdParams[1]) . "'";
       } else {
         $filterKeyQuery = "'{$fbcmdParams[1]}'";
       }
     }
-    if (strtoupper($fbcmdParams[2])=='NEW') {
+    if (strtoupper($fbcmdParams[2]) == 'NEW') {
       CheckStreamTimeStamp();
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE filter_key IN ({$filterKeyQuery}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE filter_key IN ({$filterKeyQuery}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
     } else {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes FROM stream WHERE filter_key IN ({$filterKeyQuery}) LIMIT {$fbcmdParams[2]}";
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE filter_key IN ({$filterKeyQuery}) LIMIT {$fbcmdParams[2]}";
     }
     $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id, comments.comment_list.fromid FROM #fqlStream)';
     $keyStreamNames = 'id';
     MultiFQL(array('Stream','StreamNames'));
     if (!empty($dataStream)) {
-      SavePostData($dataStream);
       PrintPostHeader();
       $postNum = 0;
       foreach ($dataStream as $a) {
         PrintPostObject(++$postNum,$a);
       }
+      SavePostData($dataStream);
     }
   }
 
@@ -2016,7 +2052,7 @@
     PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH');
     PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch']);
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'WHOAMI') {
@@ -2140,12 +2176,12 @@
   function CheckMailTimeStamp() {
     global $fbcmdPrefs;
     global $lastMailData;
-    LoadMailData();    
+    $lastMailData = LoadDataFile('mail_save','mailfile');
     if (!isset($lastMailData['timestamp'])) {
       if ($fbcmdPrefs['mail_save']) {
         FbcmdFatalError("Unexpected: Could not determine timestamp from last folder command");
       } else {
-        FbcmdFatalError("NEW requires the preference -mail_save to be set");
+        FbcmdFatalError("NEW requires the preference -mail_save=1");
       }
     }
   }
@@ -2156,7 +2192,7 @@
   function CheckStreamTimeStamp() {
     global $fbcmdPrefs;
     global $lastPostData;
-    LoadPostData();    
+    $lastPostData = LoadDataFile('stream_save','postfile');
     if (!isset($lastPostData['timestamp'])) {
       if ($fbcmdPrefs['stream_save']) {
         FbcmdFatalError("Unexpected: Could not determine timestamp from last stream command");
@@ -2172,13 +2208,13 @@
   function CleanColumns($columns) {
     global $fbcmdPrefs;
     global $printMatrix;
-  
+
     if ($fbcmdPrefs['print_clean']) {
       for ($j=0;$j<count($columns);$j++) {
         if ($columns[$j] == '') {
           $match = true;
         } else {
-          $row = count($printMatrix)-1;        
+          $row = count($printMatrix)-1;
           $match = false;
           $search = true;
           while (($search)&&($row >= 0)) {
@@ -2187,7 +2223,7 @@
                 $row--;
               } else {
                 $search = false;
-                if ($printMatrix[$row][$j]==$columns[$j]) {
+                if (strcmp($printMatrix[$row][$j],$columns[$j]) == 0) {
                   $match = true;
                 }
               }
@@ -2206,7 +2242,7 @@
     return $columns;
   }
 
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function CleanPath($curPath)
@@ -2279,7 +2315,11 @@
   function FbcmdPermissions($fbPermissionName) {
     global $fbcmdCommand;
     global $fbcmdPrefs;
-    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\nhttp://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}\nto grant permission\n");
+    $url = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}";
+    if ($fbcmdPrefs['auth_auto_launch']) {
+      LaunchBrowser($url);
+    }
+    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2298,7 +2338,7 @@
     $dirName = CleanPath($dirName);
     if ($handle = @opendir($dirName)) {
       while (false !== ($file = readdir($handle))) {
-        if (strtoupper(substr($file,-strlen($ext)))==strtoupper($ext)) {
+        if (strtoupper(substr($file,-strlen($ext))) == strtoupper($ext)) {
           $matches[] = $dirName . $file;
         }
       }
@@ -2350,7 +2390,7 @@
         }
       }
     }
-    if (count($matchList)==0) {
+    if (count($matchList) == 0) {
       if (is_numeric($matchString)) {
         $matchList[] = $matchString;
       } else {
@@ -2368,6 +2408,45 @@
       return array();
     }
     return $matchList;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function GetAlbumId($a) { //, $allowSpecial = false) {
+    global $lastAlbumData;
+    global $userStatus;
+    global $fbUser;
+    global $fbObject;
+
+
+    if (strtoupper($a) == 'LATEST') {
+      $fql = "SELECT aid,name FROM album WHERE owner={$fbUser} ORDER BY created DESC LIMIT 1";
+      try {
+        $fbReturn = $fbObject->api_client->fql_query($fql);
+        TraceReturn($fbReturn);
+      } catch(Exception $e) {
+        FbcmdException($e,'LATEST-AID');
+      }
+      if (isset($fbReturn[0]['aid'])) {
+        return $fbReturn[0]['aid'];
+      } else {
+        FbcmdFatalError("Could not retrieve latest album_id");
+      }
+    } else {
+      if ($a < 1001) {
+        $lastAlbumData = LoadDataFile('album_save','albumfile');
+        if (isset($lastAlbumData['ids'][$a])) {
+          return $lastAlbumData['ids'][$a];
+        } else {
+          FbcmdWarning ("Invalid Album ID: {$a}");
+          return false;
+        }
+      } else {
+        return $a;
+      }
+      // }
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2459,15 +2538,20 @@
 
     // Pre-process to see if Friend Lists or Pages or Groups are required
     foreach ($flistItems as $item) {
-      if (substr($item,0,1)==$fbcmdPrefs['prefix_friendlist']) {
+      if (substr($item,0,1) == $fbcmdPrefs['prefix_friendlist']) {
         array_push_unique($flistFQL,'FriendListNames');
         array_push_unique($flistFQL,'FriendListMembers');
       }
-      if ((substr($item,0,1)==$fbcmdPrefs['prefix_page'])||(strtoupper($item)=='=PAGES')) {
+      if ((substr($item,0,1) == $fbcmdPrefs['prefix_page'])||(strtoupper($item)=='=PAGES')) {
         array_push_unique($flistFQL,'PageId');
         array_push_unique($flistFQL,'PageNames');
       }
-      if (substr($item,0,1)==$fbcmdPrefs['prefix_group']) {
+      if (substr($item,0,1) == $fbcmdPrefs['prefix_group']) {
+        array_push_unique($flistFQL,'GroupNames');
+      }
+      if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
+        array_push_unique($flistFQL,'PageId');
+        array_push_unique($flistFQL,'PageNames');
         array_push_unique($flistFQL,'GroupNames');
       }
     }
@@ -2501,7 +2585,7 @@
         if ($itemUC == '=BDAY') {
           $curDate = date('m/d',time());
           foreach ($dataFriendBaseInfo as $fbi) {
-            if (substr($fbi['birthday_date'],0,5)==$curDate) {
+            if (substr($fbi['birthday_date'],0,5) == $curDate) {
               array_push_unique($flistMatchArray,$fbi['uid']);
             }
           }
@@ -2509,7 +2593,7 @@
         }
         if ($itemUC == '=ONLINE') {
           foreach ($dataFriendBaseInfo as $fbi) {
-            if (($fbi['online_presence']=='active')||(($fbi['online_presence']=='idle')&&($fbcmdPrefs['online_idle']))) {
+            if (($fbi['online_presence'] == 'active')||(($fbi['online_presence'] == 'idle')&&($fbcmdPrefs['online_idle']))) {
               array_push_unique($flistMatchArray,$fbi['uid']);
             }
           }
@@ -2551,7 +2635,7 @@
         continue;
       }
 
-      // @USERNAME /////////////////////////////////////////////////////////////
+      // !USERNAME /////////////////////////////////////////////////////////////
 
       if (substr($item,0,1) == $fbcmdPrefs['prefix_username']) {
         $uidMatches = FlistMatch($item,true,$dataFriendBaseInfo,'uid','username',$allowMultipleMatches);
@@ -2598,12 +2682,22 @@
         continue;
       }
 
+      // @TAG FORMAT ///////////////////////////////////////////////////////////
+
+      if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
+        $tagList = MatchTag(substr($item,1));
+        if ($tagList) {
+          array_merge_unique($flistMatchArray,array($tagList[0][0]));
+        }
+        continue;
+      }
+
       // REGULAR NAMES /////////////////////////////////////////////////////////
 
       $uidMatches = FlistMatch($item,false,$dataFriendBaseInfo,'uid','name',$allowMultipleMatches);
       array_merge_unique($flistMatchArray,$uidMatches);
     }
-    if (count($flistMatchArray)==0) {
+    if (count($flistMatchArray) == 0) {
       if ($failOnEmpty) {
         if (strtoupper($flistString) == '=BDAY') {
           print "No Friends With Birthdays Today\n";
@@ -2645,31 +2739,11 @@
       } else {
         $githubVersion = 'err';
       }
-      
+
     } catch (Exception $e) {
       $githubVersion = 'unavailable';
     }
     return $githubVersion;
-  }
-  
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function GetLatestAID() {
-    global $fbUser;
-    global $fbObject;
-    $fql = "SELECT aid,name FROM album WHERE owner={$fbUser} ORDER BY created DESC LIMIT 1";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e,'LATEST-AID');
-    }
-    if (isset($fbReturn[0]['aid'])) {
-      return $fbReturn[0]['aid'];
-    } else {
-      return null;
-    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2735,7 +2809,7 @@
       }
     } else {
       if ($p < 1001) {
-        LoadPostData();
+        $lastPostData = LoadDataFile('stream_save','postfile');
         if (isset($lastPostData['ids'][$p])) {
           return $lastPostData['ids'][$p];
         } else {
@@ -2785,7 +2859,7 @@
       // }
     // } else {
       if ($p < 1001) {
-        LoadMailData();
+        $lastMailData = LoadDataFile('mail_save','mailfile');
         if (isset($lastMailData['ids'][$p])) {
           return $lastMailData['ids'][$p];
         } else {
@@ -2796,9 +2870,9 @@
         return $p;
       }
     // }
-  }  
+  }
 
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function IsEmpty($obj) {
@@ -2826,9 +2900,9 @@
     global $hasLaunched;
     $hasLaunched = true;
     if (strtoupper(substr(PHP_OS, 0, 3)) == 'WIN') {
-      pclose(popen("start \"\" /B \"{$url}\"", "r"));  
-    } else { 
-      if ($fbcmdPrefs['launch_exec']) {    
+      pclose(popen("start \"\" /B \"{$url}\"", "r"));
+    } else {
+      if ($fbcmdPrefs['launch_exec']) {
         exec($fbcmdPrefs['launch_exec']);
       } else {
         if (strtoupper(substr(PHP_OS, 0, 6)) == 'DARWIN') {
@@ -2837,46 +2911,66 @@
           exec("xdg-open \"{$url}\" > /dev/null 2>&1 &");
         }
       }
-    } 
-  } 
-  
-////////////////////////////////////////////////////////////////////////////////  
-////////////////////////////////////////////////////////////////////////////////
-
-  function LoadMailData() {
-    global $fbcmdPrefs;
-    global $lastMailData;
-    if (isset($lastMailData)) {
-      return;
-    } else {
-      $lastMailData = array('0');
-      if ($fbcmdPrefs['mail_save']) {
-        if (!file_exists($fbcmdPrefs['mailfile'])) {
-          FbcmdWarning("Could not locate file {$fbcmdPrefs['mailfile']}");
-        } else {
-          $lastMailData = unserialize(@file_get_contents($fbcmdPrefs['mailfile']));
-        }
-      }
     }
   }
 
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function LoadPostData() {
+  function LoadDataFile($prefSave, $prefFile) {
     global $fbcmdPrefs;
-    global $lastPostData;
-    if (isset($lastPostData)) {
-      return;
+    $loadData = array('0');
+    if ($fbcmdPrefs[$prefSave]) {
+      if (!file_exists($fbcmdPrefs[$prefFile])) {
+        FbcmdWarning("Could not locate {$prefFile} [{$fbcmdPrefs[$prefFile]}]");
+      } else {
+        $loadData = unserialize(@file_get_contents($fbcmdPrefs[$prefFile]));
+      }
+    }
+    return($loadData);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function MatchTag($tag) {
+    global $fbcmdPrefs;
+    global $dataFriendBaseInfo;
+    global $dataPageNames;
+    global $dataGroupNames;
+    $matchOrder = explode(',',$fbcmdPrefs['status_tag_order']);
+    $matchList = array();
+    foreach ($matchOrder as $order) {
+      $matchParams = explode(':',$order);
+      if ($matchParams[0] == 'friends') {
+        $matchList = TagFieldMatch($tag, $dataFriendBaseInfo, $matchParams[1], 'uid', $matchParams[2]);
+      }
+      if ($matchParams[0] == 'pages') {
+        $matchList = TagFieldMatch($tag, $dataPageNames, $matchParams[1], 'page_id', $matchParams[2]);
+      }
+      if ($matchParams[0] == 'groups') {
+        $matchList = TagFieldMatch($tag, $dataGroupNames, $matchParams[1], 'gid', $matchParams[2]);
+      }
+      if (count($matchList) > 0) {
+        break;
+      }
+    }
+    if (count($matchList) == 1) {
+      return ($matchList);
     } else {
-      $lastPostData = array('0');
-      if ($fbcmdPrefs['stream_save']) {
-        if (!file_exists($fbcmdPrefs['postfile'])) {
-          FbcmdWarning("Could not locate file {$fbcmdPrefs['postfile']}");
-        } else {
-          $lastPostData = unserialize(@file_get_contents($fbcmdPrefs['postfile']));
+      if (count($matchList) == 0) {
+        FbcmdWarning("Tag [{$tag}] had no matches");
+      } else {
+        FbcmdWarning("Tag [{$tag}] had multiple matches:");
+        foreach ($matchList as $item) {
+          if ($item[1] != $item[2]) {
+            print "  {$item[1]} ({$item[2]})\n";
+          } else {
+            print "  {$item[1]}\n";
+          }
         }
       }
+      return (false);
     }
   }
 
@@ -3036,10 +3130,10 @@
   function PhotoSrc($obj) {
     global $fbcmdPrefs;
     $fieldName = 'src_big';
-    if ($fbcmdPrefs['pic_size']==0) {
+    if ($fbcmdPrefs['pic_size'] == 0) {
       $fieldName = 'src_small';
     }
-    if ($fbcmdPrefs['pic_size']==2) {
+    if ($fbcmdPrefs['pic_size'] == 2) {
       $fieldName = 'src';
     }
     if (isset($obj[$fieldName])) {
@@ -3113,7 +3207,7 @@ function PrintCsvRow($rowIn) {
         for ($i=0; $i<count($columnWidth)-1; $i++) {
           $columnWidth[$i] += $fbcmdPrefs['print_col_padding'];
         }
-        
+
         if ($fbcmdPrefs['print_wrap']) {
           $consoleWidth = $fbcmdPrefs['print_wrap_width'];
           if ($fbcmdPrefs['print_wrap_env_var']) {
@@ -3123,7 +3217,7 @@ function PrintCsvRow($rowIn) {
           }
           $colToWrap = count($columnWidth) - 1;
           $wrapWidth = $consoleWidth - array_sum($columnWidth) + $columnWidth[$colToWrap] - 1;
-          if ($wrapWidth < $fbcmdPrefs['print_wrap_min_width']) { 
+          if ($wrapWidth < $fbcmdPrefs['print_wrap_min_width']) {
             $wrapWidth = $columnWidth[$colToWrap]+1;
           }
           $backupMatrix = $printMatrix;
@@ -3142,7 +3236,7 @@ function PrintCsvRow($rowIn) {
               $printMatrix[] = $row;
             }
           }
-        } else { 
+        } else {
           if ($fbcmdPrefs['print_linefeed_subst']) {
             $colToWrap = count($columnWidth) - 1;
             for ($j=0; $j < count($printMatrix); $j++) {
@@ -3152,7 +3246,7 @@ function PrintCsvRow($rowIn) {
             }
           }
         }
-        
+
         foreach ($printMatrix as $row) {
           for ($i=0; $i<count($row); $i++) {
             if ($i < count($row)-1) {
@@ -3182,9 +3276,9 @@ function PrintCsvRow($rowIn) {
     PrintHeader($threadInfo,'FIELD','VALUE');
     if ($fbcmdPrefs['folder_blankrow']) {
       PrintRow('');
-    }    
+    }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3197,34 +3291,34 @@ function PrintCsvRow($rowIn) {
       $showThreadNum = '[' . $threadNum . ']';
       if ($thread['unread']) {
         $showThreadNum .= '*';
-      } 
+      }
       $threadInfo[] = $showThreadNum;
     }
     if ($fbcmdPrefs['folder_show_threadid']) {
       $threadInfo[] = $thread['thread_id'];
     }
-    
+
     $subjectShow = $thread['subject'];
     if ($subjectShow == '') {
       $subjectShow = '[no subject]';
     }
     PrintRow($threadInfo,'subject',$subjectShow);
-    
+
     $recipientsList = array();
     foreach ($thread['recipients'] as $r) {
       if ($r != $fbUser) {
         $recipientsList[] = ProfileName($r);
       }
     }
-    $recipientsShow = implode(',',$recipientsList);    
-    PrintRow($threadInfo,':to/from',$recipientsShow);        
-    
-    
+    $recipientsShow = implode(',',$recipientsList);
+    PrintRow($threadInfo,':to/from',$recipientsShow);
+
+
     if ($fbcmdPrefs['folder_show_date']) {
       PrintRow($threadInfo,':date', date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
     }
-    
-    
+
+
     if ($fbcmdPrefs['folder_show_snippet']) {
       $snippetShow = str_replace("\n", ' ', $thread['snippet']);
       if (count($recipientsList) > 1) {
@@ -3238,7 +3332,7 @@ function PrintCsvRow($rowIn) {
     }
   }
 
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function PrintHeader() {
@@ -3302,11 +3396,11 @@ function PrintCsvRow($rowIn) {
   function PrintNotificationObject($threadNum, $n) {
     global $fbcmdPrefs;
     global $fbUser;
-    
+
     $postInfo = array();
-    $postInfo[] = '[' . $threadNum . ']';    
+    $postInfo[] = '[' . $threadNum . ']';
     if ($n['is_unread']) {
-      $postInfo[0] .= '*';    
+      $postInfo[0] .= '*';
     }
     if ($fbcmdPrefs['notices_show_id']) {
       $postInfo[] = $n['notification_id'];
@@ -3323,7 +3417,7 @@ function PrintCsvRow($rowIn) {
     if ($n['title_text'] != '') {
       PrintRow($postInfo,ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
       $prefix = ':';
-    }        
+    }
     if ($n['body_text'] != '') {
       PrintRow($postInfo,ProfileName($n['app_id']),$prefix . 'body',strip_tags($n['body_text']));
     }
@@ -3425,7 +3519,7 @@ function PrintCsvRow($rowIn) {
     if ($fbcmdPrefs['stream_show_likes']) {
       if (isset($post['likes']['count'])) {
         if ($post['likes']['count'] > 0) {
-          if ($post['likes']['count']==1) {
+          if ($post['likes']['count'] == 1) {
             $likesMessage = '1 person likes this.';
           } else {
             $likesMessage = "{$post['likes']['count']} people like this.";
@@ -3519,7 +3613,7 @@ function PrintCsvRow($rowIn) {
       PrintCsvRow($printColumns);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3538,7 +3632,7 @@ function PrintCsvRow($rowIn) {
     global $fbcmdPrefs;
     if (is_array($obj)) {
       foreach ($obj as $key=>$value) {
-        if ($fieldPrefix=='') {
+        if ($fieldPrefix == '') {
           PrintRecursiveObject($arrayPrefix,"{$key}",$value);
         } else {
           PrintRecursiveObject($arrayPrefix,"{$fieldPrefix}.{$key}",$value);
@@ -3612,19 +3706,61 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function SaveMailData($obj) {
+  function SaveAlbumData($obj) {
+    $saveData = array ('ids' => array('0'), 'link' => array('0'), 'timestamp' => time());
+    foreach ($obj as $d) {
+      $saveData['ids'][] = $d['aid'];
+      $saveData['link'][] = $d['link'];
+    }
+    SaveDataFile('album_save','albumfile',$saveData);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveDataFile($prefSave, $prefFile,$saveData) {
     global $fbcmdPrefs;
-    if ($fbcmdPrefs['mail_save']) {
-      $saveMailData = array ('ids' => array('0'), 'timestamp' => time());
-      foreach ($obj as $thread) {
-        $saveMailData['ids'][] = $thread['thread_id'];
-      }
-      if (@file_put_contents($fbcmdPrefs['mailfile'],serialize($saveMailData)) == false) {
-        FbcmdWarning("Could not generate mailfile {$fbcmdPrefs['mailfile']}");
+    if ($fbcmdPrefs[$prefSave]) {
+      if (@file_put_contents($fbcmdPrefs[$prefFile],serialize($saveData)) == false) {
+        FbcmdWarning("Could not generate {$prefFile} {$fbcmdPrefs[$prefFile]}");
       }
     }
   }
-  
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveEventData($obj) {
+    $saveData = array ('ids' => array('0'), 'timestamp' => time());
+    foreach ($obj as $d) {
+      $saveData['ids'][] = $d['eid'];
+    }
+    SaveDataFile('event_save','eventfile',$saveData);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////
+
+  function SaveMailData($obj) {
+    $saveData = array ('ids' => array('0'), 'timestamp' => time());
+    foreach ($obj as $d) {
+      $saveData['ids'][] = $d['thread_id'];
+    }
+    SaveDataFile('mail_save','mailfile',$saveData);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveNoticeData($obj) {
+    $saveData = array ('ids' => array('0'), 'href' => array('0'), 'timestamp' => time());
+    foreach ($obj as $d) {
+      $saveData['ids'][] = $d['notification_id'];
+      $saveData['href'][] = $d['href'];
+    }
+    SaveDataFile('notices_save','noticefile',$saveData);
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3670,7 +3806,7 @@ function PrintCsvRow($rowIn) {
       }
     } while ($photoContents == false);
 
-    if (file_put_contents($outputFile, $photoContents)==false) {
+    if (file_put_contents($outputFile, $photoContents) == false) {
       FbcmdWarning("Could not save {$outputFile}");
       return false;
     }
@@ -3682,16 +3818,17 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 
   function SavePostData($obj) {
-    global $fbcmdPrefs;
-    if ($fbcmdPrefs['stream_save']) {
-      $savePostData = array ('ids' => array('0'), 'timestamp' => time());
-      foreach ($obj as $post) {
-        $savePostData['ids'][] = $post['post_id'];
+    $saveData = array ('ids' => array('0'), 'url' => array('0'), 'link' => array('0'), 'timestamp' => time());
+    foreach ($obj as $d) {
+      $saveData['ids'][] = $d['post_id'];
+      if (isset($d['attachment']['href'])) {
+        $saveData['link'][] = $d['attachment']['href'];
+      } else {
+        $saveData['link'][] = $d['permalink'];
       }
-      if (@file_put_contents($fbcmdPrefs['postfile'],serialize($savePostData)) == false) {
-        FbcmdWarning("Could not generate postfile {$fbcmdPrefs['postfile']}");
-      }
+      $saveData['url'][] = $d['permalink'];
     }
+    SaveDataFile('stream_save','postfile',$saveData);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3718,11 +3855,11 @@ function PrintCsvRow($rowIn) {
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
+        if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'albumfile')&&($switchKey != 'eventfile')&&($switchKey != 'mailfile')&&($switchKey != 'noticefile')&&($switchKey != 'postfile'))) {
           if (strpos($switchKey,'mkdir_mode') === false) {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";        
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
           } else {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";          
+            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
           }
         }
       }
@@ -3751,18 +3888,22 @@ function PrintCsvRow($rowIn) {
 
   function ShowAuth() {
     global $fbcmdPrefs;
+    $url = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
+    if ($fbcmdPrefs['auth_auto_launch']) {
+      LaunchBrowser($url);
+    }
     print "\n";
     print "This application is not currently authorized.  To grant authorization,\n";
     print "Generate an access code at this website:\n\n";
     print "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}\n";
     print "or execute: fbcmd go auth\n";
     print "obtain your authorization code (XXXXXX) and then execute: fbcmd AUTH XXXXXX\n\n";
-  }  
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function ShowUsage() { 
+  function ShowUsage() {
     global $fbcmdVersion;
     global $fbcmdCommandList;
     global $fbcmdCommandHelp;
@@ -3775,7 +3916,7 @@ function PrintCsvRow($rowIn) {
     print "  fbcmd COMMAND required_parameter(s) [optional_parameter(s)] -switch=value\n\n";
 
     print "commands: (can be in lower case)\n\n";
-    
+
     foreach ($fbcmdCommandList as $cmd) {
       if (!isset($fbcmdCommandHelp[$cmd])) {
         $fbcmdCommandHelp[$cmd] = "[No Help Available]\n";
@@ -3812,75 +3953,35 @@ function PrintCsvRow($rowIn) {
     }
     foreach ($dataToSearch as $d) {
       if (preg_match($matchExp,$d[$matchField])) {
-        $matchList[] = array($d[$idField],$d[$nameField]);
+        $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
       }
     }
     return $matchList;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-function TagText($textToTag) {
-  global $fbcmdPrefs;
-  global $fbUser;
-  global $fqlMatchFriends;
-  global $dataMatchFriends;
-  global $fqlMatchPages;
-  global $dataMatchPages;
-  global $fqlMatchGroups;
-  global $dataMatchGroups;
-
-  $textToTag = str_replace('@@','[[AT]]',$textToTag);
-  
-  if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches, PREG_SET_ORDER)) {
-    
-    $fqlMatchFriends = "SELECT uid,name,username FROM user WHERE uid IN (SELECT uid2 FROM friend WHERE uid1={$fbUser} AND uid2=uid2)";
-    $fqlMatchPages = "SELECT page_id,name,username FROM page WHERE page_id IN (SELECT page_id FROM page_fan WHERE uid={$fbUser})";
-    $fqlMatchGroups = "SELECT gid,name FROM group WHERE gid IN (SELECT gid FROM group_member WHERE uid={$fbUser})";
-    MultiFQL(array('MatchFriends','MatchPages','MatchGroups'));
-    
-    $matchOrder = explode(',',$fbcmdPrefs['status_tag_order']);
-
-    foreach ($matches as $pregMatch) {
-      $nameMatch = $pregMatch[1];
-      $matchList = array();
-      foreach ($matchOrder as $order) {
-        $matchParams = explode(':',$order);
-        if ($matchParams[0] == 'friends') {
-          $matchList = TagFieldMatch($nameMatch, $dataMatchFriends, $matchParams[1], 'uid', $matchParams[2]);
-        }
-        if ($matchParams[0] == 'pages') {
-          $matchList = TagFieldMatch($nameMatch, $dataMatchPages, $matchParams[1], 'page_id', $matchParams[2]);
-        }
-        if ($matchParams[0] == 'groups') {
-          $matchList = TagFieldMatch($nameMatch, $dataMatchGroups, $matchParams[1], 'gid', $matchParams[2]);
-        }
-        if (count($matchList) > 0) {
-          break;
-        }
-      }
-      if (count($matchList) == 1) {
-        $taggedText = "@[{$matchList[0][0]}:{$matchList[0][0]}:{$matchList[0][1]}]";
-      } else {
-        $taggedText = "[[AT]]$nameMatch";
-        if (count($matchList) == 0) {
-          FbcmdWarning("Tag {$pregMatch[0]} had no matches.  Use @@ to avoid tagging");
+  function TagText($textToTag) {
+    global $fbcmdPrefs;
+    $textToTag = str_replace('@@','[[AT]]',$textToTag);
+    if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches, PREG_SET_ORDER)) {
+      MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
+      foreach ($matches as $pregMatch) {
+        $matchList = MatchTag($pregMatch[1]);
+        if ($matchList) {
+          $taggedText = "@[{$matchList[0][0]}:{$matchList[0][0]}:{$matchList[0][1]}]";
         } else {
-          FbcmdWarning("Tag {$pregMatch[0]} had multiple matches: Leaving text untagged");
-          foreach ($matchList as $item) {
-            print "  {$item[1]}\n";
-          }
+          $taggedText = "[[AT]]{$pregMatch[1]}";
         }
+        $textToTag = str_replace($pregMatch[0],$taggedText,$textToTag);
       }
-      $textToTag = str_replace($pregMatch[0],$taggedText,$textToTag);
     }
+    $textToTag = str_replace('[[AT]]','@',$textToTag);
+    return $textToTag;
   }
-  
-  $textToTag = str_replace('[[AT]]','@',$textToTag);
-  
-  return $textToTag;
-}  
 
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function TraceReturn($obj) {
@@ -3896,13 +3997,13 @@ function TagText($textToTag) {
   function UserPhotoSrc($obj) {
     global $fbcmdPrefs;
     $fieldName = 'pic_big';
-    if ($fbcmdPrefs['ppic_size']==0) {
+    if ($fbcmdPrefs['ppic_size'] == 0) {
       $fieldName = 'pic_small';
     }
-    if ($fbcmdPrefs['ppic_size']==2) {
+    if ($fbcmdPrefs['ppic_size'] == 2) {
       $fieldName = 'pic';
     }
-    if ($fbcmdPrefs['ppic_size']==3) {
+    if ($fbcmdPrefs['ppic_size'] == 3) {
       $fieldName = 'pic_square';
     }
     if (isset($obj[$fieldName])) {
