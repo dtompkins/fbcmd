@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.75';
+  $fbcmdUpdateVersion = '2.8';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -191,7 +191,7 @@
     print "keyword:     Instead of a branch, you can specify one of:\n";
     print "                 clear    clear your personal user settings\n";        
     print "                 help     display this message\n";
-    print "                 install  (Windows) full install with defaults\n";
+    print "                 install  install with default branch\n";
     print "                 remove   removes fbcmd from your system\n";    
     print "                 script   generate the fbcmd script only\n";
     print "                 sudo     (Mac/Linux) create lib_dir & script only\n\n";
@@ -336,7 +336,7 @@
   if (!file_exists($fullBinScript)) {
     $isMakeScript = true;
   }
-  if (($specifiedBranch == 'script')||($specifiedBranch == 'install')) {
+  if ($specifiedBranch == 'script') {
     $isMakeScript = true;
   }
   if ($isSudo) {
@@ -367,7 +367,7 @@
     if (!file_exists($fullBinScript)) {
       $isCopyToBin = true;
     }
-    if (($specifiedBranch == 'script')||($specifiedBranch == 'install')||($isSudo == true)) {
+    if (($specifiedBranch == 'script')||($isSudo == true)) {
       $isCopyToBin = true;
     }
   }
