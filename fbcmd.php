@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev13-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev13-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2685,7 +2685,7 @@
       // @TAG FORMAT ///////////////////////////////////////////////////////////
 
       if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
-        $tagList = MatchTag(substr($item,1));
+        $tagList = MatchTag(substr($item,1),$allowPages,false);
         if ($tagList) {
           array_merge_unique($flistMatchArray,array($tagList[0][0]));
         }
@@ -2903,7 +2903,8 @@
       pclose(popen("start \"\" /B \"{$url}\"", "r"));
     } else {
       if ($fbcmdPrefs['launch_exec']) {
-        exec($fbcmdPrefs['launch_exec']);
+        $execString = str_replace('[url]', $url, $fbcmdPrefs['launch_exec']);
+        exec($execString);
       } else {
         if (strtoupper(substr(PHP_OS, 0, 6)) == 'DARWIN') {
           exec("open \"{$url}\" > /dev/null 2>&1 &");
@@ -2933,7 +2934,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function MatchTag($tag) {
+  function MatchTag($tag, $allowPages = true, $allowGroups = true) {
     global $fbcmdPrefs;
     global $dataFriendBaseInfo;
     global $dataPageNames;
@@ -2945,10 +2946,10 @@
       if ($matchParams[0] == 'friends') {
         $matchList = TagFieldMatch($tag, $dataFriendBaseInfo, $matchParams[1], 'uid', $matchParams[2]);
       }
-      if ($matchParams[0] == 'pages') {
+      if (($matchParams[0] == 'pages')&&($allowPages)) {
         $matchList = TagFieldMatch($tag, $dataPageNames, $matchParams[1], 'page_id', $matchParams[2]);
       }
-      if ($matchParams[0] == 'groups') {
+      if (($matchParams[0] == 'groups')&&($allowGroups)) {
         $matchList = TagFieldMatch($tag, $dataGroupNames, $matchParams[1], 'gid', $matchParams[2]);
       }
       if (count($matchList) > 0) {
