@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev12';
+  $fbcmdVersion = '1.0-beta3-dev13-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -379,7 +379,7 @@
   AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
   AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
   AddCommand('MUTUAL',    'flist~List friend(s) in common with other friend(s)');
-  AddCommand('NOTICES',   '[unread|markread]~See brief notifications from facebook, applications & users');
+  AddCommand('NOTICES',   '[unread|markread]~See notifications from facebook, applications & users');
   AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
@@ -1001,11 +1001,11 @@
 
   if ($fbcmdCommand == 'FINBOX') {
     ValidateParamCount(1);
-    GetFlistIds($fbcmdParams[1]);
+    GetFlistIds($fbcmdParams[1],true);
     $matchInRecipients = "('" . implode("' in recipients OR '",$flistMatchArray) . "' in recipients)";
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
-    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 and $matchInRecipients";
+    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE (folder_id = 0 OR folder_id = 1 OR folder_id = 4) and $matchInRecipients";
     $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
     $keyMessageNames = 'id';
     MultiFQL(array('Thread','MessageNames'));
