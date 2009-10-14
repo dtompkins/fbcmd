@@ -40,8 +40,8 @@ support/sample-loadinfo-text.php   # sample for the LOADINFO command
 
 # sessionkeys.txt      # Your authorized access keys (keep them secure)
 # prefs.php            # A way to edit your preferences on how FBCMD behaves
-# postdata.txt         # cached stream id data (from STREAM commands)
-# maildata.txt         # cached folder id data (from INBOX commands)
+# *data.txt            # cached id data from varous commands
+
 
 #############################################################################
 
@@ -54,5 +54,5 @@ support/sample-loadinfo-text.php   # sample for the LOADINFO command
 # fbcmd_update.php   # The program to update the fbcmd distribution
 
 # fbmcd.bat          # The batch file to run FBCMD (Windows)
-# fbcmd              # The bash file to run FBCMD (Other)
+# fbcmd              # The bash file to run FBCMD (Mac/Linux)
 
