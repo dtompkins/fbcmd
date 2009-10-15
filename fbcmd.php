@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev13-unstable2';
+  $fbcmdVersion = '1.0-beta3-dev13-unstable3';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -252,6 +252,7 @@
   AddPreference('default_loadnote_title','');
   AddPreference('default_loadnote_filename','');
   AddPreference('default_mutual_flist','=ALL');
+  AddPreference('default_mywall_count','10');  
   AddPreference('default_notices_type','');
   AddPreference('default_nsend_flist','=ME');
   AddPreference('default_nsend_message','');
@@ -379,6 +380,7 @@
   AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
   AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
   AddCommand('MUTUAL',    'flist~List friend(s) in common with other friend(s)');
+  AddCommand('MYWALL',    '[count|new]~Show the posts from other users to your wall');
   AddCommand('NOTICES',   '[unread|markread]~See notifications from facebook, applications & users');
   AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
@@ -1232,6 +1234,37 @@
         PrintPostHeader();
         PrintPostObject($fbcmdParams[1],$dataStream[0],$dataComments);
       }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'MYWALL') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_mywall_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      CheckStreamTimeStamp();
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+    } else {
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} LIMIT {$fbcmdParams[1]}";
+    }
+    $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream)';
+    $keyStreamNames = 'id';
+    MultiFQL(array('Stream','StreamNames'));
+    if (!empty($dataStream)) {
+      PrintHeader(PrintIfPref('stream_save','[#]'),PrintIfPref('stream_show_postid','POST_ID'),PrintIfPref('show_id','UID'),'NAME',PrintIfPref('stream_show_date','DATE'),'MESSAGE');
+      if ($fbcmdPrefs['stream_blankrow']) {
+        PrintRow('');
+      }    
+      $postNum = 0;
+      foreach ($dataStream as $a) {
+        $postNum++;
+        PrintRow(PrintIfPref('stream_save','[' . $postNum . ']'),PrintIfPref('stream_show_postid',$a['post_id']),PrintIfPref('show_id',$a['actor_id']),ProfileName($a['actor_id']),PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$a['created_time'])),$a['message']);
+        if ($fbcmdPrefs['stream_blankrow']) {
+          PrintRow('');
+        }
+      }
+      SavePostData($dataStream);
     }
   }
 
