@@ -411,7 +411,9 @@
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   if (isset($fbcmd_include_newCommands)) {
-    array_merge_unique($fbcmdCommandList,$fbcmd_include_newCommands);
+    foreach ($fbcmd_include_newCommands as $c) {
+      AddCommand($c[0],$c[1]);
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -661,8 +663,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if (isset($fbcmd_include_newCommands)) {
-    if (in_array($fbcmdCommand,$fbcmd_include_newCommands)) {
-      return;
+    foreach ($fbcmd_include_newCommands as $c) {
+      if ($fbcmdCommand == $c[0]) {
+        return;
+      }
     }
   }
 

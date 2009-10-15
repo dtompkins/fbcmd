@@ -23,7 +23,7 @@
 // This is a sample program to show how to create your own COMMAND(S) for FBCMD
 // see: http://fbcmd.dtompkins.com/help/how-to/add-command for more info.
 
-// *** WARNING: Do *NOT* modify this file: if you use the fbcmd_update utility
+// *** WARNING: Do *NOT* modify this file: if you use the fbcmd UPDATE
 //              this file will be updated & replaced.  Create your own instead.
 
 // If you have a new command and would like to share it with others, visit:
@@ -37,18 +37,20 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Step Two: Run the FbcmdInitInclude() procedure
 
-  FbcmdInitInclude();
+  FbcmdIncludeInit();
 
 ////////////////////////////////////////////////////////////////////////////////
-// Step Three: Add any arguments to be appended
+// Step Three: Add any arguments to be appended automatically
 
-  FbcmdAddArgument('-quiet=0');
-  FbcmdAddArgument('-facebook_debug=0');
+  FbcmdIncludeAddArgument('-quiet=0');
+  FbcmdIncludeAddArgument('-facebook_debug=0');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step Four: List your new commands so that FBCMD will recognize them
 
-  FbcmdAddCommands('FRIENDNAMES','MYNOTES','SINGLE');
+  FbcmdIncludeAddCommand('FNAMES','Display all your friend\'s names');
+  FbcmdIncludeAddCommand('MYNOTES','Display all of your notes');
+  FbcmdIncludeAddCommand('SINGLE','Display all of your single friends');
 
 ////////////////////////////////////////////////////////////////////////////////
 // Step Five: Include (run) FBCMD
@@ -58,7 +60,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 // Step Six: Add your own commands:
 
-  if ($fbcmdCommand == 'FRIENDNAMES') {
+  if ($fbcmdCommand == 'FNAMES') {
     GetFlistIds("=all");
     foreach ($flistMatchArray as $friendId) {
       print ProfileName($friendId) . "\n";

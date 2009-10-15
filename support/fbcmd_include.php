@@ -21,7 +21,7 @@
 
 // This is a support file for inclding FBCMD within other programs
 
-  function FbcmdInitInclude() {
+  function FbcmdIncludeInit() {
     global $argv;
     global $argc;
     global $fbcmd_argv;
@@ -43,19 +43,16 @@
     ob_start();
   }
 
-  function FbcmdAddArgument($p) {
+  function FbcmdIncludeAddArgument($p) {
     global $fbcmd_argv;
     global $fbcmd_argc;
     $fbcmd_argv[] = $p;
     $fbcmd_argc++;
   }
 
-  function FbcmdAddCommands() {
+  function FbcmdIncludeAddCommand($cmd, $help) {
     global $fbcmd_include_newCommands;
-    $newCommands = func_get_args();
-    foreach ($newCommands as $cmd) {
-      $fbcmd_include_newCommands[] = $cmd;
-    }
+    $fbcmd_include_newCommands[] = array($cmd,$help);
   }
 
 ?>
