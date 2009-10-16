@@ -682,7 +682,7 @@
       FbcmdFatalError("ADDALBUM 4th parameter must be one of:\n                     friends,friends-of-friends,networks,everyone");
     }
     try {
-      $fbReturn = $fbObject->api_client->photos_createAlbum($fbcmdParams[1],$fbcmdParams[2],$fbcmdParams[3],$fbcmdParams[3]);
+      $fbReturn = $fbObject->api_client->photos_createAlbum($fbcmdParams[1],$fbcmdParams[2],$fbcmdParams[3],$fbcmdParams[4]);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
       FbcmdException($e);
