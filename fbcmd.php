@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev13';
+  $fbcmdVersion = '1.0-beta3-dev14-unstable1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -394,6 +394,7 @@
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
   AddCommand('RESET',     '<no parameters>~Reset any authorization codes set by AUTH');
   AddCommand('RESTATUS',  'message~Replace your status (deletes your status and adds a new status)');
+  AddCommand('RSVP',      'event_id yes|no|maybe~RSVP to an Event from the EVENTS command');
   AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
   AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
   AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
@@ -872,21 +873,18 @@
     ValidateParamCount(0,1);
     SetDefaultParam(1,time());
     $eventAttend = ProcessEventMask($fbcmdPrefs['events_attend_mask']);
-    $fql = "SELECT eid,name,start_time FROM event WHERE eid IN (SELECT eid FROM event_member WHERE uid={$fbUser} AND rsvp_status IN ({$eventAttend})) AND start_time > {$fbcmdParams[1]} ORDER BY start_time";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
-    } catch (Exception $e) {
-      FbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      PrintHeader(PrintIfPref('event_save','[#]'),'START_TIME','EVENT');
+    $fqlEventMember = "SELECT eid,rsvp_status FROM event_member WHERE uid={$fbUser} AND rsvp_status IN ({$eventAttend})";
+    $keyEventMember = 'eid';
+    $fqlEvent = "SELECT eid,name,start_time FROM event WHERE eid IN (SELECT eid FROM #fqlEventMember) AND start_time > {$fbcmdParams[1]} ORDER BY start_time";
+    MultiFQL(array('EventMember','Event'));
+    if (!empty($dataEvent)) {
+      PrintHeader(PrintIfPref('event_save','[#]'),'START_TIME','RSVP','EVENT');
       $eventNum = 0;
-      foreach ($fbReturn as $event) {
+      foreach ($dataEvent as $event) {
         $eventNum++;
-        PrintRow(PrintIfPref('event_save','[' . $eventNum . ']'),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$event['name']);
+        PrintRow(PrintIfPref('event_save','[' . $eventNum . ']'),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$indexEventMember[$event['eid']]['rsvp_status'],$event['name']);
       }
-      SaveEventData($fbReturn);
+      SaveEventData($dataEvent);
     }
   }
 
@@ -1872,6 +1870,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'RSVP') {
+    ValidateParamCount(2);
+    $eid = GetEventId($fbcmdParams[1]);
+    $rsvp = $fbcmdParams[2];
+    if (strtoupper($rsvp) == 'YES') {
+      $rsvp = 'attending';
+    }
+    if (strtoupper($rsvp) == 'NO') {
+      $rsvp = 'declined';
+    }
+    if (strtoupper($rsvp) == 'MAYBE') {
+      $rsvp = 'unsure';
+    }
+    try {
+      $fbReturn = $fbObject->api_client->events_rsvp($eid,$rsvp);
+      TraceReturn($fbReturn);
+    } catch(Exception $e) {
+      FbcmdException($e);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'SAVEDISP') {
     ValidateParamCount(1);
     SetDefaultParam(1,$fbcmdPrefs['default_savedisp_filename']);
@@ -2329,6 +2350,9 @@
     if (($eCode == 200)||($eCode == 250)||($eCode == 281)||($eCode == 282)||($eCode == 323)) {
       FbcmdPermissions('publish_stream');
     }
+    if ($eCode == 299) {
+      FbcmdPermissions('rsvp_event');
+    }
     if ($eCode == 602) {
       FbcmdFatalError("FINFO: invalid field(s): {$e->getMessage()}");
     }
@@ -2533,6 +2557,28 @@
       if (isset($fbReturn[0]['status']['message'])) {
         $userStatus = $fbReturn[0]['status']['message'];
       }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function GetEventId($a) {
+    global $lastEventData;
+    global $userStatus;
+    global $fbUser;
+    global $fbObject;
+    
+    if ($a < 1001) {
+      $lastEventData = LoadDataFile('event_save','eventfile');
+      if (isset($lastEventData['ids'][$a])) {
+        return $lastEventData['ids'][$a];
+      } else {
+        FbcmdWarning ("Invalid Event ID: {$a}");
+        return false;
+      }
+    } else {
+      return $a;
     }
   }
 
