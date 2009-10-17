@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.8';
+  $fbcmdUpdateVersion = '2.85';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -329,7 +329,7 @@
   } else {
     $contentsBatch = "#! /bin/bash\n";
     $contentsBatch .= "# *** {$comment}\n";
-    $contentsBatch .= "php \"$mainFile\" $* -col=$(tput cols)\n";
+    $contentsBatch .= "php \"$mainFile\" \"$@\" -col=$(tput cols)\n";
   }
 
   $isMakeScript = false;
