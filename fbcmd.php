@@ -1893,6 +1893,29 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'RSVP') {
+    ValidateParamCount(2);
+    $eid = GetEventId($fbcmdParams[1]);
+    $rsvp = $fbcmdParams[2];
+    if (strtoupper($rsvp) == 'YES') {
+      $rsvp = 'attending';
+    }
+    if (strtoupper($rsvp) == 'NO') {
+      $rsvp = 'declined';
+    }
+    if (strtoupper($rsvp) == 'MAYBE') {
+      $rsvp = 'unsure';
+    }
+    try {
+      $fbReturn = $fbObject->api_client->events_rsvp($eid,$rsvp);
+      TraceReturn($fbReturn);
+    } catch(Exception $e) {
+      FbcmdException($e);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'SAVEDISP') {
     ValidateParamCount(1);
     SetDefaultParam(1,$fbcmdPrefs['default_savedisp_filename']);
