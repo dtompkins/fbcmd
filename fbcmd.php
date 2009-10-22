@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev14-unstable1';
+  $fbcmdVersion = '1.0-beta3-dev14-unstable2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1861,7 +1861,7 @@
       $statusText = $fbcmdParams[1];
     }
     try {
-      $fbReturn = $fbObject->api_client->stream_publish($statusText);
+      $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));      
       TraceReturn($fbReturn);
     } catch(Exception $e) {
       FbcmdException($e);
@@ -2012,7 +2012,7 @@
         $statusText = $fbcmdParams[1];
       }
       try {
-        $fbReturn = $fbObject->api_client->stream_publish($statusText);
+        $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
         TraceReturn($fbReturn);
       } catch(Exception $e) {
         FbcmdException($e);
