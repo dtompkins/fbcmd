@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev14-unstable2';
+  $fbcmdVersion = '1.0-beta3-dev14-unstable3';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -288,6 +288,7 @@
   AddPreference('default_postvid_description',false);
   AddPreference('default_ppics_flist','=ALL');
   AddPreference('default_ppics_savedir',false);
+  AddPreference('default_ppost_id',null);
   AddPreference('default_recent_flist','=ALL');
   AddPreference('default_recent_count','10');
   AddPreference('default_savedisp_filename','');
@@ -386,6 +387,7 @@
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
   AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
+  AddCommand('PPOST',     'page_id message [name] [link] [caption] [desc]~Post a message to a your page (for page owner owners)');  
   AddCommand('POST',      'message [name] [link] [caption] [desc]~Post (share) a story in your stream');
   AddCommand('POSTIMG',   'message img_src [img_link] [name] [link] [caption] [desc]~Post (share) an image in your stream');
   AddCommand('POSTMP3',   'msg mp3_src [title] [artist] [album] [name] [link] [caption] [desc]~Post (share) an .mp3 file in your stream');
@@ -1795,6 +1797,40 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'PPOST') {
+    ValidateParamCount(2,6);
+    SetDefaultParam(1,$fbcmdPrefs['default_ppost_id']);
+    SetDefaultParam(2,$fbcmdPrefs['default_post_message']);
+    SetDefaultParam(3,$fbcmdPrefs['default_post_name']);
+    SetDefaultParam(4,$fbcmdPrefs['default_post_link']);
+    SetDefaultParam(5,$fbcmdPrefs['default_post_caption']);
+    SetDefaultParam(6,$fbcmdPrefs['default_post_description']);
+
+    if (is_numeric($fbcmdParams[1])) {
+      $postUserId = $fbcmdParams[1];
+    } else {
+      MultiFQL(array('PageId','PageNames'));
+      $tagList = MatchTag($fbcmdParams[1]);
+      if ($tagList) {
+        $postUserId = $tagList[0][0];
+      } else {
+        FbcmdFatalError("Could not determine page {$fbcmdParams[1]}");
+      }
+    }
+    try {
+      $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[2],array('name' => $fbcmdParams[3], 'href' => $fbcmdParams[4], 'caption' => $fbcmdParams[5], 'description' => $fbcmdParams[6] ), null, null, $postUserId);
+      TraceReturn($fbReturn);
+    } catch(Exception $e) {
+      FbcmdException($e);
+    }
+    if ($fbReturn) {
+      PrintHeaderQuiet('POST_ID');
+      PrintRowQuiet($fbReturn);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'RECENT') {
     ValidateParamCount(0,2);
     SetDefaultParam(1,$fbcmdPrefs['default_recent_flist']);
@@ -2371,7 +2407,11 @@
       }
     }
     if (($eCode == 200)||($eCode == 250)||($eCode == 281)||($eCode == 282)||($eCode == 323)) {
-      FbcmdPermissions('publish_stream');
+      if ($defaultCommand == 'PPOST') {
+        FbcmdPermissions2('publish_stream');
+      } else {
+        FbcmdPermissions('publish_stream');
+      }
     }
     if ($eCode == 299) {
       FbcmdPermissions('rsvp_event');
@@ -2400,6 +2440,19 @@
     global $fbcmdCommand;
     global $fbcmdPrefs;
     $url = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}";
+    if ($fbcmdPrefs['auth_auto_launch']) {
+      LaunchBrowser($url);
+    }
+    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function FbcmdPermissions2($fbPermissionName) {
+    global $fbcmdCommand;
+    global $fbcmdPrefs;
+    $url = "http://www.facebook.com/connect/prompt_permissions.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&next=http://www.facebook.com/connect/login_success.html?xxRESULTTOKENxx&display=popup&ext_perm={$fbPermissionName}&extern=1&fbconnect=true&enable_profile_selector=1";
     if ($fbcmdPrefs['auth_auto_launch']) {
       LaunchBrowser($url);
     }
@@ -4058,9 +4111,11 @@ function PrintCsvRow($rowIn) {
     } else {
       $matchExp = "/^$matchString/i";
     }
-    foreach ($dataToSearch as $d) {
-      if (preg_match($matchExp,$d[$matchField])) {
-        $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
+    if (isset($dataToSearch)) {
+      foreach ($dataToSearch as $d) {
+        if (preg_match($matchExp,$d[$matchField])) {
+          $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
+        }
       }
     }
     return $matchList;
