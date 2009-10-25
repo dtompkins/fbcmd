@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev14-unstable3';
+  $fbcmdVersion = '1.0-beta3-dev14-unstable4';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4063,6 +4063,24 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function ShowUsageCmd($cmd) {
+    global $fbcmdCommandList;
+    global $fbcmdCommandHelp;
+
+    if (!isset($fbcmdCommandHelp[$cmd])) {
+      $fbcmdCommandHelp[$cmd] = "[No Help Available]\n";
+    }
+    $helpText = explode('~',$fbcmdCommandHelp[$cmd]);
+    print "  " . str_pad($cmd, 10, ' ') . $helpText[0]. "\n";
+    for ($j=1; $j < count($helpText); $j++) {
+      print "            " . $helpText[$j] . "\n";
+    }
+    print "\n";
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
   function ShowUsage() {
     global $fbcmdVersion;
     global $fbcmdCommandList;
@@ -4078,15 +4096,7 @@ function PrintCsvRow($rowIn) {
     print "commands: (can be in lower case)\n\n";
 
     foreach ($fbcmdCommandList as $cmd) {
-      if (!isset($fbcmdCommandHelp[$cmd])) {
-        $fbcmdCommandHelp[$cmd] = "[No Help Available]\n";
-      }
-      $helpText = explode('~',$fbcmdCommandHelp[$cmd]);
-      print "  " . str_pad($cmd, 10, ' ') . $helpText[0]. "\n";
-      for ($j=1; $j < count($helpText); $j++) {
-        print "            " . $helpText[$j] . "\n";
-      }
-      print "\n";
+      ShowUsageCmd($cmd);
     }
 
     print "examples:\n\n";
@@ -4200,7 +4210,12 @@ function PrintCsvRow($rowIn) {
       }
     }
     if ($showHelp) {
-      FbcmdFatalError("[{$fbcmdCommand}] Invalid number of parameters: try fbcmd HELP\n      visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
+      print "\n";
+      FbcmdWarning("[{$fbcmdCommand}] Invalid number of parameters");
+      print "\n";
+      print "try:        [fbcmd help ". strtolower($fbcmdCommand). "]\nto launch:  http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . "\n\nbasic help:\n\n";
+      ShowUsageCmd($fbcmdCommand);      
+      exit;
     }
   }
 
