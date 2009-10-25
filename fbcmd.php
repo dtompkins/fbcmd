@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev14-unstable4';
+  $fbcmdVersion = '1.0-beta3-dev14-unstable5';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -112,7 +112,7 @@
   // Do NOT change these System Default preference values here:
   // Modify your own prefs.php file instead
 
-  AddPreference('albumfile',"{$fbcmdBaseDir}albumdata.txt",'afile');
+  AddPreference('albumfile',"[datadir]albumdata.txt",'afile');
   AddPreference('album_save','1','asave');
   AddPreference('apics_filename','[pid].jpg','af');
   AddPreference('appkey','d96ea311638cf65f04b33c87eacf371e');
@@ -124,7 +124,7 @@
   AddPreference('csv_force_bookends','0','csvf');
   AddPreference('csv_separator',',');
   AddPreference('delpost_comment_fail','1');
-  AddPreference('eventfile',"{$fbcmdBaseDir}eventdata.txt",'efile');
+  AddPreference('eventfile',"[datadir]eventdata.txt",'efile');
   AddPreference('event_dateformat','D M d H:i','edf');
   AddPreference('event_save','1','esave');
   AddPreference('events_attend_mask','15','emask');
@@ -140,15 +140,15 @@
   AddPreference('folder_show_threadid','0','tid');
   AddPreference('fpics_filename','[pid].jpg','ff');
   AddPreference('go_default_numeric','link');
-  AddPreference('keyfile',"{$fbcmdBaseDir}sessionkeys.txt",'key');
+  AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
   AddPreference('launch_exec','');
   AddPreference('mail_save','1','msave');
-  AddPreference('mailfile',"{$fbcmdBaseDir}maildata.txt",'mfile');
+  AddPreference('mailfile',"[datadir]maildata.txt",'mfile');
   AddPreference('mkdir_mode',0777);
   AddPreference('msg_blankrow','1','mbr');
   AddPreference('msg_dateformat','M d H:i','mdf');
   AddPreference('msg_show_date','0','md');
-  AddPreference('noticefile',"{$fbcmdBaseDir}noticedata.txt",'nfile');
+  AddPreference('noticefile',"[datadir]noticedata.txt",'nfile');
   AddPreference('notices_blankrow','1','nbr');
   AddPreference('notices_dateformat','M d H:i','ndf');
   AddPreference('notices_save','1','nsave');
@@ -165,7 +165,7 @@
   AddPreference('pic_show_src','0','psrc');
   AddPreference('pic_size','1','psize');
   AddPreference('pic_skip_exists','1','pskip');
-  AddPreference('postfile',"{$fbcmdBaseDir}postdata.txt",'pfile');
+  AddPreference('postfile',"[datadir]postdata.txt",'pfile');
   AddPreference('ppic_size','1','ppsize');
   AddPreference('ppics_filename','[tid].jpg','pf');
   AddPreference('prefix_filter','#');
@@ -324,6 +324,11 @@
     } else {
       FbcmdWarning("Could not load Preferences file {$fbcmdPrefs['prefs']}");
     }
+  }
+  
+  // STEP FIVE: convert all [datadir] refs to $fbcmdBaseDir
+  foreach ($fbcmdPrefs as $key=>$value) {
+    $fbcmdPrefs[$key] = str_replace('[datadir]',$fbcmdBaseDir,$value);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
