@@ -44,7 +44,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
-//   http://fbcmd.dtompkins.com/history/ for a revision history.              //
+//   http://fbcmd.dtompkins.com/history for a revision history.               //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
