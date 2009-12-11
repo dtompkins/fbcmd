@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta3-dev14';
+  $fbcmdVersion = '1.0-beta3-dev15';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2598,10 +2598,32 @@
           }
           continue;
         }
-        if ($itemUC == '=BDAY') {
-          $curDate = date('m/d',time());
+        if (substr($itemUC,0,5) == '=BDAY') {
+          $matchTime = time();
+          if(preg_match("/=BDAY\+(\d+)?$/",$itemUC,$matches)) {
+            if(isset($matches[1])) {
+              $matchTime += 24*60*60 * $matches[1];
+            } else {
+              $matchTime += 24*60*60;
+            }
+          }
+          if(preg_match("/=BDAY-(\d+)?$/",$itemUC,$matches)) {
+            if(isset($matches[1])) {
+              $matchTime -= 24*60*60 * $matches[1];
+            } else {
+              $matchTime -= 24*60*60;
+            }
+          }
+          if(preg_match("/=BDAY=(.+)$/",$itemUC,$matches)) {
+            $matchTime = strtotime($matches[1]);
+            if (!$matchTime) {
+              FbcmdWarning("Bad BDAY Syntax: [{$item}] using today");
+              $matchTime = time();
+            }
+          }
+          $matchDate = date('m/d',$matchTime);
           foreach ($dataFriendBaseInfo as $fbi) {
-            if (substr($fbi['birthday_date'],0,5) == $curDate) {
+            if (substr($fbi['birthday_date'],0,5) == $matchDate) {
               array_push_unique($flistMatchArray,$fbi['uid']);
             }
           }
@@ -2715,8 +2737,8 @@
     }
     if (count($flistMatchArray) == 0) {
       if ($failOnEmpty) {
-        if (strtoupper($flistString) == '=BDAY') {
-          print "No Friends With Birthdays Today\n";
+        if (substr(strtoupper($flistString),0,5) == '=BDAY') {
+          print "No Friends With Birthday Matches\n";
           exit;
         } else {
           FbcmdFatalError("Empty flist: {$flistString}");
