@@ -263,29 +263,14 @@
   AddPreference('default_post_link',null);
   AddPreference('default_post_caption',null);
   AddPreference('default_post_description',null);
-  AddPreference('default_postimg_message',false);
   AddPreference('default_postimg_imgsrc','');
   AddPreference('default_postimg_imglink','0');
-  AddPreference('default_postimg_name',null);
-  AddPreference('default_postimg_link',null);
-  AddPreference('default_postimg_caption',null);
-  AddPreference('default_postimg_description',null);
-  AddPreference('default_postmp3_message',false);
   AddPreference('default_postmp3_mp3src','');
   AddPreference('default_postmp3_mp3title','');
   AddPreference('default_postmp3_mp3artist','');
   AddPreference('default_postmp3_mp3album','');
-  AddPreference('default_postmp3_name',null);
-  AddPreference('default_postmp3_link',null);
-  AddPreference('default_postmp3_caption',null);
-  AddPreference('default_postmp3_description',null);
-  AddPreference('default_postvid_message',false);
-  AddPreference('default_postvid_vidsrc','');
-  AddPreference('default_postvid_preview','');
-  AddPreference('default_postvid_name',false);
-  AddPreference('default_postvid_link',false);
-  AddPreference('default_postvid_caption',false);
-  AddPreference('default_postvid_description',false);
+  AddPreference('default_postflash_swfsrc',false);
+  AddPreference('default_postflash_imgsrc',false);  
   AddPreference('default_ppics_flist','=ALL');
   AddPreference('default_ppics_savedir',false);
   AddPreference('default_ppost_id',null);
@@ -303,7 +288,7 @@
   AddPreference('default_tagpic_y','50');
   AddPreference('default_updates_count','10');
   AddPreference('default_wallpost_flist','=ME');
-  AddPreference('default_wallpost_message','');
+  
 
   // STEP TWO: Load preferences from prefs.php in the base directory
 
@@ -392,11 +377,8 @@
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
   AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
-  AddCommand('PPOST',     'page_id message [name] [link] [caption] [desc]~Post a message to a your page (for page owner owners)');  
-  AddCommand('POST',      'message [name] [link] [caption] [desc]~Post (share) a story in your stream');
-  AddCommand('POSTIMG',   'message img_src [img_link] [name] [link] [caption] [desc]~Post (share) an image in your stream');
-  AddCommand('POSTMP3',   'msg mp3_src [title] [artist] [album] [name] [link] [caption] [desc]~Post (share) an .mp3 file in your stream');
-  AddCommand('POSTVID',   'message vid_src img_src [name] [link] [caption] [desc]~Post (share) a video in your stream');
+  AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page owner owners)');  
+  AddCommand('POST',      'message <[name] [link] [caption] [description]>~IMG message img_src [img_link] <[n] [l] [c] [d]>~MP3 message mp3_src [title] [artist] [album] <[n] [l] [c] [d]>~FLASH swf_src img_src <[n] [l] [c] [d]>~Post (share) a story (or media) in your stream');
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
   AddCommand('RESET',     '<no parameters>~Reset any authorization codes set by AUTH');
@@ -415,7 +397,7 @@
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
-  AddCommand('WALLPOST',  'flist message~Post a message on the wall of friend(s)');
+  AddCommand('WALLPOST',  'flist [POST parameters]~Post a message on the wall of friend(s)');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -1673,106 +1655,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'POST') {
-    ValidateParamCount(1,5);
-    SetDefaultParam(1,$fbcmdPrefs['default_post_message']);
-    SetDefaultParam(2,$fbcmdPrefs['default_post_name']);
-    SetDefaultParam(3,$fbcmdPrefs['default_post_link']);
-    SetDefaultParam(4,$fbcmdPrefs['default_post_caption']);
-    SetDefaultParam(5,$fbcmdPrefs['default_post_description']);
-    try {
-      $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[1],
-        array('name' => $fbcmdParams[2], 'href' => $fbcmdParams[3], 'caption' => $fbcmdParams[4], 'description' => $fbcmdParams[5] ), null, null, $fbUser);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e);
-    }
+    ValidateParamCount(1,10);
+    $fbReturn = StreamPostHelper(null, $fbUser, 1);
     if ($fbReturn) {
       PrintHeaderQuiet('POST_ID');
       PrintRowQuiet($fbReturn);
     }
   }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'POSTIMG') {
-    ValidateParamCount(2,7);
-    SetDefaultParam(1,$fbcmdPrefs['default_postimg_message']);
-    SetDefaultParam(2,$fbcmdPrefs['default_postimg_imgsrc']);
-    if ($fbcmdPrefs['default_postimg_imglink'] == '0') {
-      SetDefaultParam(3,$fbcmdParams[2]);
-    } else {
-      SetDefaultParam(3,$fbcmdPrefs['default_postimg_imglink']);
-    }
-    SetDefaultParam(4,$fbcmdPrefs['default_postimg_name']);
-    SetDefaultParam(5,$fbcmdPrefs['default_postimg_link']);
-    SetDefaultParam(6,$fbcmdPrefs['default_postimg_caption']);
-    SetDefaultParam(7,$fbcmdPrefs['default_postimg_description']);
-    try {
-      $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[1],
-        array('name' => $fbcmdParams[4], 'href' => $fbcmdParams[5], 'caption' => $fbcmdParams[6], 'description' => $fbcmdParams[7],
-          'media' => array(array( 'type' => 'image', 'src' => $fbcmdParams[2], 'href' => $fbcmdParams[3]))), null, null, $fbUser);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e);
-    }
-    if ($fbReturn) {
-      PrintHeaderQuiet('POST_ID');
-      PrintRowQuiet($fbReturn);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'POSTMP3') {
-    ValidateParamCount(2,9);
-    SetDefaultParam(1,$fbcmdPrefs['default_postmp3_message']);
-    SetDefaultParam(2,$fbcmdPrefs['default_postmp3_mp3src']);
-    SetDefaultParam(3,$fbcmdPrefs['default_postmp3_mp3title']);
-    SetDefaultParam(4,$fbcmdPrefs['default_postmp3_mp3artist']);
-    SetDefaultParam(5,$fbcmdPrefs['default_postmp3_mp3album']);
-    SetDefaultParam(6,$fbcmdPrefs['default_postmp3_name']);
-    SetDefaultParam(7,$fbcmdPrefs['default_postmp3_link']);
-    SetDefaultParam(8,$fbcmdPrefs['default_postmp3_caption']);
-    SetDefaultParam(9,$fbcmdPrefs['default_postmp3_description']);
-    try {
-      $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[1],
-        array('name' => $fbcmdParams[6], 'href' => $fbcmdParams[7], 'caption' => $fbcmdParams[8], 'description' => $fbcmdParams[9],
-          'media' => array(array('type' => 'mp3', 'src' => $fbcmdParams[2], 'title' => $fbcmdParams[3], 'artist' => $fbcmdParams[4], 'album' => $fbcmdParams[5]))), null, null, $fbUser);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e);
-    }
-    if ($fbReturn) {
-      PrintHeaderQuiet('POST_ID');
-      PrintRowQuiet($fbReturn);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'POSTVID') {
-    ValidateParamCount(3,7);
-    SetDefaultParam(1,$fbcmdPrefs['default_postvid_message']);
-    SetDefaultParam(2,$fbcmdPrefs['default_postvid_vidsrc']);
-    SetDefaultParam(3,$fbcmdPrefs['default_postvid_preview']);
-    SetDefaultParam(4,$fbcmdPrefs['default_postvid_name']);
-    SetDefaultParam(5,$fbcmdPrefs['default_postvid_link']);
-    SetDefaultParam(6,$fbcmdPrefs['default_postvid_caption']);
-    SetDefaultParam(7,$fbcmdPrefs['default_postvid_description']);
-    try {
-      $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[1],
-        array('name' => $fbcmdParams[4], 'href' => $fbcmdParams[5], 'caption' => $fbcmdParams[6], 'description' => $fbcmdParams[7],
-          'media' => array(array('type' => 'video', 'video_src' => $fbcmdParams[2], 'preview_img' => $fbcmdParams[3]))), null, null, $fbUser);
-        TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e);
-    }
-    if ($fbReturn) {
-      PrintHeaderQuiet('POST_ID');
-      PrintRowQuiet($fbReturn);
-    }
-  }
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'PPICS') {
@@ -1803,14 +1693,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'PPOST') {
-    ValidateParamCount(2,6);
+    ValidateParamCount(2,11);
     SetDefaultParam(1,$fbcmdPrefs['default_ppost_id']);
-    SetDefaultParam(2,$fbcmdPrefs['default_post_message']);
-    SetDefaultParam(3,$fbcmdPrefs['default_post_name']);
-    SetDefaultParam(4,$fbcmdPrefs['default_post_link']);
-    SetDefaultParam(5,$fbcmdPrefs['default_post_caption']);
-    SetDefaultParam(6,$fbcmdPrefs['default_post_description']);
-
+    
     if (is_numeric($fbcmdParams[1])) {
       $postUserId = $fbcmdParams[1];
     } else {
@@ -1822,12 +1707,7 @@
         FbcmdFatalError("Could not determine page {$fbcmdParams[1]}");
       }
     }
-    try {
-      $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[2],array('name' => $fbcmdParams[3], 'href' => $fbcmdParams[4], 'caption' => $fbcmdParams[5], 'description' => $fbcmdParams[6] ), null, null, $postUserId);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e);
-    }
+    $fbReturn = StreamPostHelper(null, $postUserId, 2);
     if ($fbReturn) {
       PrintHeaderQuiet('POST_ID');
       PrintRowQuiet($fbReturn);
@@ -2163,19 +2043,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'WALLPOST') {
-    ValidateParamCount(2);
+    ValidateParamCount(2,11);
     SetDefaultParam(1,$fbcmdPrefs['default_wallpost_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_wallpost_message']);
+    
     GetFlistIds($fbcmdParams[1],true,false,true);
     PrintHeaderQuiet('POST_ID','RECIPIENT_NAME');
     foreach ($flistMatchArray as $id) {
-      try {
-        $fbReturn = $fbObject->api_client->stream_publish($fbcmdParams[2],null,null,$id,$fbUser);
-        TraceReturn($fbReturn);
-        PrintRowQuiet($fbReturn,ProfileName($id));
-      } catch (Exception $e) {
-        FbcmdException($e);
-      }
+      $fbReturn = StreamPostHelper($id, $fbUser, 2);
+      PrintRowQuiet($fbReturn,ProfileName($id));      
     }
   }
 
@@ -4096,6 +3971,77 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function StreamPostHelper($target_id, $uid, $offset) {
+    global $fbcmdParams;
+    global $fbcmdPrefs;
+    global $fbObject;
+    
+    $firstParam = strtoupper($fbcmdParams[$offset]);
+    
+    if (in_array($firstParam, array('MP3','IMG','FLASH'))) {
+      if ($firstParam == 'MP3') {
+        ValidateParamCount($offset+2, $offset+9);
+        SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+        SetDefaultParam($offset+2,$fbcmdPrefs['default_postmp3_mp3src']);
+        SetDefaultParam($offset+3,$fbcmdPrefs['default_postmp3_mp3title']);
+        SetDefaultParam($offset+4,$fbcmdPrefs['default_postmp3_mp3artist']);
+        SetDefaultParam($offset+5,$fbcmdPrefs['default_postmp3_mp3album']);
+        $msg = $fbcmdParams[$offset+1];
+        $media = array(array('type' => 'mp3', 'src' => $fbcmdParams[$offset+2], 'title' => $fbcmdParams[$offset+3], 'artist' => $fbcmdParams[$offset+4], 'album' => $fbcmdParams[$offset+5]));
+        $offsetPostData = $offset + 6;
+      }
+      if ($firstParam == 'IMG') {
+        ValidateParamCount($offset+2, $offset+7);
+        SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+        SetDefaultParam($offset+2,$fbcmdPrefs['default_postimg_imgsrc']);
+        if ($fbcmdPrefs['default_postimg_imglink'] == '0') {
+          SetDefaultParam($offset+3,$fbcmdParams[$offset+2]);
+        } else {
+          SetDefaultParam($offset+3,$fbcmdPrefs['default_postimg_imglink']);
+        }
+        $msg = $fbcmdParams[$offset+1];
+        $media = array(array('type' => 'image', 'src' => $fbcmdParams[$offset+2], 'href' => $fbcmdParams[$offset+3]));
+        $offsetPostData = $offset + 4;
+      }
+      if ($firstParam == 'FLASH') {
+        ValidateParamCount($offset+3, $offset+7);
+        SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+        SetDefaultParam($offset+2,$fbcmdPrefs['default_postflash_swfsrc']);
+        SetDefaultParam($offset+3,$fbcmdPrefs['default_postflash_imgsrc']);
+        $msg = $fbcmdParams[$offset+1];
+        $media = array(array('type' => 'flash', 'swfsrc' => $fbcmdParams[$offset+2], 'imgsrc' => $fbcmdParams[$offset+3]));
+        $offsetPostData = $offset + 4;
+      }
+    } else {
+      ValidateParamCount($offset,$offset+4);
+      SetDefaultParam($offset,$fbcmdPrefs['default_post_message']);
+      $msg = $fbcmdParams[$offset];
+      $media = '';
+      $offsetPostData = $offset + 1;
+    }
+    
+    SetDefaultParam($offsetPostData, $fbcmdPrefs['default_post_name']);
+    SetDefaultParam($offsetPostData + 1, $fbcmdPrefs['default_post_link']);
+    SetDefaultParam($offsetPostData + 2, $fbcmdPrefs['default_post_caption']);
+    SetDefaultParam($offsetPostData + 3, $fbcmdPrefs['default_post_description']);
+    
+    $attachment = array('name' => $fbcmdParams[$offsetPostData], 'href' => $fbcmdParams[$offsetPostData + 1], 'caption' => $fbcmdParams[$offsetPostData + 2], 'description' => $fbcmdParams[$offsetPostData + 3]);
+    if ($media) {
+      $attachment['media'] = $media;
+    }
+    
+    try {
+      $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, null, $target_id, $uid);
+      TraceReturn($fbReturn);
+    } catch(Exception $e) {
+      FbcmdException($e);
+    }
+    return $fbReturn;
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
   function TagFieldMatch($matchString, $dataToSearch, $matchField, $idField, $partial = false, $nameField = 'name') {
     $matchList = array();
     if ($partial) {
@@ -4105,8 +4051,10 @@ function PrintCsvRow($rowIn) {
     }
     if (isset($dataToSearch)) {
       foreach ($dataToSearch as $d) {
-        if (preg_match($matchExp,$d[$matchField])) {
-          $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
+        if (isset($d[$matchField])) {
+          if (preg_match($matchExp,$d[$matchField])) {
+            $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
+          }
         }
       }
     }
