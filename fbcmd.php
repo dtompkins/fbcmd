@@ -252,7 +252,7 @@
   AddPreference('default_loadnote_title','');
   AddPreference('default_loadnote_filename','');
   AddPreference('default_mutual_flist','=ALL');
-  AddPreference('default_mywall_count','10');  
+  AddPreference('default_mywall_count','10');
   AddPreference('default_notices_type','');
   AddPreference('default_nsend_flist','=ME');
   AddPreference('default_nsend_message','');
@@ -270,7 +270,7 @@
   AddPreference('default_postmp3_mp3artist','');
   AddPreference('default_postmp3_mp3album','');
   AddPreference('default_postflash_swfsrc',false);
-  AddPreference('default_postflash_imgsrc',false);  
+  AddPreference('default_postflash_imgsrc',false);
   AddPreference('default_ppics_flist','=ALL');
   AddPreference('default_ppics_savedir',false);
   AddPreference('default_ppost_id',null);
@@ -288,7 +288,7 @@
   AddPreference('default_tagpic_y','50');
   AddPreference('default_updates_count','10');
   AddPreference('default_wallpost_flist','=ME');
-  
+
 
   // STEP TWO: Load preferences from prefs.php in the base directory
 
@@ -310,7 +310,7 @@
       FbcmdWarning("Could not load Preferences file {$fbcmdPrefs['prefs']}");
     }
   }
-  
+
   // STEP FIVE: convert all [datadir] refs to $fbcmdBaseDir
   foreach ($fbcmdPrefs as $key=>$value) {
     $fbcmdPrefs[$key] = str_replace('[datadir]',$fbcmdBaseDir,$value);
@@ -377,7 +377,7 @@
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
   AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
-  AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page owner owners)');  
+  AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page owner owners)');
   AddCommand('POST',      'message <[name] [link] [caption] [description]>~IMG message img_src [img_link] <[n] [l] [c] [d]>~MP3 message mp3_src [title] [artist] [album] <[n] [l] [c] [d]>~FLASH swf_src img_src <[n] [l] [c] [d]>~Post (share) a story (or media) in your stream');
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
@@ -1246,7 +1246,7 @@
       PrintHeader(PrintIfPref('stream_save','[#]'),PrintIfPref('stream_show_postid','POST_ID'),PrintIfPref('show_id','UID'),'NAME',PrintIfPref('stream_show_date','DATE'),'MESSAGE');
       if ($fbcmdPrefs['stream_blankrow']) {
         PrintRow('');
-      }    
+      }
       $postNum = 0;
       foreach ($dataStream as $a) {
         $postNum++;
@@ -1662,7 +1662,7 @@
       PrintRowQuiet($fbReturn);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'PPICS') {
@@ -1695,7 +1695,7 @@
   if ($fbcmdCommand == 'PPOST') {
     ValidateParamCount(2,11);
     SetDefaultParam(1,$fbcmdPrefs['default_ppost_id']);
-    
+
     if (is_numeric($fbcmdParams[1])) {
       $postUserId = $fbcmdParams[1];
     } else {
@@ -1782,7 +1782,7 @@
       $statusText = $fbcmdParams[1];
     }
     try {
-      $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));      
+      $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
       TraceReturn($fbReturn);
     } catch(Exception $e) {
       FbcmdException($e);
@@ -2045,12 +2045,12 @@
   if ($fbcmdCommand == 'WALLPOST') {
     ValidateParamCount(2,11);
     SetDefaultParam(1,$fbcmdPrefs['default_wallpost_flist']);
-    
+
     GetFlistIds($fbcmdParams[1],true,false,true);
     PrintHeaderQuiet('POST_ID','RECIPIENT_NAME');
     foreach ($flistMatchArray as $id) {
       $fbReturn = StreamPostHelper($id, $fbUser, 2);
-      PrintRowQuiet($fbReturn,ProfileName($id));      
+      PrintRowQuiet($fbReturn,ProfileName($id));
     }
   }
 
@@ -2501,7 +2501,7 @@
     global $userStatus;
     global $fbUser;
     global $fbObject;
-    
+
     if ($a < 1001) {
       $lastEventData = LoadDataFile('event_save','eventfile');
       if (isset($lastEventData['ids'][$a])) {
@@ -3975,9 +3975,9 @@ function PrintCsvRow($rowIn) {
     global $fbcmdParams;
     global $fbcmdPrefs;
     global $fbObject;
-    
+
     $firstParam = strtoupper($fbcmdParams[$offset]);
-    
+
     if (in_array($firstParam, array('MP3','IMG','FLASH'))) {
       if ($firstParam == 'MP3') {
         ValidateParamCount($offset+2, $offset+9);
@@ -4019,17 +4019,17 @@ function PrintCsvRow($rowIn) {
       $media = '';
       $offsetPostData = $offset + 1;
     }
-    
+
     SetDefaultParam($offsetPostData, $fbcmdPrefs['default_post_name']);
     SetDefaultParam($offsetPostData + 1, $fbcmdPrefs['default_post_link']);
     SetDefaultParam($offsetPostData + 2, $fbcmdPrefs['default_post_caption']);
     SetDefaultParam($offsetPostData + 3, $fbcmdPrefs['default_post_description']);
-    
+
     $attachment = array('name' => $fbcmdParams[$offsetPostData], 'href' => $fbcmdParams[$offsetPostData + 1], 'caption' => $fbcmdParams[$offsetPostData + 2], 'description' => $fbcmdParams[$offsetPostData + 3]);
     if ($media) {
       $attachment['media'] = $media;
     }
-    
+
     try {
       $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, null, $target_id, $uid);
       TraceReturn($fbReturn);
@@ -4038,7 +4038,7 @@ function PrintCsvRow($rowIn) {
     }
     return $fbReturn;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4144,7 +4144,7 @@ function PrintCsvRow($rowIn) {
       FbcmdWarning("[{$fbcmdCommand}] Invalid number of parameters");
       print "\n";
       print "try:        [fbcmd help ". strtolower($fbcmdCommand). "]\nto launch:  http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . "\n\nbasic help:\n\n";
-      ShowUsageCmd($fbcmdCommand);      
+      ShowUsageCmd($fbcmdCommand);
       exit;
     }
   }
