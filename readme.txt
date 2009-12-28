@@ -13,7 +13,7 @@
 //   [Discussion Group]          http://groups.google.com/group/fbcmd         //
 //   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
 //                                                                            //
-//   Copyright (c) 2007,2009 Dave Tompkins                                    //
+//   Copyright (c) 2007,2010 Dave Tompkins                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //

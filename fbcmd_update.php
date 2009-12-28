@@ -12,7 +12,7 @@
 //   Facebook Command Line Interface Utility                                  //
 //   http://facebook.com/fbcmd                                                //
 //   http://fbcmd.dtompkins.com                                               //
-//   Copyright (c) 2007,2009 Dave Tompkins                                    //
+//   Copyright (c) 2007,2010 Dave Tompkins                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
