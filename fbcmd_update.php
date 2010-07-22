@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.85';
+  $fbcmdUpdateVersion = '2.86';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -663,20 +663,13 @@
 
   function SavePrefsContents() {
     global $fbcmdPrefs;
-    if (isset($fbcmdPrefs['savepref_include_files'])) {
-      $includeFiles = $fbcmdPrefs['savepref_include_files'];
-    } else {
-      $includeFiles = false;
-    }
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'postfile')&&($switchKey != 'mailfile'))) {
-          if (strpos($switchKey,'mkdir_mode') === false) {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";        
-          } else {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";          
-          }
+        if (strpos($switchKey,'mkdir_mode') === false) {
+          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
+        } else {
+          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
         }
       }
     }
