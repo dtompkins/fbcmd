@@ -3508,11 +3508,12 @@ function PrintCsvRow($rowIn) {
     $timeInfo = PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$post['created_time']));
 
     if ($post['attachment']) {
-      if (isset($post['attachment']['media'][0]['type'])) {
-        $msgType = $post['attachment']['media'][0]['type'] . ' post';
-      } else {
-        $msgType = 'attach post';
-      }
+      $msgType = 'attach post';
+      if (isset($post['attachment']['media'][0])) {
+        if (isset($post['attachment']['media'][0]['type'])) {
+          $msgType = $post['attachment']['media'][0]['type'] . ' post';
+        }
+      }      
     } else {
       if ($post['app_data']) {
         $msgType = 'app post';
