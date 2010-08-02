@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta4-dev1';
+  $fbcmdVersion = '1.0-beta4-dev2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -166,6 +166,7 @@
   AddPreference('pic_size','1','psize');
   AddPreference('pic_skip_exists','1','pskip');
   AddPreference('postfile',"[datadir]postdata.txt",'pfile');
+  AddPreference('sharepost','0','share');
   AddPreference('ppic_size','1','ppsize');
   AddPreference('ppics_filename','[tid].jpg','pf');
   AddPreference('prefix_filter','#');
@@ -4044,9 +4045,15 @@ function PrintCsvRow($rowIn) {
     if ($media) {
       $attachment['media'] = $media;
     }
+    
+    if (($fbcmdPrefs['sharepost'])&&($fbcmdParams[$offsetPostData + 1])) {
+      $actionLinks = array(array('text' => 'Share', 'href' => 'http://www.facebook.com/share.php?u=' . $fbcmdParams[$offsetPostData + 1]));
+    } else {
+      $actionLinks = null;
+    }
 
     try {
-      $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, null, $target_id, $uid);
+      $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, $actionLinks, $target_id, $uid);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
       FbcmdException($e);
