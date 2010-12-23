@@ -408,6 +408,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'BC_COMMANDS') {
+    foreach ($fbcmdCommandList as $cmd) {
+      $cmd = strtolower( $cmd );
+      print "$cmd ";
+    }
+    return;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if (in_array($fbcmdCommand,array('DFILE','FEED','FEED3','FSTATUSID','FLSTATUS','PICS'))) {
     FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
   }
