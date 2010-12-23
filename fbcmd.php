@@ -316,6 +316,14 @@
     $fbcmdPrefs[$key] = str_replace('[datadir]',$fbcmdBaseDir,$value);
   }
 
+  if ($fbcmdCommand == 'BC_PREFERENCES') {
+    foreach (array_keys($fbcmdPrefs) as $pref) {
+      $pref = strtolower( $pref );
+      print "-$pref ";
+    }
+    return;
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'SAVEPREF') {

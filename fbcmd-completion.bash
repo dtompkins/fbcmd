@@ -1,6 +1,7 @@
 # bash completion for fbcmd
 
 fbcmd_commands=$(fbcmd BC_COMMANDS)
+fbcmd_preferences=$(fbcmd BC_PREFERENCES)
 
 _fbcmd() {
 
@@ -8,7 +9,12 @@ _fbcmd() {
   cur="${COMP_WORDS[COMP_CWORD]}"
   prev="${COMP_WORDS[COMP_CWORD-1]}"
 
-  COMPREPLY=( $(compgen -W "${fbcmd_commands}" -- $cur) )
+  if [[ "$cur" == -* ]] ; then
+    COMPREPLY=( $(compgen -W "${fbcmd_preferences}" -- $cur) )
+  else
+    COMPREPLY=( $(compgen -W "${fbcmd_commands}" -- $cur) )
+  fi
+
   return 0
 
 }
