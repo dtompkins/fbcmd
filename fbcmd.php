@@ -16,7 +16,7 @@
 //   [Discussion Group]          http://groups.google.com/group/fbcmd         //
 //   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
 //                                                                            //
-//   Copyright (c) 2007,2010 Dave Tompkins                                    //
+//   Copyright (c) 2007,2011 Dave Tompkins                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta4';
+  $fbcmdVersion = '1.0-beta4-dev1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -297,7 +297,7 @@
   }
 
   // STEP THREE: Read switches set from the command line
-  // This also sets $fbcmdCommand & &fbcmdParams
+  // This also sets $fbcmdCommand & $fbcmdParams
 
   ParseArguments($fbcmd_argv,$fbcmd_argc);
 
