@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.86';
+  $fbcmdUpdateVersion = '2.9';
   TraceVar('fbcmdUpdateVersion');
   
 ////////////////////////////////////////////////////////////////////////////////  
@@ -548,7 +548,7 @@
   function GetGithub($filename, $save = true) {
     global $branch;
     global $installLibDir;
-    $fileSrc = "http://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
+    $fileSrc = "https://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
     $fileDest = "{$installLibDir}{$filename}";
     $fileContents = @file_get_contents($fileSrc);
     if ($fileContents) {
