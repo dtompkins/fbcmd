@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta4-dev1';
+  $fbcmdVersion = '1.0-beta5-dev1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -115,7 +115,7 @@
   AddPreference('albumfile',"[datadir]albumdata.txt",'afile');
   AddPreference('album_save','1','asave');
   AddPreference('apics_filename','[pid].jpg','af');
-  AddPreference('appkey','d96ea311638cf65f04b33c87eacf371e');
+  AddPreference('appkey','42463270450'); // was: d96ea311638cf65f04b33c87eacf371e (depricated?)
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
   AddPreference('auth_auto_launch','1');
   AddPreference('auto_mkdir','1');
@@ -334,7 +334,7 @@
   AddCommand('ALBUMS',    '[flist]~List all photo albums for friend(s)');
   AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
-  AddCommand('AUTH',      'authcode~Sets your facebook authorization code');
+  AddCommand('AUTH',      'authcode~Sets your facebook authorization code for offline access');
   AddCommand('COMMENT',   'post_id text~Add a comment to a story that appears in the stream');
   AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
   AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
@@ -475,9 +475,9 @@
   AddGoDestination('album',       '#An album from the ALBUM command');
   AddGoDestination('app',         'The fbcmd page on facebook','http://facebook.com/fbcmd');
   AddGoDestination('auth',        'Authorize fbcmd for login',"http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}");
-  AddGoDestination('auth-ps',     'Authorize fbcmd for post_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream");
-  AddGoDestination('auth-rm',     'Authorize fbcmd for read_mailbox',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox");
-  AddGoDestination('auth-rs',     'Authorize fbcmd for read_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream");
+  //AddGoDestination('auth-ps',     'Authorize fbcmd for post_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream");
+  //AddGoDestination('auth-rm',     'Authorize fbcmd for read_mailbox',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox");
+  //AddGoDestination('auth-rs',     'Authorize fbcmd for read_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream");
   AddGoDestination('contribute',  'The fbcmd contact page','http://fbcmd.dtompkins.com/contribute');
   AddGoDestination('editapps',    'The facebook edit applications page','http://www.facebook.com/editapps.php');
   AddGoDestination('event',       '#An event from the EVENT command');
@@ -2293,11 +2293,13 @@
   function FbcmdPermissions($fbPermissionName) {
     global $fbcmdCommand;
     global $fbcmdPrefs;
-    $url = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}";
-    if ($fbcmdPrefs['auth_auto_launch']) {
-      LaunchBrowser($url);
-    }
-    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
+    print "TODO: FIX THIS!\n";
+    exit;
+    // $url = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}";
+    // if ($fbcmdPrefs['auth_auto_launch']) {
+      // LaunchBrowser($url);
+    // }
+    // FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2306,11 +2308,13 @@
   function FbcmdPermissions2($fbPermissionName) {
     global $fbcmdCommand;
     global $fbcmdPrefs;
-    $url = "http://www.facebook.com/connect/prompt_permissions.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&next=http://www.facebook.com/connect/login_success.html?xxRESULTTOKENxx&display=popup&ext_perm={$fbPermissionName}&extern=1&fbconnect=true&enable_profile_selector=1";
-    if ($fbcmdPrefs['auth_auto_launch']) {
-      LaunchBrowser($url);
-    }
-    FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
+    print "TODO: FIX THIS!\n";
+    exit;
+    // $url = "http://www.facebook.com/connect/prompt_permissions.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&next=http://www.facebook.com/connect/login_success.html?xxRESULTTOKENxx&display=popup&ext_perm={$fbPermissionName}&extern=1&fbconnect=true&enable_profile_selector=1";
+    // if ($fbcmdPrefs['auth_auto_launch']) {
+      // LaunchBrowser($url);
+    // }
+    // FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
