@@ -42,7 +42,7 @@
     print "fail";
   }
   print ("\n");
-  $remoteFile = "http://github.com/dtompkins/fbcmd/raw/master/fbcmd.php";
+  $remoteFile = "https://github.com/dtompkins/fbcmd/raw/master/fbcmd.php";
   print "Testing downloading from online: [{$remoteFile}]...";
   $phpFile = file_get_contents($remoteFile);
   if ($phpFile) {
