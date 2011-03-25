@@ -166,6 +166,7 @@
   AddPreference('pic_size','1','psize');
   AddPreference('pic_skip_exists','1','pskip');
   AddPreference('postfile',"[datadir]postdata.txt",'pfile');
+  AddPreference('sharepost','0','share');
   AddPreference('ppic_size','1','ppsize');
   AddPreference('ppics_filename','[tid].jpg','pf');
   AddPreference('prefix_filter','#');
@@ -188,7 +189,6 @@
   AddPreference('print_wrap_width','80','col');
   AddPreference('quiet','0','q');
   AddPreference('restatus_comment_new','1');
-  AddPreference('savepref_include_files','0','spf');
   AddPreference('show_id','0','id');
   AddPreference('status_dateformat','D M d H:i','stdf');
   AddPreference('status_show_date','0','std');
@@ -311,11 +311,6 @@
     }
   }
 
-  // STEP FIVE: convert all [datadir] refs to $fbcmdBaseDir
-  foreach ($fbcmdPrefs as $key=>$value) {
-    $fbcmdPrefs[$key] = str_replace('[datadir]',$fbcmdBaseDir,$value);
-  }
-
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'SAVEPREF') {
@@ -377,7 +372,7 @@
   AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
   AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
-  AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page owner owners)');
+  AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
   AddCommand('POST',      'message <[name] [link] [caption] [description]>~IMG message img_src [img_link] <[n] [l] [c] [d]>~MP3 message mp3_src [title] [artist] [album] <[n] [l] [c] [d]>~FLASH swf_src img_src <[n] [l] [c] [d]>~Post (share) a story (or media) in your stream');
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
@@ -538,14 +533,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  $fbcmdKeyFileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs['keyfile']);
+  
   if ($fbcmdCommand == 'RESET') {
     ValidateParamCount(0);
-    VerifyOutputDir($fbcmdPrefs['keyfile']);
-    if (@file_put_contents($fbcmdPrefs['keyfile'],"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
-      FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
+    VerifyOutputDir($fbcmdKeyFileName);
+    if (@file_put_contents($fbcmdKeyFileName,"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
+      FbcmdFatalError("Could not generate keyfile {$fbcmdKeyFileName}");
     }
     if (!$fbcmdPrefs['quiet']) {
-      print "keyfile {$fbcmdPrefs['keyfile']} has been RESET\n";
+      print "keyfile {$fbcmdKeyFileName} has been RESET\n";
     }
   }
 
@@ -562,9 +559,9 @@
     }
     $fbcmdUserSessionKey = $session['session_key'];
     $fbcmdUserSecretKey = $session['secret'];
-    VerifyOutputDir($fbcmdPrefs['keyfile']);
-    if (@file_put_contents ($fbcmdPrefs['keyfile'],"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
-      FbcmdFatalError("Could not generate keyfile {$fbcmdPrefs['keyfile']}");
+    VerifyOutputDir($fbcmdKeyFileName);
+    if (@file_put_contents ($fbcmdKeyFileName,"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
+      FbcmdFatalError("Could not generate keyfile {$fbcmdKeyFileName}");
     }
     try {
       $fbObject->api_client->session_key = $fbcmdUserSessionKey;
@@ -584,20 +581,20 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (!file_exists($fbcmdPrefs['keyfile'])) {
+  if (!file_exists($fbcmdKeyFileName)) {
     print "\n";
     print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";
     print "It appears to be the first time you are running the application\n";
-    print "as fbcmd could not locate your keyfile: [{$fbcmdPrefs['keyfile']}]\n\n";
+    print "as fbcmd could not locate your keyfile: [{$fbcmdKeyFileName}]\n\n";
     ShowAuth();
     return;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdKeyFile = file($fbcmdPrefs['keyfile'],FILE_IGNORE_NEW_LINES);
+  $fbcmdKeyFile = file($fbcmdKeyFileName,FILE_IGNORE_NEW_LINES);
   if (count($fbcmdKeyFile) < 2) {
-    FbcmdFatalError("Invalid keyfile {$fbcmdPrefs['keyfile']}");
+    FbcmdFatalError("Invalid keyfile {$fbcmdKeyFileName}");
   }
   $fbcmdUserSessionKey = $fbcmdKeyFile[0];
   $fbcmdUserSecretKey = $fbcmdKeyFile[1];
@@ -2958,12 +2955,14 @@
 
   function LoadDataFile($prefSave, $prefFile) {
     global $fbcmdPrefs;
+    global $fbcmdBaseDir;
+    $fileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs[$prefFile]);
     $loadData = array('0');
     if ($fbcmdPrefs[$prefSave]) {
-      if (!file_exists($fbcmdPrefs[$prefFile])) {
-        FbcmdWarning("Could not locate {$prefFile} [{$fbcmdPrefs[$prefFile]}]");
+      if (!file_exists($fileName)) {
+        FbcmdWarning("Could not locate {$prefFile} [{$fileName}]");
       } else {
-        $loadData = unserialize(@file_get_contents($fbcmdPrefs[$prefFile]));
+        $loadData = unserialize(@file_get_contents($fileName));
       }
     }
     return($loadData);
@@ -3509,11 +3508,12 @@ function PrintCsvRow($rowIn) {
     $timeInfo = PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$post['created_time']));
 
     if ($post['attachment']) {
-      if (isset($post['attachment']['media'][0]['type'])) {
-        $msgType = $post['attachment']['media'][0]['type'] . ' post';
-      } else {
-        $msgType = 'attach post';
-      }
+      $msgType = 'attach post';
+      if (isset($post['attachment']['media'][0])) {
+        if (isset($post['attachment']['media'][0]['type'])) {
+          $msgType = $post['attachment']['media'][0]['type'] . ' post';
+        }
+      }      
     } else {
       if ($post['app_data']) {
         $msgType = 'app post';
@@ -3757,11 +3757,13 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function SaveDataFile($prefSave, $prefFile,$saveData) {
+  function SaveDataFile($prefSave, $prefFile, $saveData) {
     global $fbcmdPrefs;
+    global $fbcmdBaseDir;
+    $fileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs[$prefFile]);
     if ($fbcmdPrefs[$prefSave]) {
-      if (@file_put_contents($fbcmdPrefs[$prefFile],serialize($saveData)) == false) {
-        FbcmdWarning("Could not generate {$prefFile} {$fbcmdPrefs[$prefFile]}");
+      if (@file_put_contents($fileName,serialize($saveData)) == false) {
+        FbcmdWarning("Could not generate {$prefFile} {$fileName}");
       }
     }
   }
@@ -3886,20 +3888,13 @@ function PrintCsvRow($rowIn) {
   // If you modify this, copy it to fbcmd_update.php
   function SavePrefsContents() {
     global $fbcmdPrefs;
-    if (isset($fbcmdPrefs['savepref_include_files'])) {
-      $includeFiles = $fbcmdPrefs['savepref_include_files'];
-    } else {
-      $includeFiles = false;
-    }
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (($includeFiles)||(($switchKey != 'keyfile')&&($switchKey != 'albumfile')&&($switchKey != 'eventfile')&&($switchKey != 'mailfile')&&($switchKey != 'noticefile')&&($switchKey != 'postfile'))) {
-          if (strpos($switchKey,'mkdir_mode') === false) {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
-          } else {
-            $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
-          }
+        if (strpos($switchKey,'mkdir_mode') === false) {
+          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
+        } else {
+          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
         }
       }
     }
@@ -4051,9 +4046,15 @@ function PrintCsvRow($rowIn) {
     if ($media) {
       $attachment['media'] = $media;
     }
+    
+    if (($fbcmdPrefs['sharepost'])&&($fbcmdParams[$offsetPostData + 1])) {
+      $actionLinks = array(array('text' => 'Share', 'href' => 'http://www.facebook.com/share.php?u=' . $fbcmdParams[$offsetPostData + 1]));
+    } else {
+      $actionLinks = null;
+    }
 
     try {
-      $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, null, $target_id, $uid);
+      $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, $actionLinks, $target_id, $uid);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
       FbcmdException($e);
