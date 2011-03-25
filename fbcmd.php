@@ -385,6 +385,7 @@
   AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
   AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
   AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
+  AddCommand('SHOWPERM',  '<no parameters>~List all possible permissions and show if granted to FBCMD');
   AddCommand('STATUS',    '[message]~Set your status (or display current status if no parameter)');
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
@@ -642,6 +643,8 @@
 
   $flistMatchArray = Array();
   $flistMatchIdString = '';
+  
+  $allPermissions = 'ads_management,create_event,email,friends_about_me,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photo_video_tags,friends_photos,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_pages,offline_access,publish_checkins,publish_stream,read_friendlists,read_insights,read_mailbox,read_requests,read_stream,rsvp_event,sms,user_about_me,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photo_video_tags,user_photos,user_relationship_details,user_relationships,user_religion_politics,user_status,user_videos,user_website,user_work_history,xmpp_login';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -768,6 +771,26 @@
         PrintRecursiveObject(array(PrintIfPref('show_id',$a['uid']),ProfileName($a['uid'])),'',$a);
       }
     }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'SHOWPERM') {
+    ValidateParamCount(0);
+    $fql = "SELECT {$allPermissions} from permissions where uid={$fbUser}";
+    try {
+      $fbReturn = $fbObject->api_client->fql_query($fql);
+      TraceReturn($fbReturn);
+    } catch(Exception $e) {
+      FbcmdException($e);
+    }
+    if (!empty($fbReturn)) {
+      PrintHeader('PERMISSION','GRANTED?');
+      $permList = explode(',',$allPermissions);
+      foreach ($permList as $perm) {
+        PrintRow($perm,$fbReturn[0][$perm]);
+      }
+    }    
   }
 
   ////////////////////////////////////////////////////////////////////////////////
