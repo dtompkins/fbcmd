@@ -117,7 +117,6 @@
   AddPreference('apics_filename','[pid].jpg','af');
   AddPreference('appkey','42463270450'); // was: d96ea311638cf65f04b33c87eacf371e (depricated?)
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
-  AddPreference('auth_auto_launch','1');
   AddPreference('auto_mkdir','1');
   AddPreference('csv_bookend','"');
   AddPreference('csv_escaped_bookend','""');
@@ -213,6 +212,7 @@
   AddPreference('default_addalbum_description','');
   AddPreference('default_addalbum_location','');
   AddPreference('default_addalbum_privacy','everyone');
+  AddPreference('default_addperm','create_event,friends_about_me,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photo_video_tags,friends_photos,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_pages,offline_access,publish_checkins,publish_stream,read_friendlists,read_mailbox,read_requests,read_stream,rsvp_event,user_about_me,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photo_video_tags,user_photos,user_relationship_details,user_relationships,user_religion_politics,user_status,user_videos,user_website,user_work_history');
   AddPreference('default_addpic_filename','');
   AddPreference('default_addpic_albumid',null);
   AddPreference('default_addpic_caption','');
@@ -329,6 +329,7 @@
   $fbcmdCommandList = array();
 
   AddCommand('ADDALBUM',  'title [description] [location] [privacy]~Create a new photo album');
+  AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
   AddCommand('ADDPIC',    'filename [album_id|latest] [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id|latest]~Upload (add) all *.jpg files in a directory to an album');
   AddCommand('ALBUMS',    '[flist]~List all photo albums for friend(s)');
@@ -473,12 +474,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  $urlAuth = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
+  $urlAccess = "https://www.facebook.com/dialog/oauth?client_id={$fbcmdPrefs['appkey']}&redirect_uri=http://www.facebook.com/connect/login_success.html";
+
+  AddGoDestination('access',      'Allow fbcmd to (initially) access your account',$urlAccess);
   AddGoDestination('album',       '#An album from the ALBUM command');
   AddGoDestination('app',         'The fbcmd page on facebook','http://facebook.com/fbcmd');
-  AddGoDestination('auth',        'Authorize fbcmd for login',"http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}");
-  //AddGoDestination('auth-ps',     'Authorize fbcmd for post_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=publish_stream");
-  //AddGoDestination('auth-rm',     'Authorize fbcmd for read_mailbox',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_mailbox");
-  //AddGoDestination('auth-rs',     'Authorize fbcmd for read_stream',"http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm=read_stream");
+  AddGoDestination('auth',        'Authorize fbcmd for permanent access',$urlAuth);
   AddGoDestination('contribute',  'The fbcmd contact page','http://fbcmd.dtompkins.com/contribute');
   AddGoDestination('editapps',    'The facebook edit applications page','http://www.facebook.com/editapps.php');
   AddGoDestination('event',       '#An event from the EVENT command');
@@ -575,7 +577,9 @@
       FbcmdException($e,'Invalid AUTH code / could not generate session key');
     }
     if (!$fbcmdPrefs['quiet']) {
-      print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD {$fbReturn[0]['name']}.\n";
+      print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD, {$fbReturn[0]['name']}!\n\n";
+      print "most FBCMD commands require additional permissions.\n";
+      print "to grant default permissions, execute: fbcmd addperm\n";
     }
     return;
   }
@@ -585,8 +589,8 @@
   if (!file_exists($fbcmdKeyFileName)) {
     print "\n";
     print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";
-    print "It appears to be the first time you are running the application\n";
-    print "as fbcmd could not locate your keyfile: [{$fbcmdKeyFileName}]\n\n";
+    //print "It appears to be the first time you are running the application\n";
+    //print "as fbcmd could not locate your keyfile: [{$fbcmdKeyFileName}]\n\n";
     ShowAuth();
     return;
   }
@@ -679,6 +683,19 @@
     }
     PrintHeaderQuiet('AID',PrintIfPref('pic_show_links','LINK'));
     PrintRowQuiet($fbReturn['aid'],PrintIfPref('pic_show_links',$fbReturn['link']));
+  }
+  
+////////////////////////////////////////////////////////////////////////////////  
+
+  if ($fbcmdCommand == 'ADDPERM') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_addperm']);
+    if (strtoupper($fbcmdParams[1]) == 'ALL') {
+      $fbcmdParams[1] = $allPermissions;
+    }
+    $url = "{$urlAccess}&scope={$fbcmdParams[1]}";
+    print "launching: $url\n";
+    LaunchBrowser($url);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1938,7 +1955,7 @@
     if (ParamCount() == 0) {
       GetCurrentStatus();
       if ($userStatus == 'unknown_status') {
-        FbcmdFatalError("STATUS: Unexpected Error");
+        FbcmdFatalError("STATUS: unknown_status:\n  have you granted permission to read your status? try: fbcmd addperm");
       } else {
         if ($userStatus == '') {
           print "$userName [BLANK]\n";
@@ -2276,27 +2293,6 @@
       $defaultCommand = $fbcmdCommand;
     }
     $eCode = $e->getCode();
-    if ($eCode == 612) {
-      if (($defaultCommand == 'FINBOX')||($defaultCommand == 'INBOX')||($defaultCommand == 'MSG')||($defaultCommand == 'PINBOX')||($defaultCommand == 'SENTMAIL')) {
-        FbcmdPermissions('read_mailbox');
-      } else {
-        FbcmdPermissions('read_stream');
-      }
-    }
-    if (($eCode == 200)||($eCode == 250)||($eCode == 281)||($eCode == 282)||($eCode == 323)) {
-      if ($defaultCommand == 'PPOST') {
-        FbcmdPermissions2('publish_stream');
-      } else {
-        FbcmdPermissions('publish_stream');
-      }
-    }
-    if ($eCode == 299) {
-      FbcmdPermissions('rsvp_event');
-    }
-    if ($eCode == 602) {
-      FbcmdFatalError("FINFO: invalid field(s): {$e->getMessage()}");
-    }
-
     FbcmdFatalError("{$defaultCommand}\n[{$eCode}] {$e->getMessage()}");
   }
 
@@ -2308,36 +2304,6 @@
     error_log("fbcmd [v{$fbcmdVersion}] ERROR: {$err}");
     PrintFinish();
     exit;
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function FbcmdPermissions($fbPermissionName) {
-    global $fbcmdCommand;
-    global $fbcmdPrefs;
-    print "TODO: FIX THIS!\n";
-    exit;
-    // $url = "http://www.facebook.com/authorize.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&ext_perm={$fbPermissionName}";
-    // if ($fbcmdPrefs['auth_auto_launch']) {
-      // LaunchBrowser($url);
-    // }
-    // FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function FbcmdPermissions2($fbPermissionName) {
-    global $fbcmdCommand;
-    global $fbcmdPrefs;
-    print "TODO: FIX THIS!\n";
-    exit;
-    // $url = "http://www.facebook.com/connect/prompt_permissions.php?api_key={$fbcmdPrefs['appkey']}&v=1.0&next=http://www.facebook.com/connect/login_success.html?xxRESULTTOKENxx&display=popup&ext_perm={$fbPermissionName}&extern=1&fbconnect=true&enable_profile_selector=1";
-    // if ($fbcmdPrefs['auth_auto_launch']) {
-      // LaunchBrowser($url);
-    // }
-    // FbcmdFatalError("{$fbcmdCommand} requires special permissions:\n\nvisit the website:\n{$url}\nto grant permission\n");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3948,17 +3914,19 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 
   function ShowAuth() {
-    global $fbcmdPrefs;
-    $url = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
-    if ($fbcmdPrefs['auth_auto_launch']) {
-      LaunchBrowser($url);
-    }
+    global $fbcmdPrefs, $urlAccess, $urlAuth;
     print "\n";
-    print "This application is not currently authorized.  To grant authorization,\n";
-    print "Generate an access code at this website:\n\n";
-    print "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}\n";
-    print "or execute: fbcmd go auth\n";
-    print "obtain your authorization code (XXXXXX) and then execute: fbcmd AUTH XXXXXX\n\n";
+    print "This application needs to be authorized to access your facebook account.\n";
+    print "\n";
+    print "Step 1: Allow basic (initial) access to your acount via this url:\n\n";
+    print "{$urlAccess}\n";
+    print "to launch this page, execute: fbcmd go access\n";
+    print "\n";
+    print "Step 2: Generate an offline authorization code at this url:\n\n";
+    print "{$urlAuth}\n";
+    print "to launch this page, execute: fbcmd go auth\n";
+    print "\n";
+    print "obtain your authorization code (XXXXXX) and then execute: fbcmd auth XXXXXX\n\n";
   }
 
 ////////////////////////////////////////////////////////////////////////////////
