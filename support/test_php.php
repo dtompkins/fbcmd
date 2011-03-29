@@ -20,6 +20,8 @@
   PrintOut("\n");
   PrintOut("curl extension loaded = [" . extension_loaded('curl') . "]\n");
   PrintOut("\n");
+  PrintOut("json extension loaded = [" . extension_loaded('json') . "]\n");
+  PrintOut("\n");
   PrintOut("FBCMD environment variable = [" . getenv('FBCMD') . "]\n");
   PrintOut("\n");
   PrintOut("current path = [" . getcwd() . "]\n");  
