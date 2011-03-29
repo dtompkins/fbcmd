@@ -16,7 +16,11 @@
   PrintOut("php.ini : memory_limit = [" . ini_get('memory_limit') . "]\n");
   PrintOut("php.ini : allow_url_fopen = [" . ini_get('allow_url_fopen') . "]\n");
   PrintOut("\n");
-  PrintOut("openssl loaded = [" . extension_loaded('openssl') . "]\n");
+  PrintOut("openssl extension loaded = [" . extension_loaded('openssl') . "]\n");
+  PrintOut("\n");
+  PrintOut("curl extension loaded = [" . extension_loaded('curl') . "]\n");
+  PrintOut("\n");
+  PrintOut("json extension loaded = [" . extension_loaded('json') . "]\n");
   PrintOut("\n");
   PrintOut("FBCMD environment variable = [" . getenv('FBCMD') . "]\n");
   PrintOut("\n");
