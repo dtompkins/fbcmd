@@ -222,6 +222,8 @@
   AddPreference('default_allinfo_flist','=ME');
   AddPreference('default_apics_albumid','');
   AddPreference('default_apics_savedir',false);
+  AddPreference('default_birthdays_flist','=ALL');
+  AddPreference('default_birthdays_count','10');
   AddPreference('default_comment_text','');
   AddPreference('default_display_text','FBCMD: The Command Line Interface for Facebook');
   AddPreference('default_feed1_text','');
@@ -336,6 +338,7 @@
   AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
   AddCommand('AUTH',      'authcode~Sets your facebook authorization code for offline access');
+  AddCommand('BIRTHDAYS', '[flist] [count]~Show upcoming birthdays for friend(s)');
   AddCommand('COMMENT',   'post_id text~Add a comment to a story that appears in the stream');
   AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
   AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
@@ -833,6 +836,44 @@
         }
       }
     }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'BIRTHDAYS') {
+    ValidateParamCount(0,2);
+    SetDefaultParam(1,$fbcmdPrefs['default_birthdays_flist']);
+    SetDefaultParam(2,$fbcmdPrefs['default_birthdays_count']);
+    GetFlistIds($fbcmdParams[1],true);
+	$fql = "SELECT name, birthday_date FROM user WHERE uid IN ({$flistMatchIdString}) AND birthday <> '' ORDER BY birthday_date";
+	$fbReturn = $fbObject->api_client->fql_query($fql);
+	
+	$today = getdate();
+
+	// Build friends birthdays array
+	$arr = array();
+	foreach ($fbReturn as $friend) {
+		list($month,$day,$year) = split("/", $friend['birthday_date']);
+		
+		$bDayYear = $today["year"];
+		if (((int)$month < $today["mon"]) || (((int)$month == $today["mon"]) && ((int)$day <= $today["mday"]))) {
+			$bDayYear += 1;
+		}
+		
+		$arr[$friend['name']] = $bDayYear . "-" . $month . "-" . $day . "-" . $year;
+	}
+	asort($arr);
+	
+	// Print birthdays
+	$count = 0;
+	$limit = $fbcmdParams[2];
+	foreach ($arr as $name => $bday) {
+		list($year,$month,$day,$birthYear) = split("-", $bday);
+		$mName = date("M", mktime(0, 0, 0, $month, 1, 2005));
+		$age = ($birthYear != "") ? (int)$year - (int)$birthYear : "??";
+    	print $mName . " " . $day . " (" . $age . "): " . $name ."\n";
+    	if (++$count >= $limit) break;
+	}
   }
 
 ////////////////////////////////////////////////////////////////////////////////
