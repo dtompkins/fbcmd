@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.91';
+  $fbcmdUpdateVersion = '2.92';
   TraceVar('fbcmdUpdateVersion');
 
 ////////////////////////////////////////////////////////////////////////////////
