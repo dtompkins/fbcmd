@@ -555,7 +555,7 @@
   function GetGithub($filename, $save = true) {
     global $branch;
     global $installLibDir;
-    $fileSrc = "https://github.com/dtompkins/fbcmd/raw/{$branch}/{$filename}";
+    $fileSrc = "https://raw.github.com/dtompkins/fbcmd/{$branch}/{$filename}";
     $fileDest = "{$installLibDir}{$filename}";
     $fileContents = @file_get_contents($fileSrc);
     if ($fileContents) {
