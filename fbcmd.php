@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta5-dev1';
+  $fbcmdVersion = '1.0-beta5-dev2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1066,7 +1066,8 @@
     if (!empty($fbReturn)) {
       $fields = explode(',',$fbcmdParams[1]);
       if (in_array('uid',$fields)) {
-        FbcmdWarning("FINFO: use -showid instead of specifying the uid field");
+        $fbcmdPrefs['uid'] = 1;
+        $fbcmdPrefs['print_blanks'] = 1;
       }
       $headerFields = array();
       foreach ($fields as $f) {
