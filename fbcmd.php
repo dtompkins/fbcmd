@@ -81,7 +81,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   // You can set an environment variable FBCMD to specify the location of
-  // your peronal files: sessionkeys.txt, prefs.php, postdata.txt, maildata.txt
+  // your personal files: auth.txt, prefs.php, postdata.txt, maildata.txt
 
   // Defaults: Windows:          %USERPROFILE%\fbcmd\ (c:\Users\YOURUSERNAME\fbcmd\)
   // Defaults: Mac/Linux/Other:  $HOME/.fbcmd/        (~/.fbcmd/)
@@ -140,6 +140,7 @@
   AddPreference('fpics_filename','[pid].jpg','ff');
   AddPreference('go_default_numeric','link');
   AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
+  AddPreference('authfile',"[datadir]auth.txt",'auth');
   AddPreference('launch_exec','');
   AddPreference('mail_save','1','msave');
   AddPreference('mailfile',"[datadir]maildata.txt",'mfile');
@@ -411,6 +412,12 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPERM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','COMMENT','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIKE','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','POST','PPICS','RECENT','RESET','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','SHOWPREF','SHOWPERM','STATUS','STREAM','TAGPIC','UFIELDS','VERSION','WALLPOST','WHOAMI'))) {
+    FbcmdFatalError("{$fbcmdCommand} has not been added to version 2.0 yet\n  (feel free to nag Dave if you think this should be a priority)\n");
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if (!in_array($fbcmdCommand,$fbcmdCommandList)&&($fbcmdCommand != '')) {
     FbcmdFatalError("Unknown Command: [{$fbcmdCommand}] try fbcmd HELP");
   }
@@ -531,14 +538,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  require_once('facebook/facebook.php');
-  require_once('facebook/facebook_desktop.php');
+  require_once('facebook-php-sdk/src/facebook.php');
+
+////////////////////////////////////////////////////////////////////////////////
+
+  $fbcmdAuthVersion = 2;
+  $fbcmdAuthInfo = array();
+  $fbcmdUserSessionKey = 'EMPTY';
+  $fbcmdUserSecretKey = 'EMPTY';
 
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdKeyFileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs['keyfile']);
-  
-  if ($fbcmdCommand == 'RESET') {
+  $fbcmdAuthFileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs['authfile']);
+
+  if ($fbcmdCommand == 'RESET') { //2
     ValidateParamCount(0);
     VerifyOutputDir($fbcmdKeyFileName);
     if (@file_put_contents($fbcmdKeyFileName,"EMPTY\nEMPTY\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
@@ -551,7 +565,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'AUTH') {
+  if ($fbcmdCommand == 'AUTH') { //2
     ValidateParamCount(1);
     try {
       $fbObject = new FacebookDesktop($fbcmdPrefs['appkey'], $fbcmdPrefs['appsecret']);
@@ -586,28 +600,54 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (!file_exists($fbcmdKeyFileName)) {
-    print "\n";
-    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";
-    //print "It appears to be the first time you are running the application\n";
-    //print "as fbcmd could not locate your keyfile: [{$fbcmdKeyFileName}]\n\n";
-    ShowAuth();
-    return;
+  if ((!file_exists($fbcmdAuthFileName))&&file_exists($fbcmdKeyFileName)) {
+    ConvertOldKeyFile();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdKeyFile = file($fbcmdKeyFileName,FILE_IGNORE_NEW_LINES);
-  if (count($fbcmdKeyFile) < 2) {
-    FbcmdFatalError("Invalid keyfile {$fbcmdKeyFileName}");
-  }
-  $fbcmdUserSessionKey = $fbcmdKeyFile[0];
-  $fbcmdUserSecretKey = $fbcmdKeyFile[1];
+    if (!file_exists($fbcmdAuthFileName)) {
+      ShowAuth();
+      return;
+    }
 
-  if (strncmp($fbcmdUserSessionKey,'EMPTY',5) == 0) {
-    ShowAuth();
-    return;
-  }
+////////////////////////////////////////////////////////////////////////////////
+
+  // 1
+  // $fbcmdKeyFile = file($fbcmdKeyFileName,FILE_IGNORE_NEW_LINES);
+  // if (count($fbcmdKeyFile) < 2) {
+    // FbcmdFatalError("Invalid keyfile {$fbcmdKeyFileName}");
+  // }
+  // $fbcmdUserSessionKey = $fbcmdKeyFile[0];
+  // $fbcmdUserSecretKey = $fbcmdKeyFile[1];
+
+  // if (strncmp($fbcmdUserSessionKey,'EMPTY',5) == 0) {
+    // ShowAuth();
+    // return;
+  // }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  // load the auth info
+
+  LoadAuthFile();
+
+  $facebook = new Facebook(array(
+    'appId'  => $fbcmdPrefs['appkey'],
+    'secret' => $fbcmdPrefs['appsecret'],
+    'fileUpload' => true));
+
+
+  //$facebook->setSession($fbcmdAuthInfo['session'],false);
+  $facebook->setAccessToken($fbcmdAuthInfo['access_token']);
+
+  $me = $facebook->api('/me');
+
+  print "Welcome, {$me['name']}\n";
+
+  print "\nexiting...\n";
+
+  exit;
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -647,7 +687,7 @@
 
   $flistMatchArray = Array();
   $flistMatchIdString = '';
-  
+
   $allPermissions = 'ads_management,create_event,email,friends_about_me,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photo_video_tags,friends_photos,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_pages,offline_access,publish_checkins,publish_stream,read_friendlists,read_insights,read_mailbox,read_requests,read_stream,rsvp_event,sms,user_about_me,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photo_video_tags,user_photos,user_relationship_details,user_relationships,user_religion_politics,user_status,user_videos,user_website,user_work_history,xmpp_login';
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -684,8 +724,8 @@
     PrintHeaderQuiet('AID',PrintIfPref('pic_show_links','LINK'));
     PrintRowQuiet($fbReturn['aid'],PrintIfPref('pic_show_links',$fbReturn['link']));
   }
-  
-////////////////////////////////////////////////////////////////////////////////  
+
+////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'ADDPERM') {
     ValidateParamCount(0,1);
@@ -807,7 +847,7 @@
       foreach ($permList as $perm) {
         PrintRow($perm,$fbReturn[0][$perm]);
       }
-    }    
+    }
   }
 
   ////////////////////////////////////////////////////////////////////////////////
@@ -2302,7 +2342,8 @@
 
   function FbcmdFatalError($err) {
     global $fbcmdVersion;
-    error_log("fbcmd [v{$fbcmdVersion}] ERROR: {$err}");
+    print "fbcmd [v{$fbcmdVersion}] ERROR: {$err}";
+    //error_log("fbcmd [v{$fbcmdVersion}] ERROR: {$err}");
     PrintFinish();
     exit;
   }
@@ -2312,7 +2353,8 @@
 
   function FbcmdWarning($err) {
     global $fbcmdVersion;
-    error_log("fbcmd [v{$fbcmdVersion}] WARNING: {$err}");
+    print "fbcmd [v{$fbcmdVersion}] WARNING: {$err}";
+    //error_log("fbcmd [v{$fbcmdVersion}] WARNING: {$err}");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2760,7 +2802,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function GetGithubVersion($branch) {
-    try {
+    try {  //2
       $phpFile = @file_get_contents("http://github.com/dtompkins/fbcmd/raw/{$branch}/fbcmd.php");
       preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$phpFile,$matches);
       if (isset($matches[1])) {
@@ -3507,7 +3549,7 @@ function PrintCsvRow($rowIn) {
         if (isset($post['attachment']['media'][0]['type'])) {
           $msgType = $post['attachment']['media'][0]['type'] . ' post';
         }
-      }      
+      }
     } else {
       if ($post['app_data']) {
         $msgType = 'app post';
@@ -3915,7 +3957,9 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 
   function ShowAuth() {
-    global $fbcmdPrefs, $urlAccess, $urlAuth;
+    global $fbcmdPrefs, $urlAccess, $urlAuth, $fbcmdVersion;
+    print "\n";
+    print "Welcome to fbcmd! [version $fbcmdVersion]\n\n";
     print "\n";
     print "This application needs to be authorized to access your facebook account.\n";
     print "\n";
@@ -4042,7 +4086,7 @@ function PrintCsvRow($rowIn) {
     if ($media) {
       $attachment['media'] = $media;
     }
-    
+
     if (($fbcmdPrefs['sharepost'])&&($fbcmdParams[$offsetPostData + 1])) {
       $actionLinks = array(array('text' => 'Share', 'href' => 'http://www.facebook.com/share.php?u=' . $fbcmdParams[$offsetPostData + 1]));
     } else {
@@ -4185,6 +4229,129 @@ function PrintCsvRow($rowIn) {
           FbcmdFatalError("Invalid Path: {$filePath}");
         }
       }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function ConvertOldKeyFile() { // CONVERT OLD 1.x key file to 2.0 auth file
+    global $fbcmdPrefs;
+    global $fbcmdKeyFileName;
+    global $fbcmdAuthFileName;
+    global $fbcmdUserSessionKey;
+    global $fbcmdUserSecretKey;
+    global $fbcmdAuthVersion;
+    global $fbcmdAuthInfo;
+    print "\nIt appears you have a fbcmd 1.x key file...\n\n";
+    $fbcmdKeyFile = file($fbcmdKeyFileName,FILE_IGNORE_NEW_LINES);
+    if (count($fbcmdKeyFile) >= 2) {
+      $fbcmdUserSessionKey = $fbcmdKeyFile[0];
+      $fbcmdUserSecretKey = $fbcmdKeyFile[1];
+    }
+    if (strncmp($fbcmdUserSessionKey,'EMPTY',5) == 0) {
+      print "But it's invalid or empty, so I'll delete it\n\n";
+      if (!unlink($fbcmdKeyFileName)) {
+        FbcmdFatalError("Could not delete key file\n");
+      }
+      ShowAuth();
+      return;
+    }
+    $fbcmdOldKeyFileName = "{$fbcmdKeyFileName}_old";
+    print "backing up {$fbcmdKeyFileName} -> {$fbcmdOldKeyFileName} ...\n\n";
+    if (!rename($fbcmdKeyFileName,$fbcmdOldKeyFileName)) {
+      FbcmdFatalError("Could not rename key file\n");
+    }
+    print "Generating new Auth token...\n\n";
+    GenAuthInfoFromSessionKey();
+    print "Saving new Auth file: {$fbcmdAuthFileName} ...\n\n";
+    SaveAuthFile();
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function ConvertSessionKeyToAuthToken($appkey,$appsecret,$usersessionKey) {
+    global $fbcmdPrefs;
+    $ch = curl_init();
+    curl_setopt_array ($ch, Facebook::$CURL_OPTS);
+    curl_setopt_array ($ch, array(
+      CURLOPT_URL => "https://graph.facebook.com/oauth/exchange_sessions",
+      CURLOPT_POST => 1,
+      CURLOPT_POSTFIELDS => "client_id={$appkey}&client_secret={$appsecret}&sessions={$usersessionKey}",
+      CURLOPT_SSL_VERIFYHOST => 0,
+      CURLOPT_SSL_VERIFYPEER => false
+    ));
+    $result = curl_exec($ch);
+    curl_close($ch);
+    if ($result) {
+      $result = json_decode($result,true);
+      if (isset($result[0]['access_token'])) {
+        return $result[0]['access_token'];
+      }
+    }
+    FbcmdFatalError("could not convert session key to auth token");
+    return null;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function GenAuthInfoFromSessionKey() {
+    global $fbcmdPrefs;
+    global $fbcmdUserSessionKey;
+    global $fbcmdUserSecretKey;
+    global $fbcmdAuthVersion;
+    global $fbcmdAuthInfo;
+    $uidFromSessionKey = end(explode("-",$fbcmdUserSessionKey));
+    $authToken = ConvertSessionKeyToAuthToken($fbcmdPrefs['appkey'],$fbcmdPrefs['appsecret'],$fbcmdUserSessionKey);
+
+    $fbcmdAuthInfo = array (
+      'version' => $fbcmdAuthVersion,
+      'usersessionkey' => $fbcmdUserSessionKey,
+      'usersecretkey' => $fbcmdUserSecretKey,
+      //'session' => array (
+        'access_token' => $authToken,
+        'uid' => $uidFromSessionKey,
+      //  'sig' => md5("access_token={$authToken}uid={$uidFromSessionKey}{$fbcmdPrefs['appsecret']}")
+      //)
+    );
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function SaveAuthFile() {
+    global $fbcmdAuthInfo;
+    global $fbcmdAuthFileName;
+    $keyData = serialize($fbcmdAuthInfo);
+    VerifyOutputDir($fbcmdAuthFileName);
+    if (@file_put_contents ($fbcmdAuthFileName,"{$keyData}\n# keep this file secure!\n") == false) {
+      FbcmdFatalError("Could not generate keyfile {$fbcmdAuthFileName}");
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function LoadAuthFile() {
+    global $fbcmdAuthInfo;
+    global $fbcmdAuthFileName;
+    global $fbcmdAuthVersion;
+
+    $fbcmdAuthFile = file($fbcmdAuthFileName,FILE_IGNORE_NEW_LINES);
+    if (!isset($fbcmdAuthFile[0])) {
+      FbcmdFatalError("Invalid auth file 1 {$fbcmdAuthFileName}");
+    }
+    if (strncmp($fbcmdAuthFile[0],'a:',2) != 0) {
+      FbcmdFatalError("Invalid auth file 2 {$fbcmdAuthFileName}");
+    }
+    $fbcmdAuthInfo = unserialize($fbcmdAuthFile[0]);
+    if (!isset($fbcmdAuthInfo['version'])) {
+      FbcmdFatalError("Invalid auth file {$fbcmdAuthFileName} (no version info)");
+    }
+    if ($fbcmdAuthInfo['version'] > $fbcmdAuthVersion) {
+      FbcmdWarning("auth file version ({$fbcmdAuthInfo['version']}) is newer than current version ({$fbcmdAuthVersion})");
     }
   }
 
