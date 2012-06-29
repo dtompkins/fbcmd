@@ -16,7 +16,7 @@
 //   [Discussion Group]          http://groups.google.com/group/fbcmd         //
 //   [Open Source Repository]    http://github.com/dtompkins/fbcmd            //
 //                                                                            //
-//   Copyright (c) 2007,2011 Dave Tompkins                                    //
+//   Copyright (c) 2007,2012 Dave Tompkins                                    //
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 //                                                                            //
@@ -53,7 +53,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '1.0-beta5-dev2';
+  $fbcmdVersion = '1.1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
