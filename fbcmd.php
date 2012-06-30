@@ -2302,7 +2302,7 @@
 
   function FbcmdFatalError($err) {
     global $fbcmdVersion;
-    error_log("fbcmd [v{$fbcmdVersion}] ERROR: {$err}");
+    print "fbcmd [v{$fbcmdVersion}] ERROR: {$err}";
     PrintFinish();
     exit;
   }
@@ -2312,7 +2312,7 @@
 
   function FbcmdWarning($err) {
     global $fbcmdVersion;
-    error_log("fbcmd [v{$fbcmdVersion}] WARNING: {$err}");
+    print "fbcmd [v{$fbcmdVersion}] WARNING: {$err}";
   }
 
 ////////////////////////////////////////////////////////////////////////////////
