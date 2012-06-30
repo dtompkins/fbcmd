@@ -412,7 +412,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPERM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','COMMENT','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIKE','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','POST','PPICS','RECENT','RESET','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','SHOWPREF','SHOWPERM','STATUS','STREAM','TAGPIC','UFIELDS','VERSION','WALLPOST','WHOAMI'))) {
+  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIKE','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','POST','PPICS','RECENT','RESET','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','SHOWPREF','STREAM','TAGPIC','UFIELDS','VERSION','WALLPOST','WHOAMI'))) {
     FbcmdFatalError("{$fbcmdCommand} has not been added to version 2.0 yet\n  (feel free to nag Dave if you think this should be a priority)\n");
   }
 
@@ -572,7 +572,7 @@
       $session = $fbObject->do_get_session($fbcmdParams[1]);
       TraceReturn($session);
     } catch (Exception $e) {
-      FbcmdException($e,'Invalid AUTH code / could not authorize session');
+      OldFbcmdException($e,'Invalid AUTH code / could not authorize session');
     }
     $fbcmdUserSessionKey = $session['session_key'];
     $fbcmdUserSecretKey = $session['secret'];
@@ -588,7 +588,7 @@
       $fbReturn = $fbObject->api_client->users_getInfo($fbUser,array('name'));
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e,'Invalid AUTH code / could not generate session key');
+      OldFbcmdException($e,'Invalid AUTH code / could not generate session key');
     }
     if (!$fbcmdPrefs['quiet']) {
       print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD, {$fbReturn[0]['name']}!\n\n";
@@ -613,7 +613,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  // 1
+  //1
   // $fbcmdKeyFile = file($fbcmdKeyFileName,FILE_IGNORE_NEW_LINES);
   // if (count($fbcmdKeyFile) < 2) {
     // FbcmdFatalError("Invalid keyfile {$fbcmdKeyFileName}");
@@ -631,37 +631,41 @@
   // load the auth info
 
   LoadAuthFile();
+  
+  // create the Facebook Object
 
   $facebook = new Facebook(array(
     'appId'  => $fbcmdPrefs['appkey'],
     'secret' => $fbcmdPrefs['appsecret'],
     'fileUpload' => true));
-
-
-  //$facebook->setSession($fbcmdAuthInfo['session'],false);
+    
   $facebook->setAccessToken($fbcmdAuthInfo['access_token']);
 
-  $me = $facebook->api('/me');
-
-  print "Welcome, {$me['name']}\n";
-
-  print "\nexiting...\n";
-
-  exit;
-
+  //2
+  // $me = $facebook->api('/me');
+  // print "Welcome, {$me['name']}\n";
+  // $facebook->setAccessToken('test_bogus_token');
+  // try {
+    // $me = $facebook->api('/me');
+  // } catch (FacebookApiException $e) {
+    // FbcmdException($e);
+  // }
+  // exit;
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   // create the Facebook Object
 
-  try {
-    $fbObject = new FacebookDesktop($fbcmdPrefs['appkey'], $fbcmdPrefs['appsecret']);
-    $fbObject->api_client->session_key = $fbcmdUserSessionKey;
-    $fbObject->secret = $fbcmdUserSecretKey;
-    $fbObject->api_client->secret = $fbcmdUserSecretKey;
-    $fbUser = $fbObject->api_client->users_getLoggedInUser();
-  } catch (Exception $e) {
-    FbcmdException($e,'Could not use session key / log in user');
-  }
+  //1
+  // try {
+    // $fbObject = new FacebookDesktop($fbcmdPrefs['appkey'], $fbcmdPrefs['appsecret']);
+    // $fbObject->api_client->session_key = $fbcmdUserSessionKey;
+    // $fbObject->secret = $fbcmdUserSecretKey;
+    // $fbObject->api_client->secret = $fbcmdUserSecretKey;
+    // $fbUser = $fbObject->api_client->users_getLoggedInUser();
+  // } catch (Exception $e) {
+    // OldFbcmdException($e,'Could not use session key / log in user');
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -673,22 +677,25 @@
 
   // GLOBAL FQL strings for FLISTS
 
-  $fqlFriendId = "SELECT uid2 FROM friend WHERE uid1={$fbUser} AND uid2=uid2";
-  $fqlFriendBaseInfo = "SELECT uid,first_name,last_name,name,username,birthday_date,online_presence,status FROM user WHERE uid IN (SELECT uid2 FROM #fqlFriendId) OR uid={$fbUser}";
-  $keyFriendBaseInfo = 'uid';
-  $fqlFriendListNames = "SELECT flid,name FROM friendlist WHERE owner={$fbUser}";
-  $keyFriendListNames = 'flid';
-  $fqlFriendListMembers = "SELECT flid,uid FROM friendlist_member WHERE flid IN (SELECT flid FROM #fqlFriendListNames)";
-  $fqlPageId = "SELECT page_id FROM page_fan WHERE uid={$fbUser}";
-  $fqlPageNames = "SELECT page_id,name,username FROM page WHERE page_id IN (SELECT page_id FROM #fqlPageId)";
-  $keyPageNames = 'page_id';
-  $fqlGroupNames = "SELECT gid,name FROM group WHERE gid IN (SELECT gid FROM group_member WHERE uid={$fbUser})";
-  $keyGroupNames = 'gid';
+  //1
+  // $fqlFriendId = "SELECT uid2 FROM friend WHERE uid1={$fbUser} AND uid2=uid2";
+  // $fqlFriendBaseInfo = "SELECT uid,first_name,last_name,name,username,birthday_date,online_presence,status FROM user WHERE uid IN (SELECT uid2 FROM #fqlFriendId) OR uid={$fbUser}";
+  // $keyFriendBaseInfo = 'uid';
+  // $fqlFriendListNames = "SELECT flid,name FROM friendlist WHERE owner={$fbUser}";
+  // $keyFriendListNames = 'flid';
+  // $fqlFriendListMembers = "SELECT flid,uid FROM friendlist_member WHERE flid IN (SELECT flid FROM #fqlFriendListNames)";
+  // $fqlPageId = "SELECT page_id FROM page_fan WHERE uid={$fbUser}";
+  // $fqlPageNames = "SELECT page_id,name,username FROM page WHERE page_id IN (SELECT page_id FROM #fqlPageId)";
+  // $keyPageNames = 'page_id';
+  // $fqlGroupNames = "SELECT gid,name FROM group WHERE gid IN (SELECT gid FROM group_member WHERE uid={$fbUser})";
+  // $keyGroupNames = 'gid';
 
   $flistMatchArray = Array();
   $flistMatchIdString = '';
 
-  $allPermissions = 'ads_management,create_event,email,friends_about_me,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photo_video_tags,friends_photos,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_pages,offline_access,publish_checkins,publish_stream,read_friendlists,read_insights,read_mailbox,read_requests,read_stream,rsvp_event,sms,user_about_me,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photo_video_tags,user_photos,user_relationship_details,user_relationships,user_religion_politics,user_status,user_videos,user_website,user_work_history,xmpp_login';
+  //$allPermissions = 'ads_management,create_event,email,friends_about_me,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photo_video_tags,friends_photos,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_pages,offline_access,publish_checkins,publish_stream,read_friendlists,read_insights,read_mailbox,read_requests,read_stream,rsvp_event,sms,user_about_me,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photo_video_tags,user_photos,user_relationship_details,user_relationships,user_religion_politics,user_status,user_videos,user_website,user_work_history,xmpp_login';
+  
+  $allPermissions = 'ads_management,create_event,email,friends_about_me,friends_actions.music,friends_actions.news,friends_actions.video,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_games_activity,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photos,friends_questions,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_subscriptions,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_notifications,manage_pages,publish_actions,publish_checkins,publish_stream,read_friendlists,read_insights,read_mailbox,read_requests,read_stream,rsvp_event,user_about_me,user_actions.music,user_actions.news,user_actions.video,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_games_activity,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photos,user_questions,user_relationship_details,user_relationships,user_religion_politics,user_status,user_subscriptions,user_videos,user_website,user_work_history,xmpp_login';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -719,7 +726,7 @@
       $fbReturn = $fbObject->api_client->photos_createAlbum($fbcmdParams[1],$fbcmdParams[2],$fbcmdParams[3],$fbcmdParams[4]);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     PrintHeaderQuiet('AID',PrintIfPref('pic_show_links','LINK'));
     PrintRowQuiet($fbReturn['aid'],PrintIfPref('pic_show_links',$fbReturn['link']));
@@ -753,7 +760,7 @@
       $fbReturn = $fbObject->api_client->photos_upload($fbcmdParams[1], $fbcmdParams[2], $fbcmdParams[3], $fbUser);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     PrintHeaderQuiet('PID',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
     PrintRowQuiet($fbReturn['pid'],PrintIfPref('pic_show_links',$fbReturn['link']),PrintIfPref('pic_show_src',PhotoSrc($fbReturn)));
@@ -774,7 +781,7 @@
           $fbReturn = $fbObject->api_client->photos_upload($fileName, $fbcmdParams[2], '', $fbUser);
           TraceReturn($fbReturn);
         } catch (Exception $e) {
-          FbcmdException($e);
+          OldFbcmdException($e);
         }
         PrintRowQuiet($fbReturn['pid'],PrintIfPref('pic_show_links',$fbReturn['link']),PrintIfPref('pic_show_src',PhotoSrc($fbReturn)));
       }
@@ -794,7 +801,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if (!empty($fbReturn)) {
       PrintHeader(PrintIfPref('album_save','[#]'),PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME',PrintIfPref('pic_show_albumid','AID'),PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
@@ -820,7 +827,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if (!empty($fbReturn)) {
       PrintHeader(PrintIfPref('show_id','UID'),'NAME','FIELD','VALUE');
@@ -834,21 +841,39 @@
 
   if ($fbcmdCommand == 'SHOWPERM') {
     ValidateParamCount(0);
-    $fql = "SELECT {$allPermissions} from permissions where uid={$fbUser}";
     try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      FbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      PrintHeader('PERMISSION','GRANTED?');
-      $permList = explode(',',$allPermissions);
-      foreach ($permList as $perm) {
-        PrintRow($perm,$fbReturn[0][$perm]);
-      }
+      $fbReturn = $facebook->api('/me/permissions');
+      print_r($fbReturn);
+    } catch (facebookapiexception $e) {
+      fbcmdexception($e);
     }
   }
+    
+  // print "Welcome, {$me['name']}\n";
+  // $facebook->setAccessToken('test_bogus_token');
+  // try {
+    // $me = $facebook->api('/me');
+  // } catch (FacebookApiException $e) {
+    // FbcmdException($e);
+  // }    
+
+  // if ($fbcmdCommand == 'SHOWPERM') {
+    // ValidateParamCount(0);
+    // $fql = "SELECT {$allPermissions} from permissions where uid={$fbUser}";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn($fbReturn);
+    // } catch(Exception $e) {
+      // OldFbcmdException($e);
+    // }
+    // if (!empty($fbReturn)) {
+      // PrintHeader('PERMISSION','GRANTED?');
+      // $permList = explode(',',$allPermissions);
+      // foreach ($permList as $perm) {
+        // PrintRow($perm,$fbReturn[0][$perm]);
+      // }
+    // }
+  // }
 
   ////////////////////////////////////////////////////////////////////////////////
 
@@ -862,7 +887,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if (!empty($fbReturn)) {
       PrintHeader(PrintIfPref('pic_show_albumid','AID'),'PID',PrintIfPref('pic_show_date','CREATED'),'CAPTION',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
@@ -879,18 +904,26 @@
 
   if ($fbcmdCommand == 'COMMENT') {
     ValidateParamCount(2);
-    SetDefaultParam(2,$fbcmdPrefs['default_comment_text']);
-    $curPostId = GetPostId($fbcmdParams[1],true);
-    if ($curPostId) {
-      try {
-        $fbReturn = $fbObject->api_client->stream_addComment($curPostId,$fbcmdParams[2]);
-        TraceReturn($fbReturn);
-      } catch (Exception $e) {
-        FbcmdException($e);
-      }
-      PrintHeaderQuiet('POST_ID');
-      PrintRowQuiet($curPostId);
+    try {
+      $fbReturn = $facebook->api("/{$fbcmdParams[1]}/comments",'POST',array('message' => $fbcmdParams[2]));
+      print_r($fbReturn);
+    } catch (facebookapiexception $e) {
+      fbcmdexception($e);
     }
+
+ 
+    // SetDefaultParam(2,$fbcmdPrefs['default_comment_text']);
+    // $curPostId = GetPostId($fbcmdParams[1],true);
+    // if ($curPostId) {
+      // try {
+        // $fbReturn = $fbObject->api_client->stream_addComment($curPostId,$fbcmdParams[2]);
+        // TraceReturn($fbReturn);
+      // } catch (Exception $e) {
+        // OldFbcmdException($e);
+      // }
+      // PrintHeaderQuiet('POST_ID');
+      // PrintRowQuiet($curPostId);
+    // }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -909,7 +942,7 @@
         $fbReturn = $fbObject->api_client->stream_remove($curPostId);
         TraceReturn($fbReturn);
       } catch (Exception $e) {
-        FbcmdException($e);
+        OldFbcmdException($e);
       }
       if ($fbReturn) {
         PrintHeaderQuiet('POST_ID');
@@ -929,7 +962,7 @@
       $fbReturn = $fbObject->api_client->profile_setFBML($fbcmdParams[1],null,$fbcmdParams[1],'',$fbcmdParams[1],$fbcmdParams[1]);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -963,7 +996,7 @@
       $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => ''),'','',FacebookRestClient::STORY_SIZE_ONE_LINE);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -978,7 +1011,7 @@
         $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => $fbcmdParams[2]),'','',FacebookRestClient::STORY_SIZE_SHORT);
         TraceReturn($fbReturn);
       } catch (Exception $e) {
-        FbcmdException($e);
+        OldFbcmdException($e);
       }
     }
     if (ParamCount() == 4) {
@@ -988,7 +1021,7 @@
         $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => $fbcmdParams[2], 'images' => array( array('src' => $fbcmdParams[3], 'href' => $fbcmdParams[3]))),'','',FacebookRestClient::STORY_SIZE_SHORT);
         TraceReturn($fbReturn);
       } catch (Exception $e) {
-        FbcmdException($e);
+        OldFbcmdException($e);
       }
     }
   }
@@ -1003,7 +1036,7 @@
       $fbReturn = $fbObject->api_client->links_post($fbcmdParams[1],$fbcmdParams[2]);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1017,7 +1050,7 @@
       $fbReturn = $fbObject->api_client->notes_create($fbcmdParams[1],$fbcmdParams[2]);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1101,7 +1134,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if (!empty($fbReturn)) {
       $fields = explode(',',$fbcmdParams[1]);
@@ -1210,7 +1243,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if (!empty($fbReturn)) {
       PrintHeader('INDEX','FIELD','VALUE');
@@ -1450,7 +1483,7 @@
           $fbReturn = $fbObject->api_client->stream_addLike($curPostId);
           TraceReturn($fbReturn);
         } catch (Exception $e) {
-          FbcmdException($e);
+          OldFbcmdException($e);
         }
         PrintRowQuiet($curPostId);
       }
@@ -1466,7 +1499,7 @@
       TraceReturn($fbReturn);
       $limitNSEND = $fbReturn;
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     PrintHeader('COMMAND','LIMIT','DURATION');
     PrintRow('FEED','10','per day');
@@ -1489,7 +1522,7 @@
       $fbReturn = $fbObject->api_client->profile_setFBML($fbFbmlFile,null,$fbFbmlFile,'',$fbFbmlFile,$fbFbmlFile);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1514,7 +1547,7 @@
       $fbReturn = $fbObject->api_client->profile_setInfo($fbCmdInfo['title'], $fbCmdInfo['type'], $fbCmdInfo['info_fields']);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1535,7 +1568,7 @@
       $rbReturn = $fbObject->api_client->notes_create($fbcmdParams[1],$fbFbmlFile);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1642,7 +1675,7 @@
       $fbReturn = $fbObject->api_client->notifications_get();
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     PrintHeader('FIELD','VALUE');
     PrintRow('MESSAGES_UNREAD',$fbReturn['messages']['unread']);
@@ -1670,7 +1703,7 @@
         $fbReturn = $fbObject->api_client->notifications_send($id, $fbcmdParams[2], 'user_to_user');
         TraceReturn($fbReturn);
       } catch (Exception $e) {
-        FbcmdException($e);
+        OldFbcmdException($e);
       }
       PrintRowQuiet(ProfileName($id));
     }
@@ -1753,7 +1786,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if (!empty($fbReturn)) {
       PrintHeader(PrintIfPref('show_id','UID'),'NAME','SRC');
@@ -1804,7 +1837,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if ($fbReturn) {
       PrintHeader(PrintIfPref('show_id','ID'),'NAME',PrintIfPref('status_show_date','TIME'),'STATUS');
@@ -1825,7 +1858,7 @@
         $fbReturn = $fbObject->api_client->fql_query($fql);
         TraceReturn($fbReturn);
       } catch(Exception $e) {
-        FbcmdException($e,'GET-POST');
+        OldFbcmdException($e,'GET-POST');
       }
       if (isset($fbReturn[0]['post_id'])) {
         $postID = $fbReturn[0]['post_id'];
@@ -1847,7 +1880,7 @@
           $fbReturn = $fbObject->api_client->stream_remove($postID);
           TraceReturn($fbReturn);
         } catch (Exception $e) {
-          FbcmdException($e);
+          OldFbcmdException($e);
         }
         if (!$fbReturn) {
           FbcmdFatalError("RESTATUS: Could not remove previous status");
@@ -1863,7 +1896,7 @@
       $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1886,7 +1919,7 @@
       $fbReturn = $fbObject->api_client->events_rsvp($eid,$rsvp);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -1899,7 +1932,7 @@
       $fbReturn = $fbObject->api_client->profile_getFBML($fbUser,2);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     // strip out the <fb:fbml> tags
     $fbFbml = $fbReturn;
@@ -1919,7 +1952,7 @@
       $fbReturn = $fbObject->api_client->profile_getInfo();
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     $fbInfoFile = var_export($fbReturn,true);
     $fbInfoFile = "<?php\n\$fbCmdInfo = {$fbInfoFile};\n?>\n";
@@ -1965,7 +1998,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     if ($fbReturn) {
       PrintHeader('KEY','RANK','NAME','TYPE');
@@ -1992,31 +2025,40 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'STATUS') {
-    ValidateParamCount(0,1);
-    if (ParamCount() == 0) {
-      GetCurrentStatus();
-      if ($userStatus == 'unknown_status') {
-        FbcmdFatalError("STATUS: unknown_status:\n  have you granted permission to read your status? try: fbcmd addperm");
-      } else {
-        if ($userStatus == '') {
-          print "$userName [BLANK]\n";
-        } else {
-          print "$userName $userStatus\n";
-        }
-      }
-    } else {
-      if ($fbcmdPrefs['status_tag']) {
-        $statusText = TagText($fbcmdParams[1]);
-      } else {
-        $statusText = $fbcmdParams[1];
-      }
-      try {
-        $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
-        TraceReturn($fbReturn);
-      } catch(Exception $e) {
-        FbcmdException($e);
-      }
+    ValidateParamCount(1); //2 just set for now
+
+    try {
+      $fbReturn = $facebook->api('/me/feed','POST',array('message' => $fbcmdParams[1]));
+      print_r($fbReturn);
+    } catch (facebookapiexception $e) {
+      fbcmdexception($e);
     }
+    
+    
+    // if (ParamCount() == 0) {
+      // GetCurrentStatus();
+      // if ($userStatus == 'unknown_status') {
+        // FbcmdFatalError("STATUS: unknown_status:\n  have you granted permission to read your status? try: fbcmd addperm");
+      // } else {
+        // if ($userStatus == '') {
+          // print "$userName [BLANK]\n";
+        // } else {
+          // print "$userName $userStatus\n";
+        // }
+      // }
+    // } else {
+      // if ($fbcmdPrefs['status_tag']) {
+        // $statusText = TagText($fbcmdParams[1]);
+      // } else {
+        // $statusText = $fbcmdParams[1];
+      // }
+      // try {
+        // $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
+        // TraceReturn($fbReturn);
+      // } catch(Exception $e) {
+        // OldFbcmdException($e);
+      // }
+    // }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2088,7 +2130,7 @@
       $fbReturn = $fbObject->api_client->photos_addTag($fbcmdParams[1],$tagId,$tagText,$fbcmdParams[3],$fbcmdParams[4],null,null);
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
   }
 
@@ -2328,13 +2370,34 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function FbcmdException(Exception $e, $defaultCommand = true) {
+  function OldFbcmdException(Exception $e, $defaultCommand = true) {
     if ($defaultCommand) {
       global $fbcmdCommand;
       $defaultCommand = $fbcmdCommand;
     }
     $eCode = $e->getCode();
     FbcmdFatalError("{$defaultCommand}\n[{$eCode}] {$e->getMessage()}");
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function FbcmdException(Exception $e, $defaultCommand = true) {
+    if ($defaultCommand) {
+      global $fbcmdCommand;
+      $defaultCommand = $fbcmdCommand;
+    }
+    $result = $e->getResult();
+    $type = $e->getType();
+    $code = $e->getCode();
+    $msg = $e->getMessage();
+    if (isset($result['error']['code'])) {
+      $code = $result['error']['code'];
+    }
+    if (isset($result['error']['message'])) {
+      $msg = $result['error']['message'];
+    }
+    FbcmdFatalError("{$defaultCommand}\n[{$type}:{$code}] {$msg}");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2453,7 +2516,7 @@
         $fbReturn = $fbObject->api_client->fql_query($fql);
         TraceReturn($fbReturn);
       } catch(Exception $e) {
-        FbcmdException($e,'LATEST-AID');
+        OldFbcmdException($e,'LATEST-AID');
       }
       if (isset($fbReturn[0]['aid'])) {
         return $fbReturn[0]['aid'];
@@ -2489,7 +2552,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e,'GET-POST');
+      OldFbcmdException($e,'GET-POST');
     }
     if (isset($fbReturn[0]['comments']['count'])) {
       return $fbReturn[0]['comments']['count'];
@@ -2512,7 +2575,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     $userName = 'unknown_name';
     $userStatus = 'unknown_status';
@@ -2559,7 +2622,7 @@
       $fbReturn = $fbObject->api_client->fql_query($fql);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     $matchFilterName = FlistMatch($filtName,true,$fbReturn,'filter_key','name',false);
     if (count($matchFilterName) == 0) {
@@ -2740,7 +2803,7 @@
             $fbReturn = $fbObject->api_client->fql_query($fql);
             TraceReturn($fbReturn);
           } catch(Exception $e) {
-            FbcmdException($e);
+            OldFbcmdException($e);
           }
           if (!empty($fbReturn)) {
             foreach ($fbReturn as $u) {
@@ -2867,7 +2930,7 @@
           $fbReturn = $fbObject->api_client->fql_query($fql);
           TraceReturn($fbReturn);
         } catch(Exception $e) {
-          FbcmdException($e,'GET-POST');
+          OldFbcmdException($e,'GET-POST');
         }
         if (isset($fbReturn[0]['post_id'])) {
           return $fbReturn[0]['post_id'];
@@ -2917,7 +2980,7 @@
           // $fbReturn = $fbObject->api_client->fql_query($fql);
           // TraceReturn($fbReturn);
         // } catch(Exception $e) {
-          // FbcmdException($e,'GET-POST');
+          // OldFbcmdException($e,'GET-POST');
         // }
         // if (isset($fbReturn[0]['post_id'])) {
           // return $fbReturn[0]['post_id'];
@@ -3075,7 +3138,7 @@
       $fbMultiFqlReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
       TraceReturn($fbMultiFqlReturn);
     } catch (Exception $e) {
-      FbcmdException($e,'MultiFQL');
+      OldFbcmdException($e,'MultiFQL');
     }
     if ($fbMultiFqlReturn) {
       for ($i=0; $i < count($queryList); $i++) {
@@ -3111,7 +3174,7 @@
       $fbReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
       TraceReturn($fbReturn);
     } catch (Exception $e) {
-      FbcmdException($e,'MULTI-FQL-ID');
+      OldFbcmdException($e,'MULTI-FQL-ID');
     }
     $results = array();
     if ($fbReturn) {
@@ -4097,7 +4160,7 @@ function PrintCsvRow($rowIn) {
       $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, $actionLinks, $target_id, $uid);
       TraceReturn($fbReturn);
     } catch(Exception $e) {
-      FbcmdException($e);
+      OldFbcmdException($e);
     }
     return $fbReturn;
   }
