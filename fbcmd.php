@@ -412,7 +412,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIKE','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','POST','PPICS','RECENT','RESET','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','SHOWPREF','STREAM','TAGPIC','UFIELDS','VERSION','WALLPOST','WHOAMI'))) {
+  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','AUTH','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','POST','PPICS','RECENT','RESET','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','SHOWPREF','STREAM','TAGPIC','UFIELDS','VERSION','WHOAMI'))) {
     FbcmdFatalError("{$fbcmdCommand} has not been added to version 2.0 yet\n  (feel free to nag Dave if you think this should be a priority)\n");
   }
 
@@ -1474,20 +1474,27 @@
 
   if ($fbcmdCommand == 'LIKE') {
     ValidateParamCount(1);
-    $likesList = explode(',',$fbcmdParams[1]);
-    PrintHeaderQuiet('POST_ID');
-    foreach ($likesList as $like) {
-      $curPostId = GetPostId($like);
-      if ($curPostId) {
-        try {
-          $fbReturn = $fbObject->api_client->stream_addLike($curPostId);
-          TraceReturn($fbReturn);
-        } catch (Exception $e) {
-          OldFbcmdException($e);
-        }
-        PrintRowQuiet($curPostId);
-      }
+    try {
+      $fbReturn = $facebook->api("/{$fbcmdParams[1]}/likes",'POST');
+      print_r($fbReturn);
+    } catch (facebookapiexception $e) {
+      fbcmdexception($e);
     }
+    
+    // $likesList = explode(',',$fbcmdParams[1]);
+    // PrintHeaderQuiet('POST_ID');
+    // foreach ($likesList as $like) {
+      // $curPostId = GetPostId($like);
+      // if ($curPostId) {
+        // try {
+          // $fbReturn = $fbObject->api_client->stream_addLike($curPostId);
+          // TraceReturn($fbReturn);
+        // } catch (Exception $e) {
+          // OldFbcmdException($e);
+        // }
+        // PrintRowQuiet($curPostId);
+      // }
+    // }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2163,15 +2170,26 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'WALLPOST') {
-    ValidateParamCount(2,11);
-    SetDefaultParam(1,$fbcmdPrefs['default_wallpost_flist']);
+  
+    ValidateParamCount(2); //2 just set for now
 
-    GetFlistIds($fbcmdParams[1],true,false,true);
-    PrintHeaderQuiet('POST_ID','RECIPIENT_NAME');
-    foreach ($flistMatchArray as $id) {
-      $fbReturn = StreamPostHelper($id, $fbUser, 2);
-      PrintRowQuiet($fbReturn,ProfileName($id));
+    try {
+      $fbReturn = $facebook->api("/{$fbcmdParams[1]}/feed",'POST',array('message' => $fbcmdParams[2]));
+      print_r($fbReturn);
+    } catch (facebookapiexception $e) {
+      fbcmdexception($e);
     }
+    
+  
+    // ValidateParamCount(2,11);
+    // SetDefaultParam(1,$fbcmdPrefs['default_wallpost_flist']);
+
+    // GetFlistIds($fbcmdParams[1],true,false,true);
+    // PrintHeaderQuiet('POST_ID','RECIPIENT_NAME');
+    // foreach ($flistMatchArray as $id) {
+      // $fbReturn = StreamPostHelper($id, $fbUser, 2);
+      // PrintRowQuiet($fbReturn,ProfileName($id));
+    // }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
