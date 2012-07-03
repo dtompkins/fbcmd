@@ -277,14 +277,16 @@
   AddPreference('default_post_link',null);
   AddPreference('default_post_caption',null);
   AddPreference('default_post_description',null);
-  AddPreference('default_postimg_imgsrc','');
-  AddPreference('default_postimg_imglink','0');
-  AddPreference('default_postmp3_mp3src','');
-  AddPreference('default_postmp3_mp3title','');
-  AddPreference('default_postmp3_mp3artist','');
-  AddPreference('default_postmp3_mp3album','');
-  AddPreference('default_postflash_swfsrc',false);
-  AddPreference('default_postflash_imgsrc',false);
+  AddPreference('default_post_img_url',null); //2  
+  AddPreference('default_post_src_url',null); //2
+  //1 AddPreference('default_postimg_imgsrc',''); 
+  //1 AddPreference('default_postimg_imglink','0');
+  //1 AddPreference('default_postmp3_mp3src','');
+  //1 AddPreference('default_postmp3_mp3title','');
+  //1 AddPreference('default_postmp3_mp3artist','');
+  //1 AddPreference('default_postmp3_mp3album','');
+  //1 AddPreference('default_postflash_swfsrc',false);
+  //1 AddPreference('default_postflash_imgsrc',false);
   AddPreference('default_ppics_flist','=ALL');
   AddPreference('default_ppics_savedir',false);
   AddPreference('default_ppost_id',null);
@@ -300,6 +302,7 @@
   AddPreference('default_tagpic_target','=ME');
   AddPreference('default_tagpic_x','50');
   AddPreference('default_tagpic_y','50');
+  AddPreference('default_target',''); //2  
   AddPreference('default_updates_count','10');
   AddPreference('default_wallpost_flist','=ME');
 
@@ -397,7 +400,7 @@
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
   AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
   AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
-  AddCommand('POST',      'message <[name] [link] [caption] [description]>~IMG message img_src [img_link] <[n] [l] [c] [d]>~MP3 message mp3_src [title] [artist] [album] <[n] [l] [c] [d]>~FLASH swf_src img_src <[n] [l] [c] [d]>~Post (share) a story (or media) in your stream');
+  AddCommand('POST',      '[SRC url] [IMG url] message [name] [link] [caption] [description]~Post a story in your feed.~[IMG url] will add a picture.~[SRC url] is flash source for video, etc.'); //2
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('PREV',      '[N]~Show results from [Nth] previous command, missed resolves, etc.'); //2
   AddCommand('OBJ',       'obj~display facebook object');//2
@@ -414,15 +417,16 @@
   AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
   AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
   AddCommand('SHOWPERM',  '<no parameters>~List all possible permissions and show if granted to FBCMD');
-  AddCommand('STATUS',    '[message]~Set your status (or display current status if no parameter)');
+  AddCommand('STATUS',    '[text message]~Set your status'); //2
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
+  AddCommand('TARGET',    'obj COMMAND <parameters>~execute COMMAND for the target user (obj)~(for example: TARGET bob POST Hello)'); //2
   AddCommand('TEST',      '<no parameters>~Test your installation'); //2
   AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
-  AddCommand('WALLPOST',  'flist [POST parameters]~Post a message on the wall of friend(s)');
+  AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -686,12 +690,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdAs) { //2
-    if ($fbcmdAsArg == '0') {
-      $fbcmdAsArg = $fbcmdPrefs['default_as'];
+  if ($fbcmdCommand == 'AS') { //2
+    ValidateParamCount(2,99);
+    SetDefaultParam(1,$fbcmdPrefs['default_as']);
+    $asId = $fbcmdParams[1];
+    RemoveParams(0,1);
+    if (!in_array($fbcmdCommand,array('POST','STATUS'))) {
+      FbcmdFatalError("AS does not support the command {$fbcmdCommand}");
     }
-    $newtoken = '';
-    if (Resolve($fbcmdAsArg,true,'number,prev,alias,accounts')) {
+    $newtoken = '';    
+    if (Resolve($asId,true,'number,prev,alias,accounts')) {
       try {
         $fbReturn = $facebook->api('/me/accounts');
         TraceReturn($fbReturn);
@@ -711,17 +719,33 @@
     if ($newtoken) {
       $facebook->setAccessToken($newtoken);
     } else {
-      $fbcmdCommand = 'AS';
-      FbcmdFatalError("could not get access_token for {$fbcmdAsArg}");
+      FbcmdFatalError("could not get access_token for {$asId}");
     }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdLoop) {
+  if ($fbcmdCommand == 'LOOP') {
     print "Dave hasn't implemented LOOP yet... but it will be cool!\n";
-    //2 ensure doesn't work with included commands
+    //2 ensure doesn't try to work with included commands
     exit;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  $fbcmdTargetId = 'me';
+  
+  if ($fbcmdCommand == 'TARGET') { //2
+    ValidateParamCount(2,99);
+    SetDefaultParam(1,$fbcmdPrefs['default_target']);
+    $target = $fbcmdParams[1];
+    RemoveParams(0,1);
+    if (!in_array($fbcmdCommand,array('POST'))) {
+      FbcmdFatalError("TARGET does not support the command {$fbcmdCommand}");
+    }
+    if (Resolve($target,true)) {
+      $fbcmdTargetId = $resolvedId;
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1829,13 +1853,13 @@
 
   if ($fbcmdCommand == 'POST') { //1
     ValidateParamCount(1,10);
-    $fbReturn = StreamPostHelper(null, $fbUser, 1);
+    $fbReturn = PostCore();
     if ($fbReturn) {
       PrintHeaderQuiet('POST_ID');
       PrintRowQuiet($fbReturn);
     }
   }
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'PPICS') { //1
@@ -3541,15 +3565,6 @@
     global $fbcmdParams;
     global $fbcmdPrefs;
     global $fbcmdPrefAliases;
-    global $fbcmdAs;
-    global $fbcmdAsArg;
-    global $fbcmdLoop;
-    global $fbcmdLoopArg;
-
-    $fbcmdAs = false;
-    $fbcmdAsArg = '0';
-    $fbcmdLoop = false;
-    $fbcmdLoopArg = '0';
 
     for ($i=1; $i < $in_argc; $i++) {
       $curArg = $in_argv[$i];
@@ -3574,28 +3589,12 @@
         if (isset($fbcmdPrefs[$switchKey])) {
           $fbcmdPrefs[$switchKey] = $switchValue;
         } else {
-          FbcmdWarning("Ignoring Parameter {$i}: Unknown Switch [{$switchKey}]");
+          FbcmdWarning("Ignoring Parameter {$i}: Unknown Switch [{$switchKey}]\n");
         }
       } else {
         if ($fbcmdCommand == '') {
-          if (strtoupper($curArg) == 'AS') {
-            $fbcmdAs = true;
-            $i++;
-            if ($i < $in_argc) {
-              $fbcmdAsArg = $in_argv[$i];
-            }
-          } else {
-            if (strtoupper($curArg) == 'LOOP') {
-              $fbcmdLoop = true;
-              $i++;
-              if ($i < $in_argc) {
-                $fbcmdLoopArg = $in_argv[$i];
-              }
-            } else {
-              $fbcmdCommand = strtoupper($curArg);
-              $fbcmdParams[] = $fbcmdCommand;
-            }
-          }
+          $fbcmdCommand = strtoupper($curArg);
+          $fbcmdParams[] = $fbcmdCommand;
         } else {
           $fbcmdParams[] = $curArg;
         }
@@ -3632,6 +3631,93 @@
         PrintRow($base,$display,htmlspecialchars_decode(strip_tags($post['attachment'][$field])));
       }
     }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function PostCore() {
+    global $fbcmdParams;
+    global $fbcmdPrefs;
+    global $fbcmdTargetId;    
+    global $facebook;
+
+    
+    $args = array();    
+
+    $firstParam = strtoupper($fbcmdParams[1]);
+    
+    if (strtoupper($fbcmdParams[1]) == 'MP3') {
+      FbcmdFatalError("2.0: POST MP3 not done yet / not supported");
+    }
+    if (strtoupper($fbcmdParams[1]) == 'SRC') {
+      ValidateParamCount(2,9);
+      SetDefaultParam(2,$fbcmdPrefs['default_post_src_url']);
+      $args['source'] = $fbcmdParams[2];
+      RemoveParams(1,2);
+    }
+    if (strtoupper($fbcmdParams[1]) == 'IMG') {
+      ValidateParamCount(2,7);
+      SetDefaultParam(2,$fbcmdPrefs['default_post_img_url']);
+      $args['picture'] = $fbcmdParams[2];
+      RemoveParams(1,2);
+    }
+    // if ($firstParam == 'MP3') {
+      // ValidateParamCount($offset+2, $offset+9);
+      // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+      // SetDefaultParam($offset+2,$fbcmdPrefs['default_postmp3_mp3src']);
+      // SetDefaultParam($offset+3,$fbcmdPrefs['default_postmp3_mp3title']);
+      // SetDefaultParam($offset+4,$fbcmdPrefs['default_postmp3_mp3artist']);
+      // SetDefaultParam($offset+5,$fbcmdPrefs['default_postmp3_mp3album']);
+      // $msg = $fbcmdParams[$offset+1];
+      // $media = array(array('type' => 'mp3', 'src' => $fbcmdParams[$offset+2], 'title' => $fbcmdParams[$offset+3], 'artist' => $fbcmdParams[$offset+4], 'album' => $fbcmdParams[$offset+5]));
+      // $offsetPostData = $offset + 6;
+    // }
+    // if ($firstParam == 'IMG') {
+      // ValidateParamCount($offset+2, $offset+7);
+      // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+      // SetDefaultParam($offset+2,$fbcmdPrefs['default_postimg_imgsrc']);
+      // if ($fbcmdPrefs['default_postimg_imglink'] == '0') {
+        // SetDefaultParam($offset+3,$fbcmdParams[$offset+2]);
+      // } else {
+        // SetDefaultParam($offset+3,$fbcmdPrefs['default_postimg_imglink']);
+      // }
+      // $msg = $fbcmdParams[$offset+1];
+      // $media = array(array('type' => 'image', 'src' => $fbcmdParams[$offset+2], 'href' => $fbcmdParams[$offset+3]));
+      // $offsetPostData = $offset + 4;
+    // }
+    // if ($firstParam == 'FLASH') {
+      // ValidateParamCount($offset+3, $offset+7);
+      // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+      // SetDefaultParam($offset+2,$fbcmdPrefs['default_postflash_swfsrc']);
+      // SetDefaultParam($offset+3,$fbcmdPrefs['default_postflash_imgsrc']);
+      // $msg = $fbcmdParams[$offset+1];
+      // $media = array(array('type' => 'flash', 'swfsrc' => $fbcmdParams[$offset+2], 'imgsrc' => $fbcmdParams[$offset+3]));
+      // $offsetPostData = $offset + 4;
+    // }
+    ValidateParamCount(1,5);
+    SetDefaultParam(1,$fbcmdPrefs['default_post_message']);
+    //$msg = $fbcmdParams[1]; //2 todo: tagging
+    //$media = '';
+    SetDefaultParam(2, $fbcmdPrefs['default_post_name']); //1 //2 consider changing order: link before name ??
+    SetDefaultParam(3, $fbcmdPrefs['default_post_link']);
+    SetDefaultParam(4, $fbcmdPrefs['default_post_caption']);
+    SetDefaultParam(5, $fbcmdPrefs['default_post_description']);
+    
+    $args['message'] = $fbcmdParams[1];
+    if ($fbcmdParams[2]) $args['name'] = $fbcmdParams[2];
+    if ($fbcmdParams[3]) $args['link'] = $fbcmdParams[3];
+    if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
+    if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
+    
+    print_r($args);
+    try {
+      $fbReturn = $facebook->api("/{$fbcmdTargetId}/feed",'POST',$args);
+      TraceReturn($fbReturn);
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
+    }
+    return $fbReturn;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4209,6 +4295,40 @@ function PrintCsvRow($rowIn) {
     return 'unknown';
   }
 
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function RemoveParam($a) {
+    global $fbcmdParams;
+    global $fbcmdCommand;    
+    $cur = $a;
+    $count = ParamCount();
+    if (($a >= 0)&&($a <= $count)) {
+      while ($cur < $count) {
+        $fbcmdParams[$cur] = $fbcmdParams[$cur + 1];
+        $cur++;
+      }
+      unset($fbcmdParams[$count]);
+    } else {
+      FbcmdWarning("UNEXPECTED: Can't remove parameter {$a}\n");
+    }
+    $fbcmdCommand = strtoupper($fbcmdParams[0]);
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+  
+  function RemoveParams($a, $b=null)
+  {
+    global $fbcmdParams;
+    if ($b == null) {
+      $b = $a;
+    }
+    for ($j=$a; $j <= $b; $j++) {
+      RemoveParam($a);
+    }
+  }
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
