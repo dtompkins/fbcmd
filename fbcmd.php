@@ -607,6 +607,7 @@
           print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\n\nWelcome to FBCMD, {$fbReturn['name']}!\n\n";
           print "most FBCMD commands require additional permissions.\n";
           print "to grant default permissions, execute: fbcmd addperm\n";
+          print "to test your permissions, execute: fbcmd test\n";
         }
       } else {
         FbcmdFatalError("Possible authentication error: could not determine your name");
@@ -796,6 +797,12 @@
     }
     $url = "{$urlAccess}&scope={$fbcmdParams[1]}";
     LaunchBrowser($url);
+    
+    print "This command should launch a browser to grant permissions.\n";
+    print "in case it doesn't, here is the messy url:\n\n{$url}\n\n";
+    print "(note: this grants you access to your information and nobody else)\n\n";
+    print "after granting permssions, execute: fbcmd test\n\n\n";    
+    
   }
 
 ////////////////////////////////////////////////////////////////////////////////
