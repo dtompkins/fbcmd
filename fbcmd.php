@@ -2249,8 +2249,8 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'TEST') { //2
-    $testPost = "474872245874123_476429925718355";
+  if ($fbcmdCommand == 'TEST') { //2 add more tests
+    $testPost = "474872245874123_476522569042424";
     try {
       $fbReturn = $facebook->api('/me');
       TraceReturn($fbReturn);
@@ -2264,12 +2264,9 @@
       $fbReturn = $facebook->api("/{$testPost}/likes",'POST');
       TraceReturn($fbReturn);
       if ($fbReturn == 1) {
-        print "test 1 passed!\n";
-      }
-      $fbReturn = $facebook->api("/{$testPost}/comments",'POST',array('message' => "{$testName} successfully installed fbcmd!"));
-      TraceReturn($fbReturn);
-      if (isset($fbReturn['id'])) {
-        print "test 2 passed! ({$fbReturn['id']})\n";
+        print "Test 1: like the test post: passed\n";
+      } else {
+        print "Test 1: like the test post: failed\n";
       }
       print "congratulations!\n";
     } catch (FacebookApiException $e) {
