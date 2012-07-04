@@ -54,7 +54,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '2.0-dev3';
+  $fbcmdVersion = '2.0-dev4';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -222,8 +222,8 @@
   // Parameter Defaults
   AddPreference('default_addalbum_title','');
   AddPreference('default_addalbum_description','');
-  AddPreference('default_addalbum_location','');
-  AddPreference('default_addalbum_privacy','everyone');
+  //1 AddPreference('default_addalbum_location','');
+  //1 AddPreference('default_addalbum_privacy','everyone');
   AddPreference('default_addperm','all');
   AddPreference('default_addpic_filename','');
   AddPreference('default_addpic_albumid',null);
@@ -351,15 +351,15 @@
 
   $fbcmdCommandList = array();
 
-  AddCommand('ADDALBUM',  'title [description] [location] [privacy]~Create a new photo album');
+  AddCommand('ADDALBUM',  'title [description]~Create a new photo album');
   AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
   AddCommand('ADDPIC',    'filename [album_id|latest] [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id|latest]~Upload (add) all *.jpg files in a directory to an album');
   AddCommand('ALBUMS',    '[flist]~List all photo albums for friend(s)');
-  AddCommand('ALIAS',     'aliasname obj~Create a new alias for an object (or display all if no arg)');//2
+  AddCommand('ALIAS',     'aliasname objname~Create a new alias for an object (or display all if no arg)');//2
   AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
-  AddCommand('AS',        'obj COMMAND ...~execute COMMAND on behalf of obj (eg: for pages)'); //2
+  AddCommand('AS',        'objname COMMAND <parameters>~execute COMMAND on behalf of objname (eg: for pages)'); //2
   AddCommand('AUTH',      'authcode~Enter your facebook authorization code');
   AddCommand('COMMENT',   'post_id text~Add a comment to a story that appears in the stream');
   AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
@@ -390,7 +390,7 @@
   AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
   AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
   AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
-  AddCommand('LOOP',      'objlist COMMAND ...~execute COMMAND for each obj in objlist'); //2
+  AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist'); //2
   AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
   AddCommand('MUTUAL',    'flist~List friend(s) in common with other friend(s)');
   AddCommand('MYWALL',    '[count|new]~Show the posts from other users to your wall');
@@ -403,11 +403,11 @@
   AddCommand('POST',      '[SRC url] [IMG url] message [name] [link] [caption] [description]~Post a story in your feed.~[IMG url] will add a picture.~[SRC url] is flash source for video, etc.'); //2
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('PREV',      '[N]~Show results from [Nth] previous command, missed resolves, etc.'); //2
-  AddCommand('OBJ',       'obj~display facebook object');//2
+  AddCommand('OBJ',       'objname~display facebook object');//2
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
   AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');//2
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
-  AddCommand('RESOLVE',   'obj~Try to resolve a name to an object'); //2
+  AddCommand('RESOLVE',   'objname~Try to resolve a name to an object'); //2
   AddCommand('RESTATUS',  'message~Replace your status (deletes your status and adds a new status)');
   AddCommand('RSVP',      'event_id yes|no|maybe~RSVP to an Event from the EVENTS command');
   AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
@@ -420,7 +420,7 @@
   AddCommand('STATUS',    '[text message]~Set your status'); //2
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
-  AddCommand('TARGET',    'obj COMMAND <parameters>~execute COMMAND for the target user (obj)~(for example: TARGET bob POST Hello)'); //2
+  AddCommand('TARGET',    ' <parameters> COMMAND <parameters>~execute COMMAND for the target objname~(for example: TARGET bob POST Hello)'); //2
   AddCommand('TEST',      '<no parameters>~Test your installation'); //2
   AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
@@ -443,7 +443,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS','WHOAMI'))) {
+  if (in_array($fbcmdCommand,array('ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS','WHOAMI'))) {
     FbcmdFatalError("{$fbcmdCommand} has not been added to version 2.0 yet\n  (feel free to nag Dave if you think this should be a priority)\n");
   }
 
@@ -695,7 +695,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_as']);
     $asId = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('POST','STATUS'))) {
+    if (!in_array($fbcmdCommand,array('ADDALBUM','POST','STATUS'))) {
       FbcmdFatalError("AS does not support the command {$fbcmdCommand}");
     }
     $newtoken = '';    
@@ -793,22 +793,31 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'ADDALBUM') { //1
-    ValidateParamCount(1,4);
+    ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_addalbum_title']);
     SetDefaultParam(2,$fbcmdPrefs['default_addalbum_description']);
-    SetDefaultParam(3,$fbcmdPrefs['default_addalbum_location']);
-    SetDefaultParam(4,$fbcmdPrefs['default_addalbum_privacy']);
-    if (!in_array($fbcmdParams[4],array('friends','friends-of-friends','networks','everyone'))) {
-      FbcmdFatalError("ADDALBUM 4th parameter must be one of:\n                     friends,friends-of-friends,networks,everyone");
-    }
+    
     try {
-      $fbReturn = $fbObject->api_client->photos_createAlbum($fbcmdParams[1],$fbcmdParams[2],$fbcmdParams[3],$fbcmdParams[4]);
+      $fbReturn = $facebook->api("/me/albums",'POST',array('name' => $fbcmdParams[1], 'message' => $fbcmdParams[2]));
       TraceReturn($fbReturn);
-    } catch (Exception $e) {
-      OldFbcmdException($e);
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
     }
-    PrintHeaderQuiet('AID',PrintIfPref('pic_show_links','LINK'));
-    PrintRowQuiet($fbReturn['aid'],PrintIfPref('pic_show_links',$fbReturn['link']));
+    
+    
+    // SetDefaultParam(3,$fbcmdPrefs['default_addalbum_location']);
+    // SetDefaultParam(4,$fbcmdPrefs['default_addalbum_privacy']);
+    // if (!in_array($fbcmdParams[4],array('friends','friends-of-friends','networks','everyone'))) {
+      // FbcmdFatalError("ADDALBUM 4th parameter must be one of:\n                     friends,friends-of-friends,networks,everyone");
+    // }
+    // try {
+      // $fbReturn = $fbObject->api_client->photos_createAlbum($fbcmdParams[1],$fbcmdParams[2],$fbcmdParams[3],$fbcmdParams[4]);
+      // TraceReturn($fbReturn);
+    // } catch (Exception $e) {
+      // OldFbcmdException($e);
+    // }
+    // PrintHeaderQuiet('AID',PrintIfPref('pic_show_links','LINK'));
+    // PrintRowQuiet($fbReturn['aid'],PrintIfPref('pic_show_links',$fbReturn['link']));
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1945,8 +1954,7 @@
 
   if ($fbcmdCommand == 'REFRESH') { //2
     ValidateParamCount(0);
-    BuildRefCache(1);
-    SaveDataFile('cachefile',$fbcmdRefCache,'cache_refs');
+    BuildRefCache(true);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2490,6 +2498,7 @@
     $fbcmdRefCache['groups'] = GetRefArray('/me/groups');
     if ($showMsg) PrintQuiet("  albums...\n");
     $fbcmdRefCache['albums'] = GetRefArray('/me/albums');
+    SaveDataFile('cachefile',$fbcmdRefCache,'cache_refs');
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3723,7 +3732,6 @@
     if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
     if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
     
-    print_r($args);
     try {
       $fbReturn = $facebook->api("/{$fbcmdTargetId}/feed",'POST',$args);
       TraceReturn($fbReturn);
@@ -4167,16 +4175,21 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function PrintPrev($i = 0) { //2 todo: prettier print, offset by one
+  function PrintPrev($upto = 0) { //2 todo: prettier print, offset by one
     global $fbcmdPrev;
-    if (isset($fbcmdPrev[$i])) {
-      $j = 1;
-      while (isset($fbcmdPrev[$i][$j])) {
-        print "[{$j}] {$fbcmdPrev[$i][$j]['id']} {$fbcmdPrev[$i][$j]['name']}\n";
-        $j++;
+    for ($i = 0; $i <= $upto; $i++) {
+      if (isset($fbcmdPrev[$i])) {
+        $j = 1;
+        while (isset($fbcmdPrev[$i][$j])) {
+          if ($i == 0) {
+            print "[{$j}] ";
+          } else {
+            print "[{$i}.{$j}] ";
+          }
+          print "{$fbcmdPrev[$i][$j]['id']} {$fbcmdPrev[$i][$j]['name']}\n";
+          $j++;
+        }
       }
-    } else {
-      print "NO LAST TO PRINT"; //2
     }
   }
 
