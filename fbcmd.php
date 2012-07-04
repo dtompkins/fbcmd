@@ -443,7 +443,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','POST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS','WHOAMI'))) {
+  if (in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS','WHOAMI'))) {
     FbcmdFatalError("{$fbcmdCommand} has not been added to version 2.0 yet\n  (feel free to nag Dave if you think this should be a priority)\n");
   }
 
@@ -2281,18 +2281,31 @@
       $testName = "UNKNOWN";
       if (isset($fbReturn['name'])) {
         $testName = $fbReturn['name'];
-        print "Hello, {$testName}\n";
+        print "Test 1 PASSED. Determine your name: Hello, {$testName}\n";
       } else {
-        print "I could not determine your name :(\n";
+        print "Test 1 FAILED. Could not determine your name :(\n";
       }
       $fbReturn = $facebook->api("/{$testPost}/likes",'POST');
       TraceReturn($fbReturn);
       if ($fbReturn == 1) {
-        print "Test 1: like the test post: passed\n";
+        print "Test 2 PASSED. Liked the test post\n";
       } else {
-        print "Test 1: like the test post: failed\n";
+        print "Test 2 FAILED. Could not like the test post\n";
       }
-      print "congratulations!\n";
+      $fbReturn = $facebook->api('/me/feed','POST', array (
+        'message' => 'just successfully installed fbcmd',
+        'name' => 'fbcmd',
+        'link' => 'http://www.facebook.com/cmdlinepage',
+        'caption' => 'Command Line Interface for Facebook',
+        'description' => 'fbcmd is an open source facebook application.  The project home page is at http://fbcmd.dtompkins.com',
+        'picture' => "http://fbcmd.dtompkins.com/attachments/fbcmd75.png"));
+      TraceReturn($fbReturn);
+      if (isset($fbReturn['id'])) {
+        print "Test 3 PASSED. Posted an installation message on your wall\n";
+      } else {
+        print "Test 3 FAILED. Could not posted an installation message on your wall\n";
+      }
+      print "TODO: Describe how to remove that last post"; //2
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
