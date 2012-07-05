@@ -1,7 +1,7 @@
 Dave's Current TODOs for FBCMD
 ==============================
 
-the most recent version of this file is at: 
+the most recent version of this file is at:
 https://raw.github.com/dtompkins/fbcmd/dev/todo.txt
 ---------------------------------------------------
 
@@ -22,3 +22,24 @@ WEBSITE / Google Group
 =============
 
 * nail down auto (last?) & recent syntaxes
+
+
+
+OLD pre 2.0 FEATURE REQUESTS
+============================
+* [From Carl C.] More comprehensive Backup options
+
+* [from Jeremy M.] Upload Photos to a Group
+
+* Allow user to "alias" their key friends for easier reference
+* Option to Cache your Friend info, etc. to make faster FLISTS
+* Enhance TAGPIC: Add a 'latest' and use same format as @tagging in status
+* Facebook just updated the EVENT API... look into adding commands such as RSVP
+* Should add a 2nd STREAM parameter for when to start from ... ie: STREAM #family 100 200 would give posts 100->200
+* add a FINDPOST command that searches the contents of posts. I'm waiting to see how the API will open this up
+* Some kind of interface to display who you are and aren't following
+* Perhaps a PINFO Command similar to FINFO
+* The Facbeook Group Interface is lame... but maybe GINFO, GINFO, GEVENTS?
+* Add attachments to MSGs
+* Possibly a =family FLIST parameter?
+* Make it so you can reference albums by Name instead of ID
