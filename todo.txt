@@ -1,7 +1,9 @@
-This is Dave's running TODO list for FBCMD.
+Dave's Current TODOs for FBCMD
+==============================
 
-The most up-to-date version will always be in the 'dev' branch:
+the most recent version of this file is at: 
 https://raw.github.com/dtompkins/fbcmd/dev/todo.txt
+---------------------------------------------------
 
 WEBSITE / Google Group
 ======================
