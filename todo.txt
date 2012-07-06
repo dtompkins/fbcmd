@@ -10,18 +10,18 @@ WEBSITE / Google Group
 
 * respond to http://fbcmd.dtompkins.com/feedback posts, and then redirect to new app page
 * respond to most google group responses
-* move the bugs, wishlist, history to point to the github page
-* remove additional files
-* remove individual preference page... have one big page
-* remove depricated page
+* remove individual help page for each preference... have one big page
+* remove depricated pages
 * add new "SYNTAX" page
-
 
 
 2.0 MIGRATION
 =============
 
-* nail down auto (last?) & recent syntaxes
+* nail down auto/last? & recent syntaxes
+* enable more commands
+* remove depricated commands
+* look into album bugs?
 
 
 

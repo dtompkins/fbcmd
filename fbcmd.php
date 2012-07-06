@@ -54,7 +54,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '2.0-dev4';
+  $fbcmdVersion = '2.0-dev5';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -150,6 +150,9 @@
   AddPreference('go_default_numeric','link');
   AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
   AddPreference('launch_exec','');
+  AddPreference('last_length','10'); //2
+  AddPreference('last_save','1'); //2
+  AddPreference('lastfile',"[datadir]last.txt"); //2 alias  
   AddPreference('mail_save','1','msave');
   AddPreference('mailfile',"[datadir]maildata.txt",'mfile');
   AddPreference('mkdir_mode',0777);
@@ -350,12 +353,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdCommandList = array();
+  
+  $notYet = array('ADDPICD','ALLINFO','APICS','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS');
 
   AddCommand('ADDALBUM',  'title [description]~Create a new photo album');
   AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
-  AddCommand('ADDPIC',    'filename [album_id|latest] [caption]~Upload (add) a photo to an album');
+  AddCommand('ADDPIC',    'filename album_id [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id|latest]~Upload (add) all *.jpg files in a directory to an album');
-  AddCommand('ALBUMS',    '[flist]~List all photo albums for friend(s)');
+  AddCommand('ALBUMS',    'List all photo albums');
   AddCommand('ALIAS',     'aliasname objname~Create a new alias for an object (or display all if no arg)');//2
   AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
@@ -377,7 +382,7 @@
   AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
   AddCommand('FPICS',     'flist [savedir]~List [and optionally save] all photos where friend(s) are tagged');
   AddCommand('FQL',       'statement [flist]~Perform a custom FQL Query');
-  AddCommand('FRIENDS',   '[flist]~Generate a list of all your friends');
+  AddCommand('FRIENDS',   'List all friends');
   AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
   AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
   AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
@@ -416,11 +421,11 @@
   AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
   AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
   AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
-  AddCommand('SHOWPERM',  '<no parameters>~List all possible permissions and show if granted to FBCMD');
+  AddCommand('SHOWPERM',  '<no parameters>~List all possible permissions granted to FBCMD');
   AddCommand('STATUS',    '[text message]~Set your status'); //2
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
-  AddCommand('TARGET',    ' <parameters> COMMAND <parameters>~execute COMMAND for the target objname~(for example: TARGET bob POST Hello)'); //2
+  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for the target objname~(for example: TARGET bob POST Hello)'); //2
   AddCommand('TEST',      '<no parameters>~Test your installation'); //2
   AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
@@ -443,7 +448,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,array('ADDPIC','ADDPICD','ALBUMS','ALLINFO','APICS','DELPOST','DISPLAY','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FRIENDS','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MUTUAL','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS','WHOAMI'))) {
+  if (in_array($fbcmdCommand,$notYet)) {
     FbcmdFatalError("{$fbcmdCommand} has not been added to version 2.0 yet\n  (feel free to nag Dave if you think this should be a priority)\n");
   }
 
@@ -514,6 +519,7 @@
 
   $fbcmdRefCache = LoadDataFile('cachefile','cache_refs'); //2
   $fbcmdPrev = LoadDataFile('prevfile','prev_save'); //2
+  $fbcmdLast = LoadDataFile('lastfile','last_save'); //2
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -605,7 +611,7 @@
     $facebook->setAccessToken($fbcmdAuthInfo['access_token']);
     try {
       $fbReturn = $facebook->api('/me');
-      TraceReturn($fbReturn);
+      TraceReturn();
       if (isset($fbReturn['name'])) {
         if (!$fbcmdPrefs['quiet']) {
           print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\n\nWelcome to FBCMD, {$fbReturn['name']}!\n\n";
@@ -640,7 +646,7 @@
       // $fbObject->api_client->secret = $fbcmdUserSecretKey;
       // $fbUser = $fbObject->api_client->users_getLoggedInUser();
       // $fbReturn = $fbObject->api_client->users_getInfo($fbUser,array('name'));
-      // TraceReturn($fbReturn);
+      // TraceReturn();
     // } catch (Exception $e) {
       // OldFbcmdException($e,'Invalid AUTH code / could not generate session key');
     // }
@@ -695,14 +701,14 @@
     SetDefaultParam(1,$fbcmdPrefs['default_as']);
     $asId = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('ADDALBUM','POST','STATUS'))) {
+    if (!in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ALBUMS','POST','STATUS'))) {
       FbcmdFatalError("AS does not support the command {$fbcmdCommand}");
     }
     $newtoken = '';    
     if (Resolve($asId,true,'number,prev,alias,accounts')) {
       try {
         $fbReturn = $facebook->api('/me/accounts');
-        TraceReturn($fbReturn);
+        //TraceReturn(); //2
         if (isset($fbReturn['data'])) {
           foreach ($fbReturn['data'] as $a) {
             if ((isset($a['id']))&&(isset($a['access_token']))) {
@@ -740,11 +746,12 @@
     SetDefaultParam(1,$fbcmdPrefs['default_target']);
     $target = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('POST'))) {
+    if (!in_array($fbcmdCommand,array('ALBUMS','FRIENDS','POST'))) {
       FbcmdFatalError("TARGET does not support the command {$fbcmdCommand}");
     }
     if (Resolve($target,true)) {
       $fbcmdTargetId = $resolvedId;
+      NewLast('target', $resolvedId, $resolvedText);
     }
   }
 
@@ -799,7 +806,12 @@
     
     try {
       $fbReturn = $facebook->api("/me/albums",'POST',array('name' => $fbcmdParams[1], 'message' => $fbcmdParams[2]));
-      TraceReturn($fbReturn);
+      TraceReturn();
+      if (isset($fbReturn['id'])) {
+        NewLast('album', $fbReturn['id'], $fbcmdParams[1]);
+      } else {
+        FbcmdWarning('no return ID');
+      }
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
@@ -812,7 +824,7 @@
     // }
     // try {
       // $fbReturn = $fbObject->api_client->photos_createAlbum($fbcmdParams[1],$fbcmdParams[2],$fbcmdParams[3],$fbcmdParams[4]);
-      // TraceReturn($fbReturn);
+      // TraceReturn();
     // } catch (Exception $e) {
       // OldFbcmdException($e);
     // }
@@ -840,7 +852,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ADDPIC') { //1
+  if ($fbcmdCommand == 'ADDPIC') { //2
     ValidateParamCount(1,3);
     SetDefaultParam(1,$fbcmdPrefs['default_addpic_filename']);
     SetDefaultParam(2,$fbcmdPrefs['default_addpic_albumid']);
@@ -849,14 +861,21 @@
       FbcmdFatalError("Could not find file {$fbcmdParams[1]}");
     }
     $fbcmdParams[2] = GetAlbumId($fbcmdParams[2]);
-    try {
-      $fbReturn = $fbObject->api_client->photos_upload($fbcmdParams[1], $fbcmdParams[2], $fbcmdParams[3], $fbUser);
-      TraceReturn($fbReturn);
-    } catch (Exception $e) {
-      OldFbcmdException($e);
+    if (Resolve($asId,true,'number,prev,alias,albums')) {
+      try {
+        $fbReturn = $facebook->api("/{$resolvedId}/photos",'POST',array('source' => '@' . $fbcmdParams[1], 'message' => $fbcmdParams[3]));
+        TraceReturn();
+        if (isset($fbReturn['id'])) {
+          NewLast('pic', $fbReturn['id'], "[{$fbcmdParams[1]}] {$fbcmdParams[3]}");
+        } else {
+          FbcmdWarning('no return ID');
+        }
+      } catch (FacebookApiException $e) {
+        FbcmdException($e);
+      }
+      //PrintHeaderQuiet('PID',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
+      //PrintRowQuiet($fbReturn['id'],PrintIfPref('pic_show_links',$fbReturn['link']),PrintIfPref('pic_show_src',PhotoSrc($fbReturn)));
     }
-    PrintHeaderQuiet('PID',PrintIfPref('pic_show_links','LINK'),PrintIfPref('pic_show_src','SRC'));
-    PrintRowQuiet($fbReturn['pid'],PrintIfPref('pic_show_links',$fbReturn['link']),PrintIfPref('pic_show_src',PhotoSrc($fbReturn)));
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -872,7 +891,7 @@
       foreach ($fileList as $fileName) {
         try {
           $fbReturn = $fbObject->api_client->photos_upload($fileName, $fbcmdParams[2], '', $fbUser);
-          TraceReturn($fbReturn);
+          TraceReturn();
         } catch (Exception $e) {
           OldFbcmdException($e);
         }
@@ -905,26 +924,37 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ALBUMS') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_albums_flist']);
-    GetFlistIds($fbcmdParams[1],true);
-    $fql = "SELECT aid,owner,name,size,created,link FROM album WHERE owner IN ({$flistMatchIdString})";
+  if ($fbcmdCommand == 'ALBUMS') { //2
+    ValidateParamCount(0);
     try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
-    } catch(Exception $e) {
-      OldFbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      PrintHeader(PrintIfPref('album_save','[#]'),PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME',PrintIfPref('pic_show_albumid','AID'),PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
-      $albumNum = 0;
-      foreach ($fbReturn as $a) {
-        $albumNum++;
-        PrintRow(PrintIfPref('album_save','[' . $albumNum. ']'),PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),PrintIfPref('pic_show_albumid',$a['aid']),PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
+      $fbReturn = $facebook->api("/{$fbcmdTargetId}/albums");
+      TraceReturn();
+      if (!ReturnDataToPrev()) {
+        FbcmdWarning('no albums');
       }
-      SaveAlbumData($fbReturn);
-    }
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
+    }  
+ 
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_albums_flist']);
+    // GetFlistIds($fbcmdParams[1],true);
+    // $fql = "SELECT aid,owner,name,size,created,link FROM album WHERE owner IN ({$flistMatchIdString})";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OldFbcmdException($e);
+    // }
+    // if (!empty($fbReturn)) {
+      // PrintHeader(PrintIfPref('album_save','[#]'),PrintIfPref('show_id','OWNER_ID'),'OWNER_NAME',PrintIfPref('pic_show_albumid','AID'),PrintIfPref('pic_show_date','CREATED'),'NAME','SIZE',PrintIfPref('pic_show_links','LINK'));
+      // $albumNum = 0;
+      // foreach ($fbReturn as $a) {
+        // $albumNum++;
+        // PrintRow(PrintIfPref('album_save','[' . $albumNum. ']'),PrintIfPref('show_id',$a['owner']),ProfileName($a['owner']),PrintIfPref('pic_show_albumid',$a['aid']),PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$a['created'])),$a['name'],$a['size'],PrintIfPref('pic_show_links',$a['link']));
+      // }
+      // SaveAlbumData($fbReturn);
+    // }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -938,7 +968,7 @@
     $fql = "SELECT {$allUserInfoFields} from user where uid in ({$flistMatchIdString}) ORDER BY last_name";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -960,7 +990,7 @@
     $fql = "SELECT pid,aid,owner,src_small,src_big,src,link,caption,created FROM photo WHERE aid IN ({$fbcmdParams[1]})";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -981,7 +1011,7 @@
     ValidateParamCount(2);
     try {
       $fbReturn = $facebook->api("/{$fbcmdParams[1]}/comments",'POST',array('message' => $fbcmdParams[2]));
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
@@ -992,7 +1022,7 @@
     // if ($curPostId) {
       // try {
         // $fbReturn = $fbObject->api_client->stream_addComment($curPostId,$fbcmdParams[2]);
-        // TraceReturn($fbReturn);
+        // TraceReturn();
       // } catch (Exception $e) {
         // OldFbcmdException($e);
       // }
@@ -1015,7 +1045,7 @@
     if ($curPostId) {
       try {
         $fbReturn = $fbObject->api_client->stream_remove($curPostId);
-        TraceReturn($fbReturn);
+        TraceReturn();
       } catch (Exception $e) {
         OldFbcmdException($e);
       }
@@ -1035,7 +1065,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_display_text']);
     try {
       $fbReturn = $fbObject->api_client->profile_setFBML($fbcmdParams[1],null,$fbcmdParams[1],'',$fbcmdParams[1],$fbcmdParams[1]);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1069,7 +1099,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_feed1_text']);
     try {
       $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => ''),'','',FacebookRestClient::STORY_SIZE_ONE_LINE);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1084,7 +1114,7 @@
     if (ParamCount() == 2) {
       try {
         $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => $fbcmdParams[2]),'','',FacebookRestClient::STORY_SIZE_SHORT);
-        TraceReturn($fbReturn);
+        TraceReturn();
       } catch (Exception $e) {
         OldFbcmdException($e);
       }
@@ -1094,7 +1124,7 @@
       SetDefaultParam(4,$fbcmdPrefs['default_feed2_imglink']);
       try {
         $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => $fbcmdParams[2], 'images' => array( array('src' => $fbcmdParams[3], 'href' => $fbcmdParams[3]))),'','',FacebookRestClient::STORY_SIZE_SHORT);
-        TraceReturn($fbReturn);
+        TraceReturn();
       } catch (Exception $e) {
         OldFbcmdException($e);
       }
@@ -1109,7 +1139,7 @@
     SetDefaultParam(2,$fbcmdPrefs['default_feedlink_text']);
     try {
       $fbReturn = $fbObject->api_client->links_post($fbcmdParams[1],$fbcmdParams[2]);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1123,7 +1153,7 @@
     SetDefaultParam(2,$fbcmdPrefs['default_feednote_body']);
     try {
       $fbReturn = $fbObject->api_client->notes_create($fbcmdParams[1],$fbcmdParams[2]);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1207,7 +1237,7 @@
     $fql = "SELECT uid,{$fbcmdParams[1]} from user where uid in ({$flistMatchIdString}) ORDER BY last_name";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -1316,7 +1346,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -1330,14 +1360,25 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FRIENDS') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_friends_flist']);
-    GetFlistIds($fbcmdParams[1], true, true, true);
-    PrintHeader(array('ID','NAME'));
-    foreach ($flistMatchArray as $id) {
-      PrintRow($id,ProfileName($id));
-    }
+  if ($fbcmdCommand == 'FRIENDS') { //2
+    ValidateParamCount(0);
+    try {
+      $fbReturn = $facebook->api("/{$fbcmdTargetId}/friends");
+      TraceReturn();
+      if (!ReturnDataToPrev()) {
+        FbcmdWarning('no friends');
+      }
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
+    }  
+  
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_friends_flist']);
+    // GetFlistIds($fbcmdParams[1], true, true, true);
+    // PrintHeader(array('ID','NAME'));
+    // foreach ($flistMatchArray as $id) {
+      // PrintRow($id,ProfileName($id));
+    // }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1551,7 +1592,7 @@
     ValidateParamCount(1);
     try {
       $fbReturn = $facebook->api("/{$fbcmdParams[1]}/likes",'POST');
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
@@ -1563,7 +1604,7 @@
       // if ($curPostId) {
         // try {
           // $fbReturn = $fbObject->api_client->stream_addLike($curPostId);
-          // TraceReturn($fbReturn);
+          // TraceReturn();
         // } catch (Exception $e) {
           // OldFbcmdException($e);
         // }
@@ -1578,7 +1619,7 @@
     ValidateParamCount(0);
     try {
       $fbReturn = $fbObject->api_client->admin_getAllocation('notifications_per_day');
-      TraceReturn($fbReturn);
+      TraceReturn();
       $limitNSEND = $fbReturn;
     } catch (Exception $e) {
       OldFbcmdException($e);
@@ -1602,7 +1643,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->profile_setFBML($fbFbmlFile,null,$fbFbmlFile,'',$fbFbmlFile,$fbFbmlFile);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1627,7 +1668,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->profile_setInfo($fbCmdInfo['title'], $fbCmdInfo['type'], $fbCmdInfo['info_fields']);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1648,7 +1689,7 @@
     }
     try {
       $rbReturn = $fbObject->api_client->notes_create($fbcmdParams[1],$fbFbmlFile);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1693,24 +1734,36 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MUTUAL') { //1
+  if ($fbcmdCommand == 'MUTUAL') { //2
     ValidateParamCount(1);
-    SetDefaultParam(1,$fbcmdPrefs['default_mutual_flist']);
-    GetFlistIds($fbcmdParams[1]);
-    PrintHeader(PrintIfPref('show_id','ID'),'NAME',PrintIfPref('show_id','FRIEND_ID'),'FRIEND_NAME');
-    do {
-      $curChunkIds = GetNextChunkIds();
-      if ($curChunkIds) {
-        $results = MultiFqlById($curChunkIds,"SELECT uid,name FROM user WHERE uid IN (SELECT uid1 FROM friend WHERE uid1 IN (SELECT uid2 FROM friend WHERE uid1={$fbUser}) AND uid2=[id])");
-        foreach ($curChunkIds as $id) {
-          if ($results[$id]) {
-            foreach ($results[$id] as $user) {
-              PrintRow(PrintIfPref('show_id',$id),ProfileName($id),PrintIfPref('show_id',$id),$user['name']);
-            }
-          }
+    if (Resolve($fbcmdParams[1],true,'number,prev,alias,friends')) {
+      try {
+        $fbReturn = $facebook->api("/{$fbcmdTargetId}/mutualfriends/{$resolvedId}");
+        TraceReturn();
+        if (!ReturnDataToPrev()) {
+          FbcmdWarning('no friends');
         }
-      }
-    } while ($curChunkIds);
+      } catch (FacebookApiException $e) {
+        FbcmdException($e);
+      }  
+    }
+    // ValidateParamCount(1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_mutual_flist']);
+    // GetFlistIds($fbcmdParams[1]);
+    // PrintHeader(PrintIfPref('show_id','ID'),'NAME',PrintIfPref('show_id','FRIEND_ID'),'FRIEND_NAME');
+    // do {
+      // $curChunkIds = GetNextChunkIds();
+      // if ($curChunkIds) {
+        // $results = MultiFqlById($curChunkIds,"SELECT uid,name FROM user WHERE uid IN (SELECT uid1 FROM friend WHERE uid1 IN (SELECT uid2 FROM friend WHERE uid1={$fbUser}) AND uid2=[id])");
+        // foreach ($curChunkIds as $id) {
+          // if ($results[$id]) {
+            // foreach ($results[$id] as $user) {
+              // PrintRow(PrintIfPref('show_id',$id),ProfileName($id),PrintIfPref('show_id',$id),$user['name']);
+            // }
+          // }
+        // }
+      // }
+    // } while ($curChunkIds);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1742,7 +1795,7 @@
         }
         if (count($unreadIds) > 0) {
           $fbReturn = $fbObject->api_client->call_method('facebook.Notifications.markRead',array('notification_ids' => implode(',',$unreadIds)));
-          TraceReturn($fbReturn);
+          TraceReturn();
         }
       }
       SaveNoticeData($dataNotification);
@@ -1755,7 +1808,7 @@
     ValidateParamCount(0);
     try {
       $fbReturn = $fbObject->api_client->notifications_get();
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -1783,7 +1836,7 @@
     foreach ($flistMatchArray as $id) {
       try {
         $fbReturn = $fbObject->api_client->notifications_send($id, $fbcmdParams[2], 'user_to_user');
-        TraceReturn($fbReturn);
+        TraceReturn();
       } catch (Exception $e) {
         OldFbcmdException($e);
       }
@@ -1797,7 +1850,7 @@
     ValidateParamCount(1);
     try {
       $fbReturn = $facebook->api($fbcmdParams[1]);
-      TraceReturn($fbReturn);
+      TraceReturn();
       print_r($fbReturn);
     } catch (FacebookApiException $e) {
       FbcmdException($e);
@@ -1864,6 +1917,7 @@
     ValidateParamCount(1,10);
     $fbReturn = PostCore();
     if ($fbReturn) {
+      NewLast('post', $fbReturn['id'], $fbcmdParams[1]);
       PrintHeaderQuiet('POST_ID');
       PrintRowQuiet($fbReturn);
     }
@@ -1879,7 +1933,7 @@
     $fql = "SELECT uid,pic,pic_big,pic_small,pic_square FROM user WHERE uid IN ({$flistMatchIdString}) ORDER BY last_name";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -1930,7 +1984,7 @@
     $fql = "SELECT uid,message,time FROM status WHERE uid in ({$flistMatchIdString}) ORDER BY time DESC LIMIT {$fbcmdParams[2]}";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -1975,7 +2029,7 @@
       $fql = "SELECT post_id,comments.count FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
       try {
         $fbReturn = $fbObject->api_client->fql_query($fql);
-        TraceReturn($fbReturn);
+        TraceReturn();
       } catch(Exception $e) {
         OldFbcmdException($e,'GET-POST');
       }
@@ -1997,7 +2051,7 @@
       if ($deletePost) {
         try {
           $fbReturn = $fbObject->api_client->stream_remove($postID);
-          TraceReturn($fbReturn);
+          TraceReturn();
         } catch (Exception $e) {
           OldFbcmdException($e);
         }
@@ -2013,7 +2067,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -2036,7 +2090,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->events_rsvp($eid,$rsvp);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -2049,7 +2103,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_savedisp_filename']);
     try {
       $fbReturn = $fbObject->api_client->profile_getFBML($fbUser,2);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -2069,7 +2123,7 @@
     ValidateParamCount(1);
     try {
       $fbReturn = $fbObject->api_client->profile_getInfo();
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -2115,7 +2169,7 @@
     $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -2133,7 +2187,7 @@
     ValidateParamCount(0);
     try {
       $fbReturn = $facebook->api('/me/permissions');
-      TraceReturn($fbReturn);
+      TraceReturn();
       print_r($fbReturn);
     } catch (FacebookApiException $e) {
       FbcmdException($e);
@@ -2143,7 +2197,7 @@
     // $fql = "SELECT {$allPermissions} from permissions where uid={$fbUser}";
     // try {
       // $fbReturn = $fbObject->api_client->fql_query($fql);
-      // TraceReturn($fbReturn);
+      // TraceReturn();
     // } catch(Exception $e) {
       // OldFbcmdException($e);
     // }
@@ -2176,7 +2230,7 @@
     ValidateParamCount(1);
     try {
       $fbReturn = $facebook->api('/me/feed','POST',array('message' => $fbcmdParams[1]));
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
@@ -2199,7 +2253,7 @@
       // }
       // try {
         // $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
-        // TraceReturn($fbReturn);
+        // TraceReturn();
       // } catch(Exception $e) {
         // OldFbcmdException($e);
       // }
@@ -2273,7 +2327,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->photos_addTag($fbcmdParams[1],$tagId,$tagText,$fbcmdParams[3],$fbcmdParams[4],null,null);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e);
     }
@@ -2285,7 +2339,7 @@
     $testPost = "474872245874123_476522569042424";
     try {
       $fbReturn = $facebook->api('/me');
-      TraceReturn($fbReturn);
+      TraceReturn();
       $testName = "UNKNOWN";
       if (isset($fbReturn['name'])) {
         $testName = $fbReturn['name'];
@@ -2294,7 +2348,7 @@
         print "Test 1 FAILED. Could not determine your name :(\n";
       }
       $fbReturn = $facebook->api("/{$testPost}/likes",'POST');
-      TraceReturn($fbReturn);
+      TraceReturn();
       if ($fbReturn == 1) {
         print "Test 2 PASSED. Liked the test post\n";
       } else {
@@ -2307,7 +2361,7 @@
         'caption' => 'Command Line Interface for Facebook',
         'description' => 'fbcmd is an open source facebook application.  The project home page is at http://fbcmd.dtompkins.com',
         'picture' => "http://fbcmd.dtompkins.com/attachments/fbcmd75.png"));
-      TraceReturn($fbReturn);
+      TraceReturn();
       if (isset($fbReturn['id'])) {
         print "Test 3 PASSED. Posted an installation message on your wall\n";
       } else {
@@ -2329,10 +2383,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'WHOAMI') { //1
+  if ($fbcmdCommand == 'WHOAMI') { //2
     ValidateParamCount(0);
-    $fbReturn = $fbObject->api_client->users_getInfo($fbUser,array('name'));
-    PrintRow($fbUser,$fbReturn[0]['name']);
+    try {
+      $fbReturn = $facebook->api('/me');
+      TraceReturn();
+      if (isset($fbReturn['name'])&&(isset($fbReturn['id']))) {
+        print "{$fbReturn['id']}  {$fbReturn['name']}\n";
+      } else {
+        FbcmdWarning("no id");
+      }
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2342,7 +2405,7 @@
     try {
       if (Resolve($fbcmdParams[1],true)) {
         $fbReturn = $facebook->api("/{$resolvedId}/feed",'POST',array('message' => $fbcmdParams[2]));
-        TraceReturn($fbReturn);
+        TraceReturn();
       }
     } catch (FacebookApiException $e) {
       FbcmdException($e);
@@ -2837,7 +2900,7 @@
       $fql = "SELECT aid,name FROM album WHERE owner={$fbUser} ORDER BY created DESC LIMIT 1";
       try {
         $fbReturn = $fbObject->api_client->fql_query($fql);
-        TraceReturn($fbReturn);
+        TraceReturn();
       } catch(Exception $e) {
         OldFbcmdException($e,'LATEST-AID');
       }
@@ -2873,7 +2936,7 @@
 
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e,'GET-POST');
     }
@@ -2896,7 +2959,7 @@
     $fql = "SELECT name,status FROM user WHERE uid={$fbUser}";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -2943,7 +3006,7 @@
     $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
     try {
       $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -3124,7 +3187,7 @@
           $fql = "SELECT uid FROM group_member WHERE gid={$gidMatches[0]}";
           try {
             $fbReturn = $fbObject->api_client->fql_query($fql);
-            TraceReturn($fbReturn);
+            TraceReturn();
           } catch(Exception $e) {
             OldFbcmdException($e);
           }
@@ -3285,7 +3348,7 @@
         }
         try {
           $fbReturn = $fbObject->api_client->fql_query($fql);
-          TraceReturn($fbReturn);
+          TraceReturn();
         } catch(Exception $e) {
           OldFbcmdException($e,'GET-POST');
         }
@@ -3335,7 +3398,7 @@
         // }
         // try {
           // $fbReturn = $fbObject->api_client->fql_query($fql);
-          // TraceReturn($fbReturn);
+          // TraceReturn();
         // } catch(Exception $e) {
           // OldFbcmdException($e,'GET-POST');
         // }
@@ -3413,7 +3476,7 @@
     global $fbcmdPrefs;
     global $fbcmdBaseDir;
     $fileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs[$prefFile]);
-    $loadData = array('0');
+    $loadData = array();
     if (($prefSave == 1)||($fbcmdPrefs[$prefSave])) {
       if (!file_exists($fileName)) {
         if ($prefSave == 1) {
@@ -3535,7 +3598,7 @@
     }
     try {
       $fbReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (Exception $e) {
       OldFbcmdException($e,'MULTI-FQL-ID');
     }
@@ -3554,6 +3617,33 @@
       }
     }
     return $results;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function NewLast($type,$id,$text) {
+  
+    global $fbcmdPrefs;
+    global $fbcmdLast;
+    
+    if ($fbcmdPrefs['last_save']) {
+      if (!isset($fbcmdLast)) {
+        $fbcmdLast = array();
+      }
+      if (!isset($fbcmdLast[$type])) {
+        $fbcmdLast[$type] = array();
+      }
+      $k = $fbcmdPrefs['last_length'];
+      while ($k > 0) {
+        if (isset($fbcmdLast[$type][$k-1])) {
+          $fbcmdLast[$type][$k] = $fbcmdLast[$type][$k-1];
+        }
+        $k--;
+      }
+      $fbcmdLast[$type][0] = array('id' => $id, 'name' => $text);
+      SaveDataFile('lastfile',$fbcmdLast,'last_save');
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3734,7 +3824,7 @@
     
     try {
       $fbReturn = $facebook->api("/{$fbcmdTargetId}/feed",'POST',$args);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
@@ -4440,10 +4530,32 @@ function PrintCsvRow($rowIn) {
     }
     if ($exitOnFalse) {
       ShiftPrev();
-      $fbcmdPrev[0] = $resolvedMatches;
+      for ($j=1; $j <= $numMatch; $j++) {
+        AddPrev($resolvedMatches[$j]['id'],$resolvedMatches[$j]['name']);
+      }
       SaveDataFile('prevfile',$fbcmdPrev,'prev_save');
       PrintPrev();
       FbcmdFatalError("Could not resolve \"{$matchme}\"");
+    }
+    return false;
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function ReturnDataToPrev() {
+    global $fbReturn;
+    global $fbcmdPrev;
+    if ((isset($fbReturn['data']))&&(is_array($fbReturn['data']))) {
+      ShiftPrev();
+      for ($j=0; $j < count($fbReturn['data']); $j++) {
+        if (isset($fbReturn['data'][$j]['id'])&&($fbReturn['data'][$j]['name'])) {
+          AddPrev($fbReturn['data'][$j]['id'], $fbReturn['data'][$j]['name']);
+        }
+      }
+      SaveDataFile('prevfile',$fbcmdPrev,'prev_save');
+      PrintPrev();
+      return true;
     }
     return false;
   }
@@ -4645,6 +4757,11 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
+  function AddPrev($id, $name) {
+    global $fbcmdPrev;
+    $fbcmdPrev[0][] = array('id' => $id, 'name' => $name);
+  }
+
   function ShiftPrev() {
     global $fbcmdPrefs;
     global $fbcmdPrev;
@@ -4656,6 +4773,8 @@ function PrintCsvRow($rowIn) {
       }
       $k--;
     }
+    $fbcmdPrev[0] = array();
+    $fbcmdPrev[0][] = array('id' => 0, 'name' => '0');
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4704,6 +4823,7 @@ function PrintCsvRow($rowIn) {
     global $fbcmdVersion;
     global $fbcmdCommandList;
     global $fbcmdCommandHelp;
+    global $notYet;
 
     print "\n";
     print "fbcmd [v{$fbcmdVersion}] Facebook Command Line Interface\n\n";
@@ -4713,9 +4833,26 @@ function PrintCsvRow($rowIn) {
     print "  fbcmd COMMAND required_parameter(s) [optional_parameter(s)] -switch=value\n\n";
 
     print "commands: (can be in lower case)\n\n";
+    
+    print "=====================================================================\n";
+    print "NOT SUPPORTED YET IN 2.0\n"  ;
+    print "=====================================================================\n\n";
+    
 
     foreach ($fbcmdCommandList as $cmd) {
-      ShowUsageCmd($cmd);
+      if (in_array($cmd,$notYet)) {
+        ShowUsageCmd($cmd);
+      }
+    }
+
+    print "=====================================================================\n";
+    print "PARTIAL SUPPORT IN 2.0\n";
+    print "=====================================================================\n\n";
+
+    foreach ($fbcmdCommandList as $cmd) {
+      if (!in_array($cmd,$notYet)) {
+        ShowUsageCmd($cmd);
+      }
     }
 
     print "examples:\n\n";
@@ -4800,7 +4937,7 @@ function PrintCsvRow($rowIn) {
 
     try {
       $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, $actionLinks, $target_id, $uid);
-      TraceReturn($fbReturn);
+      TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
     }
@@ -4854,9 +4991,13 @@ function PrintCsvRow($rowIn) {
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function TraceReturn($obj) {
+  function TraceReturn($obj = false) {
     global $fbcmdPrefs;
+    global $fbReturn;
     if ($fbcmdPrefs['trace']) {
+      if (!$obj) {
+        $obj = $fbReturn;
+      }
       print_r ($obj);
     }
   }
