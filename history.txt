@@ -10,13 +10,14 @@ Version 2.0-beta1
 * MAJOR restructuring of how AUTH works... now uses authfile, not keyfile
 * new command ALIAS + prefs + file
 * new command AS + prefs
-* mod command OBJ (still some todo)
+* mod command OBJ (still some work)
 * mod command POST -- changed syntax
 * new command PREV + prefs + file
 * new command REFRESH + cache* prefs + file
 * new command RESOLVE + prefs
 * new command TARGET + prefs
 * new command TEST
+* new command UNLIKE
 * fixed URLs to point to new github area
 
 
