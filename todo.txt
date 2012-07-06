@@ -21,7 +21,8 @@ WEBSITE / Google Group
 * nail down auto/last? & recent syntaxes
 * enable more commands
 * remove depricated commands
-* look into album bugs?
+* look into album bug? (ignores album name on addpic)
+* Try to get tags working in POST
 
 
 
