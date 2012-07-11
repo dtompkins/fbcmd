@@ -11,7 +11,7 @@ WEBSITE / Google Group
 * respond to http://fbcmd.dtompkins.com/feedback posts, and then redirect to new app page
 * respond to most google group responses
 * remove individual help page for each preference... have one big page
-* remove depricated pages
+* remove depricated pages: DELPOST, WALLPOST
 * add new "SYNTAX" page
 
 
@@ -21,10 +21,11 @@ WEBSITE / Google Group
 * nail down auto/last? & recent syntaxes
 * enable more commands
 * remove depricated commands
-* look into album bug? (ignores album name on addpic)
 * Try to get tags working in POST
-
-
+* add the save behaviour for apics
+* work on paging: use parse_url & parse_str
+* clean up txt output -- fix . for showperm
+* add behaviour to show current status
 
 OLD pre 2.0 FEATURE REQUESTS
 ============================
