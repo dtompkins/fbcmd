@@ -19,6 +19,7 @@ Version 2.0-beta1
 * new command TARGET + prefs
 * new command TEST
 * new command UNLIKE
+* ren command FPICS -> TPICS (to reflect 'tagging')
 * modified syntax for: POST, MUTUAL
 * fixed URLs to point to new github area
 

@@ -26,6 +26,8 @@ WEBSITE / Google Group
 * work on paging: use parse_url & parse_str
 * clean up txt output -- fix . for showperm
 * add behaviour to show current status
+* add support for \n within posts, etc.
+* add CPIC
 
 OLD pre 2.0 FEATURE REQUESTS
 ============================
