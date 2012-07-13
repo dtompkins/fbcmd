@@ -54,7 +54,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '2.0-dev6';
+  $fbcmdVersion = '2.0-dev7';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -138,8 +138,8 @@
   AddPreference('events_attend_mask','15','emask');
   //1 AddPreference('facebook_debug','0','debug');
   AddPreference('feed_template','60736970450');
-  AddPreference('fevents_attend_mask','1','fmask');
-  AddPreference('fgroups_show_id','1','gid');
+  //AddPreference('fevents_attend_mask','1','fmask');
+  //AddPreference('fgroups_show_id','1','gid');
   AddPreference('flist_chunksize','10','ch');
   AddPreference('folder_blankrow','1','fbr');
   AddPreference('folder_dateformat','M d H:i','fdf');
@@ -235,25 +235,25 @@
   AddPreference('default_addpicd_dirname','');
   AddPreference('default_addpicd_albumid',null);
   AddPreference('default_albums_flist','=ME');
-  AddPreference('default_allinfo_flist','=ME');
+  //1 AddPreference('default_allinfo_flist','=ME');
   AddPreference('default_apics_albumid',null);
   AddPreference('default_apics_savedir',false);
   AddPreference('default_as',''); //2
   AddPreference('default_comment_text','');
   //1 AddPreference('default_display_text','FBCMD: The Command Line Interface for Facebook');
-  AddPreference('default_feed1_text','');
-  AddPreference('default_feed2_title','');
-  AddPreference('default_feed2_body','');
-  AddPreference('default_feed2_imgsrc','');
-  AddPreference('default_feed2_imglink','');
+  //1 AddPreference('default_feed1_text','');
+  //1 AddPreference('default_feed2_title','');
+  //1 AddPreference('default_feed2_body','');
+  //1 AddPreference('default_feed2_imgsrc','');
+  //1 AddPreference('default_feed2_imglink','');
   AddPreference('default_feedlink_link','');
   AddPreference('default_feedlink_text','');
   AddPreference('default_feednote_title','');
   AddPreference('default_feednote_body','');
-  AddPreference('default_fevents_flist','=ME');
-  AddPreference('default_fgroups_flist','=ME');
-  AddPreference('default_finfo_fields','birthday_date');
-  AddPreference('default_finfo_flist','=ALL');
+  //AddPreference('default_fevents_flist','=ME');
+  //AddPreference('default_fgroups_flist','=ME');
+  //1 AddPreference('default_finfo_fields','birthday_date');
+  //1 AddPreference('default_finfo_flist','=ALL');
   AddPreference('default_flast_flist','=ME');
   AddPreference('default_flast_count','10');
   AddPreference('default_fonline_flist','=ALL');
@@ -264,16 +264,16 @@
   AddPreference('default_fstream_flist','=ALL');
   AddPreference('default_fstream_count','10');
   AddPreference('default_inbox_count','10');
-  AddPreference('default_loaddisp_filename','');
-  AddPreference('default_loadinfo_filename','');
+  //1 AddPreference('default_loaddisp_filename','');
+  //1 AddPreference('default_loadinfo_filename','');
   AddPreference('default_loadnote_title','');
   AddPreference('default_loadnote_filename','');
   AddPreference('default_loop',''); //2
   AddPreference('default_mutual_flist','=ALL');
   AddPreference('default_mywall_count','10');
   AddPreference('default_notices_type','');
-  AddPreference('default_nsend_flist','=ME');
-  AddPreference('default_nsend_message','');
+  //1 AddPreference('default_nsend_flist','=ME');
+  //1 AddPreference('default_nsend_message','');
   AddPreference('default_opics_flist','=ME');
   AddPreference('default_opics_savedir',false);
   AddPreference('default_post_message','');
@@ -293,11 +293,11 @@
   //1 AddPreference('default_postflash_imgsrc',false);
   AddPreference('default_ppics_flist','=ALL');
   AddPreference('default_ppics_savedir',false);
-  AddPreference('default_ppost_id',null);
+  //1 AddPreference('default_ppost_id',null);
   AddPreference('default_recent_flist','=ALL');
   AddPreference('default_recent_count','10');
-  AddPreference('default_savedisp_filename','');
-  AddPreference('default_saveinfo_filename','');
+  //1 AddPreference('default_savedisp_filename','');
+  //1 AddPreference('default_saveinfo_filename','');
   AddPreference('default_sentmail_count','10');
   AddPreference('default_showpref_defaults','0');
   AddPreference('default_stream_filter','1');
@@ -309,6 +309,8 @@
   AddPreference('default_target',''); //2  
   AddPreference('default_updates_count','10');
   //2 AddPreference('default_wallpost_flist','=ME');
+  
+  //2 Output Format Preferences
   
   AddPreference('output','','o');
   AddPreference('show','','s');
@@ -333,6 +335,12 @@
   AddPreference('friends_output','txt');
   AddPreference('friends_show','all');
   AddPreference('friends_txtcols','index:4,name:70');
+  AddPreference('groups_output','txt');
+  AddPreference('groups_show','all');
+  AddPreference('groups_txtcols','index:4,name:70');
+  AddPreference('info_output','txt');
+  AddPreference('info_show','all');
+  AddPreference('info_txtcols','key:25,value:50');
   AddPreference('mutual_output','txt');
   AddPreference('mutual_show','all');
   AddPreference('mutual_txtcols','index:4,name:70');  
@@ -386,7 +394,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdCommandList = array();
-  $notYet = array('ALLINFO','EVENTS','FEED1','FEED2','FEEDLINK','FEEDNOTE','FEVENTS','FGROUPS','FINBOX','FINFO','FLAST','FONLINE','FPICS','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','LIMITS','LOADDISP','LOADINFO','LOADNOTE','MSG','MYWALL','NOTICES','NOTIFY','NSEND','OPICS','PINBOX','PPOST','PPICS','RECENT','RECENT','RESTATUS','RSVP','SAVEDISP','SAVEINFO','SENTMAIL','SFILTERS','STREAM','TAGPIC','UFIELDS');
+  $notYet = array('EVENTS', 'FEEDLINK','FEEDNOTE','FINBOX','FLAST','FONLINE','FPICS','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','LOADNOTE','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM','TAGPIC');
+  $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   AddCommand('ADDALBUM',  'title [description]~Create a new photo album');
   AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
@@ -394,7 +403,7 @@
   AddCommand('ADDPICD',   'dirname [album_id]~Upload (add) all *.jpg files in a directory to an album');
   AddCommand('ALBUMS',    'List all photo albums');
   AddCommand('ALIAS',     'aliasname objname~Create a new alias for an object (or display all if no arg)');//2
-  AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
+  //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
   AddCommand('AS',        'objname COMMAND <parameters>~execute COMMAND on behalf of objname (eg: for pages)'); //2
   AddCommand('AUTH',      'authcode~Enter your facebook authorization code');
@@ -403,31 +412,33 @@
   //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
   //1 AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
   AddCommand('EVENTS',    '[time]~Display your events');
-  AddCommand('FEED1',     'title~Add a one-line story to your news feed');
-  AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
+  //1 AddCommand('FEED1',     'title~Add a one-line story to your news feed');
+  //1 AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
   AddCommand('FEEDLINK',  '[link] text~Share a link in your news feed');
   AddCommand('FEEDNOTE',  'title body~Share a note in your news feed');
-  AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
-  AddCommand('FGROUPS',   '[flist]~List groups that friend(s) are members of');
+  //AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
+  //AddCommand('FGROUPS',   '[flist]~List groups that friend(s) are members of');
   AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
-  AddCommand('FINFO',     'fields [flist]~List information fields for friend(s) (see UFIELDS)');
+  //1 AddCommand('FINFO',     'fields [flist]~List information fields for friend(s) (see UFIELDS)');
   AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
   AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
   AddCommand('FPICS',     'flist [savedir]~List [and optionally save] all photos where friend(s) are tagged');
   AddCommand('FQL',       'statement [flist]~Perform a custom FQL Query');
-  AddCommand('FRIENDS',   'List all friends');
+  AddCommand('FRIENDS',   'List all your friends');
   AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
   AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
   AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
   AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
+  AddCommand('GROUPS',    '<no parameters>~List your (or your TARGET\'s) groups');
   AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
   AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
   AddCommand('INBOX',     '[count|unread|new]~Display the latest messages from the inbox');
+  AddCommand('INFO',       'objname~Display info for a facebook object (friend, me, page, event, etc.)');//2  
   AddCommand('LAST',      '[N]~Show results from [Nth] successful command'); //2
   AddCommand('LIKE',      'objname~Like an object (can\'t like pages)'); //2
-  AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
-  AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
-  AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
+  //1 AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
+  //1 AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
+  //1 AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
   AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
   AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist'); //2
   AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
@@ -435,22 +446,21 @@
   AddCommand('MYWALL',    '[count|new]~Show the posts from other users to your wall');
   AddCommand('NOTICES',   '[unread|markread]~See notifications from facebook, applications & users');
   AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
-  AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
+  //1 AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
-  AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
-  AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
+  //1 AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
+  //1 AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
   AddCommand('POST',      '[SRC url] [IMG url] message [name] [link] [caption] [description]~Post a story in your feed.~[IMG url] will add a picture.~[SRC url] is flash source for video, etc.'); //2
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed resolved id'); //2
-  AddCommand('OBJ',       'objname~display facebook object');//2
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
   AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');//2
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
   AddCommand('RESOLVE',   'objname~Try to resolve a name to an object'); //2
   AddCommand('RESTATUS',  'message~Replace your status (deletes your status and adds a new status)');
   AddCommand('RSVP',      'event_id yes|no|maybe~RSVP to an Event from the EVENTS command');
-  AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
-  AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
+  //1 AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
+  //1 AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
   AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
   AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
   AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
@@ -461,12 +471,12 @@
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
   AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for the target objname~(for example: TARGET bob POST Hello)'); //2
   AddCommand('TEST',      '<no parameters>~Test your installation'); //2
-  AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
+  //1 AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
   AddCommand('UNLIKE',    'objname~Unlike an object'); //2
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
-  //2 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
+  //1 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -477,7 +487,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,array('DELPOST','DFILE','DISPLAY','FEED','FEED3','FSTATUSID','FLSTATUS','PICS','WALLPOST'))) {
+  if (in_array($fbcmdCommand,$depricatedCommands)) {
     FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
   }
 
@@ -781,7 +791,7 @@
     SetDefaultParam(1,$fbcmdPrefs['default_target']);
     $target = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('ALBUMS','FRIENDS','POST'))) {
+    if (!in_array($fbcmdCommand,array('ALBUMS','FRIENDS','GROUPS','POST'))) {
       FbcmdFatalError("TARGET does not support the command {$fbcmdCommand}");
     }
     if (Resolve($target,true)) {
@@ -938,26 +948,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $allUserInfoFields = "about_me,activities,affiliations,allowed_restrictions,birthday,birthday_date,books,current_location,education_history,email_hashes,family,first_name,has_added_app,hometown_location,hs_info,interests,is_app_user,is_blocked,last_name,locale,meeting_for,meeting_sex,movies,music,name,notes_count,online_presence,pic,pic_big,pic_big_with_logo,pic_small,pic_small_with_logo,pic_square,pic_square_with_logo,pic_with_logo,political,profile_blurb,profile_update_time,profile_url,proxied_email,quotes,relationship_status,religion,sex,significant_other_id,status,timezone,tv,uid,username,verified,wall_count,website,work_history";
+  // $allUserInfoFields = "about_me,activities,affiliations,allowed_restrictions,birthday,birthday_date,books,current_location,education_history,email_hashes,family,first_name,has_added_app,hometown_location,hs_info,interests,is_app_user,is_blocked,last_name,locale,meeting_for,meeting_sex,movies,music,name,notes_count,online_presence,pic,pic_big,pic_big_with_logo,pic_small,pic_small_with_logo,pic_square,pic_square_with_logo,pic_with_logo,political,profile_blurb,profile_update_time,profile_url,proxied_email,quotes,relationship_status,religion,sex,significant_other_id,status,timezone,tv,uid,username,verified,wall_count,website,work_history";
 
-  if ($fbcmdCommand == 'ALLINFO') {  //1 DEPRICATE?
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_allinfo_flist']);
-    GetFlistIds($fbcmdParams[1]);
-    $fql = "SELECT {$allUserInfoFields} from user where uid in ({$flistMatchIdString}) ORDER BY last_name";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OldFbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      PrintHeader(PrintIfPref('show_id','UID'),'NAME','FIELD','VALUE');
-      foreach ($fbReturn as $a) {
-        PrintRecursiveObject(array(PrintIfPref('show_id',$a['uid']),ProfileName($a['uid'])),'',$a);
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'ALLINFO') {  
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_allinfo_flist']);
+    // GetFlistIds($fbcmdParams[1]);
+    // $fql = "SELECT {$allUserInfoFields} from user where uid in ({$flistMatchIdString}) ORDER BY last_name";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OldFbcmdException($e);
+    // }
+    // if (!empty($fbReturn)) {
+      // PrintHeader(PrintIfPref('show_id','UID'),'NAME','FIELD','VALUE');
+      // foreach ($fbReturn as $a) {
+        // PrintRecursiveObject(array(PrintIfPref('show_id',$a['uid']),ProfileName($a['uid'])),'',$a);
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1032,45 +1042,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FEED1') { //1
-    ValidateParamCount(1);
-    SetDefaultParam(1,$fbcmdPrefs['default_feed1_text']);
-    try {
-      $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => ''),'','',FacebookRestClient::STORY_SIZE_ONE_LINE);
-      TraceReturn();
-    } catch (Exception $e) {
-      OldFbcmdException($e);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'FEED2') { //1
-    ValidateParamCount(array(2,4));
-    SetDefaultParam(1,$fbcmdPrefs['default_feed2_title']);
-    SetDefaultParam(2,$fbcmdPrefs['default_feed2_body']);
-    if (ParamCount() == 2) {
-      try {
-        $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => $fbcmdParams[2]),'','',FacebookRestClient::STORY_SIZE_SHORT);
-        TraceReturn();
-      } catch (Exception $e) {
-        OldFbcmdException($e);
-      }
-    }
-    if (ParamCount() == 4) {
-      SetDefaultParam(3,$fbcmdPrefs['default_feed2_imgsrc']);
-      SetDefaultParam(4,$fbcmdPrefs['default_feed2_imglink']);
-      try {
-        $fbReturn = $fbObject->api_client->feed_publishUserAction($fbcmdPrefs['feed_template'],array('title-text' => $fbcmdParams[1], 'body-text' => $fbcmdParams[2], 'images' => array( array('src' => $fbcmdParams[3], 'href' => $fbcmdParams[3]))),'','',FacebookRestClient::STORY_SIZE_SHORT);
-        TraceReturn();
-      } catch (Exception $e) {
-        OldFbcmdException($e);
-      }
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
   if ($fbcmdCommand == 'FEEDLINK') { //1
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_feedlink_link']);
@@ -1099,52 +1070,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FEVENTS') { //1
-    ValidateParamCount(1,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_fevents_flist']);
-    SetDefaultParam(2,time());
-    $eventAttend = ProcessEventMask($fbcmdPrefs['fevents_attend_mask']);
-    GetFlistIds($fbcmdParams[1],true);
-    PrintHeader(PrintIfPref('show_id','ID'),'NAME','START_TIME','EVENT');
-    do {
-      $curChunkIds = GetNextChunkIds();
-      if ($curChunkIds) {
-        $results = MultiFqlById($curChunkIds,"SELECT eid,name,start_time FROM event WHERE eid IN (SELECT eid FROM event_member WHERE uid=[id] AND rsvp_status IN ({$eventAttend})) AND start_time > {$fbcmdParams[2]} ORDER BY start_time");
-        foreach ($curChunkIds as $id) {
-          if ($results[$id]) {
-            foreach ($results[$id] as $event) {
-              PrintRow(PrintIfPref('show_id',$id),ProfileName($id),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$event['name']);
-            }
-          }
-        }
-      }
-    } while ($curChunkIds);
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'FGROUPS') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_fgroups_flist']);
-    GetFlistIds($fbcmdParams[1],true);
-    PrintHeader(PrintIfPref('show_id','ID'),'NAME',PrintIfPref('fgroups_show_id','GROUP_ID'),'GROUP');
-    do {
-      $curChunkIds = GetNextChunkIds();
-      if ($curChunkIds) {
-        $results = MultiFqlById($curChunkIds,"SELECT gid,name FROM group WHERE gid IN (SELECT gid FROM group_member WHERE uid=[id])");
-        foreach ($curChunkIds as $id) {
-          if ($results[$id]) {
-            foreach ($results[$id] as $group) {
-              PrintRow(PrintIfPref('show_id',$id),ProfileName($id),PrintIfPref('fgroups_show_id',$group['gid']),$group['name']);
-            }
-          }
-        }
-      }
-    } while ($curChunkIds);
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
   if ($fbcmdCommand == 'FINBOX') { //1
     ValidateParamCount(1);
     GetFlistIds($fbcmdParams[1],true);
@@ -1162,49 +1087,6 @@
         PrintFolderObject(++$threadNum,$t);
       }
       SaveMailData($dataThread);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'FINFO') { //1
-    ValidateParamCount(1,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_finfo_fields']);
-    SetDefaultParam(2,$fbcmdPrefs['default_finfo_flist']);
-    GetFlistIds($fbcmdParams[2]);
-    $fql = "SELECT uid,{$fbcmdParams[1]} from user where uid in ({$flistMatchIdString}) ORDER BY last_name";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OldFbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      $fields = explode(',',$fbcmdParams[1]);
-      if (in_array('uid',$fields)) {
-        $fbcmdPrefs['uid'] = 1;
-        $fbcmdPrefs['print_blanks'] = 1;
-      }
-      $headerFields = array();
-      foreach ($fields as $f) {
-        $headerFields[] = strtoupper($f);
-      }
-      PrintHeader(PrintIfPref('show_id','UID'),'NAME',$headerFields);
-      foreach ($fbReturn as $user) {
-        $outputFields = array();
-        $isEmptyRow = true;
-        foreach ($user as $key=>$value) {
-          if ($key != 'uid') {
-            $outputFields[] = DisplayField($value);
-            if (!IsEmpty($value)) {
-              $isEmptyRow = false;
-            }
-          }
-        }
-        if ((!$isEmptyRow)||($fbcmdPrefs['print_blanks'])) {
-          PrintRow(PrintIfPref('show_id',$user['uid']),ProfileName($user['uid']),$outputFields);
-        }
-      }
     }
   }
 
@@ -1382,6 +1264,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'GROUPS') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/groups");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no groups');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'MYWALL') { //1
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_mywall_count']);
@@ -1513,6 +1405,24 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'INFO') { //2
+    ValidateParamCount(1);
+    $obj = $fbcmdParams[1];
+    if (Resolve($fbcmdParams[1],false)) {
+      $obj = $resolvedId;
+    }
+    try {
+      $fbReturn = $facebook->api($obj);
+      TraceReturn();
+      ProcessReturn();
+      PrintReturn();
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'LAST') { //2
     ValidateParamCount(0,1);
     SetDefaultParam(1,0);
@@ -1528,67 +1438,6 @@
       if (!$fbReturn) {
         FbcmdWarning("did not like");
       }
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'LIMITS') { //1
-    ValidateParamCount(0);
-    try {
-      $fbReturn = $fbObject->api_client->admin_getAllocation('notifications_per_day');
-      TraceReturn();
-      $limitNSEND = $fbReturn;
-    } catch (Exception $e) {
-      OldFbcmdException($e);
-    }
-    PrintHeader('COMMAND','LIMIT','DURATION');
-    PrintRow('FEED','10','per day');
-    PrintRow('NSEND',$limitNSEND,'per day');
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'LOADDISP') { //1
-    ValidateParamCount(1);
-    SetDefaultParam(1,$fbcmdPrefs['default_loaddisp_filename']);
-    if (!file_exists($fbcmdParams[1])) {
-      FbcmdFatalError("Could not locate file {$fbcmdParams[1]}");
-    }
-    $fbFbmlFile = @file_get_contents($fbcmdParams[1]);
-    if ($fbFbmlFile == false) {
-      FbcmdFatalError("Could not read file {$fbcmdParams[1]}");
-    }
-    try {
-      $fbReturn = $fbObject->api_client->profile_setFBML($fbFbmlFile,null,$fbFbmlFile,'',$fbFbmlFile,$fbFbmlFile);
-      TraceReturn();
-    } catch (Exception $e) {
-      OldFbcmdException($e);
-    }
-  }
-
-  ////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'LOADINFO') { //1
-    ValidateParamCount(1);
-    SetDefaultParam(1,$fbcmdPrefs['default_loadinfo_filename']);
-    if (!file_exists($fbcmdParams[1])) {
-      FbcmdFatalError("Could not locate file {$fbcmdParams[1]}");
-    }
-    $fbCmdInfo = '';
-    try {
-      if(!@include_once($fbcmdParams[1])) throw new Exception('');
-    } catch(Exception $e) {
-      FbcmdFatalError("Could not read Info File {$fbcmdParams[1]}");
-    }
-    if ($fbCmdInfo == '') {
-      FbcmdFatalError("\$fbCmdInfo was not set properly in {$fbcmdParams[1]}");
-    }
-    try {
-      $fbReturn = $fbObject->api_client->profile_setInfo($fbCmdInfo['title'], $fbCmdInfo['type'], $fbCmdInfo['info_fields']);
-      TraceReturn();
-    } catch (Exception $e) {
-      OldFbcmdException($e);
     }
   }
 
@@ -1740,43 +1589,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'NSEND') { //1
-    ValidateParamCount(2);
-    SetDefaultParam(1,$fbcmdPrefs['default_nsend_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_nsend_message']);
-    GetFlistIds($fbcmdParams[1],false,false,true);
-    PrintHeaderQuiet('RECIPIENT_NAME');
-    foreach ($flistMatchArray as $id) {
-      try {
-        $fbReturn = $fbObject->api_client->notifications_send($id, $fbcmdParams[2], 'user_to_user');
-        TraceReturn();
-      } catch (Exception $e) {
-        OldFbcmdException($e);
-      }
-      PrintRowQuiet(ProfileName($id));
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'OBJ') { //2
-    ValidateParamCount(1);
-    $obj = $fbcmdParams[1];
-    if (Resolve($fbcmdParams[1],false)) { // not sure if obj should do this... maybe an INFO ?
-      $obj = $resolvedId;
-    }
-    try {
-      $fbReturn = $facebook->api($obj);
-      TraceReturn();
-      ProcessReturn();
-      PrintReturn();
-    } catch (FacebookApiException $e) {
-      FbcmdException($e);
-    }
-  }
-  
-////////////////////////////////////////////////////////////////////////////////
-
   if ($fbcmdCommand == 'OPICS') { //1
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_opics_flist']);
@@ -1799,34 +1611,6 @@
         }
       }
     } while ($curChunkIds);
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'PINBOX') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_updates_count']);
-    if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND unread > 0";
-    } else {
-      if (strtoupper($fbcmdParams[1]) == 'NEW') {
-        CheckMailTimeStamp();
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 AND updated_time > {$lastMailData['timestamp']}";
-      } else {
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 4 LIMIT {$fbcmdParams[1]}";
-      }
-    }
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-    $keyMessageNames = 'id';
-    MultiFQL(array('Thread','MessageNames'));
-    if (!empty($dataThread)) {
-      PrintFolderHeader();
-      $threadNum = 0;
-      foreach ($dataThread as $t) {
-        PrintFolderObject(++$threadNum,$t);
-      }
-      SaveMailData($dataThread);
-    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2011,44 +1795,6 @@
       TraceReturn();
     } catch(Exception $e) {
       OldFbcmdException($e);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'SAVEDISP') { //1
-    ValidateParamCount(1);
-    SetDefaultParam(1,$fbcmdPrefs['default_savedisp_filename']);
-    try {
-      $fbReturn = $fbObject->api_client->profile_getFBML($fbUser,2);
-      TraceReturn();
-    } catch (Exception $e) {
-      OldFbcmdException($e);
-    }
-    // strip out the <fb:fbml> tags
-    $fbFbml = $fbReturn;
-    $fbFbml = preg_replace('/<fb:fbml version="[\d\.]+">/','',$fbFbml);
-    $fbFbml = preg_replace('/<\/fb:fbml>/','',$fbFbml);
-    if (@file_put_contents($fbcmdParams[1],$fbFbml) == false) {
-      FbcmdFatalError("Could not write file {$fbcmdParams[1]}");
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'SAVEINFO') { //1
-    SetDefaultParam(1,$fbcmdPrefs['default_saveinfo_filename']);
-    ValidateParamCount(1);
-    try {
-      $fbReturn = $fbObject->api_client->profile_getInfo();
-      TraceReturn();
-    } catch (Exception $e) {
-      OldFbcmdException($e);
-    }
-    $fbInfoFile = var_export($fbReturn,true);
-    $fbInfoFile = "<?php\n\$fbCmdInfo = {$fbInfoFile};\n?>\n";
-    if (@file_put_contents($fbcmdParams[1],$fbInfoFile) == false) {
-      FbcmdFatalError("Could not write file {$fbcmdParams[1]}");
     }
   }
 
@@ -5035,10 +4781,10 @@ function PrintCsvRow($rowIn) {
     print "examples:\n\n";
 
     print "  fbcmd status \"is excited to play with fbcmd\"\n";
-    print "  fbcmd finfo birthday_date -csv\n";
-    print "  fbcmd stream #family 25\n\n";
+    //print "  fbcmd finfo birthday_date -csv\n"; //2 POST, TARGET, INFO, ALIAS
+    //print "  fbcmd stream #family 25\n\n";
 
-    print "for additional help, examples, parameter usage, flists, preference settings,\n";
+    print "for additional help, examples, parameter usage, preference settings,\n";
     print "visit the FBCMD wiki at:\n\n";
     print "  http://fbcmd.dtompkins.com\n\n";
     exit;

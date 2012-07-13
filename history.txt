@@ -11,7 +11,8 @@ Version 2.0-beta1
 * new output format arguments: -output[-o], -show[-s], -txtcols[-tc]
 * new command ALIAS + prefs + file
 * new command AS + prefs
-* new command OBJ (still some work)
+* new command GROUPS
+* new command INFO
 * new command PREV + prefs + file
 * new command REFRESH + cache* prefs + file
 * new command RESOLVE + prefs
@@ -21,7 +22,7 @@ Version 2.0-beta1
 * modified syntax for: POST, MUTUAL
 * fixed URLs to point to new github area
 
-* depricated commands: DELPOST, DISPLAY, WALLPOST
+* depricated commands: ALLINFO,DELPOST,DISPLAY,FEED1,FEVENTS,FGROUPS,FINFO,LIMITS,LOADDISP,LOADINFO,NSEND,PINBOX,PPOST,SAVEDISP,SAVEINFO,UFIELDS,WALLPOST
 * cleaned up several preference names to be more consistent
 
 Version 1.1
