@@ -85,6 +85,13 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  // because the FB object does a session_start(), we need to do one first
+  // otherwise we get Warning: session_start(): Cannot send session cookie...
+
+  session_start();
+
+////////////////////////////////////////////////////////////////////////////////
+
   // You can set an environment variable FBCMD to specify the location of
   // your personal files: auth.txt, prefs.php, alias.php, etc...
 
@@ -114,8 +121,8 @@
 
   // STEP ONE: System Defaults
 
-  // Do NOT change these System Default preference values here:
-  // Modify your own prefs.php file instead
+  // If you want to change your own defaults, modify your own prefs.php
+  // Do NOT change them here, as they will get blown away on updates
 
   AddPreference('albumfile',"[datadir]albumdata.txt",'afile');
   AddPreference('album_save','1','asave');
@@ -442,95 +449,101 @@
   $notYet = array('EVENTS','FINBOX','FLAST','FONLINE','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM','TAGPIC');
   $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
+  $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST');
+
+  AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
+  AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
+  AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
+  AddCommand('FQL',       'statement [flist]~Perform a custom FQL Query');
+  AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
+  AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
+  AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
+  AddCommand('INBOX',     '[count|unread|new]~Display the latest messages from the inbox');
+  AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
+  AddCommand('MYWALL',    '[count|new]~Show the posts from other users to your wall');
+  AddCommand('NOTICES',   '[unread|markread]~See notifications from facebook, applications & users');
+  AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
+  AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
+  AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
+  AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
+  AddCommand('RESTATUS',  'message~Replace your status (deletes your status and adds a new status)');
+  AddCommand('RSVP',      'event_id yes|no|maybe~RSVP to an Event from the EVENTS command');
+  AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
+  AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
+  AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
+  AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
+
   AddCommand('ACCOUNTS',  '<no parameters>~List your accounts (e.g.: your pages)');
   AddCommand('ADDALBUM',  'title [description]~Create a new photo album');
   AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
   AddCommand('ADDPIC',    'filename [album_id] [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id]~Upload (add) all *.jpg files in a directory to an album');
-  AddCommand('ALBUMS',    'List all your[T] photo albums');
-  AddCommand('ALIAS',     'aliasname objname~Create a new alias for an object (or display all if no arg)');//2
-  //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
+  AddCommand('ALBUMS',    '<no parameters>~List all your photo albums');
+  AddCommand('ALIAS',     '[aliasname objname]~Create a new alias for an object~or list all aliases if no parameters');//2
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
   AddCommand('AS',        'objname COMMAND <parameters>~execute COMMAND on behalf of objname (eg: for pages)'); //2
   AddCommand('AUTH',      'authcode~Enter your facebook authorization code');
   AddCommand('COMMENT',   'objname text~Add a comment to a post, picture, etc.');
+  AddCommand('COUNT',     '[N|all] COMMAND <parameters>~retrieve N results for COMMAND'); //2
   AddCommand('DEL',       'objname~Deletes a facebook object');
-  //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
-  //1 AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
   AddCommand('EVENTS',    '[time]~Display your events');
-  //1 AddCommand('FEED1',     'title~Add a one-line story to your news feed');
-  //1 AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
-  //AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
-  //AddCommand('FGROUPS',   '[flist]~List groups that friend(s) are members of');
-  AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
-  //1 AddCommand('FINFO',     'fields [flist]~List information fields for friend(s) (see UFIELDS)');
-  AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
-  AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
-  AddCommand('FQL',       'statement [flist]~Perform a custom FQL Query');
-  AddCommand('FRIENDS',   'List your friends');
-  AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
-  AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
-  AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
+  AddCommand('FRIENDS',   '<no parameters>~List your friends');
   AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
-  AddCommand('GROUPS',    '<no parameters>~List your[T] groups');
+  AddCommand('GROUPS',    '<no parameters>~List your groups');
   AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
   AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
-  AddCommand('INBOX',     '[count|unread|new]~Display the latest messages from the inbox');
-  AddCommand('INFO',       'objname~Display info for a facebook object (friend, me, page, event, etc.)');//2
+  AddCommand('INFO',      'objname~Display info for a facebook object (friend, me, page, event, etc.)');//2
   AddCommand('LAST',      '[N]~Show results from [Nth] successful command'); //2
   AddCommand('LIKE',      'objname~Like an object (can\'t like pages)'); //2
-  AddCommand('LIKES',     '[category]~List your[T] likes~[category] is one of books,games,movies,music,television'); //2
-  //1 AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
-  AddCommand('LINKS',      'Display your[T] posted links');
-  //1 AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
-  //1 AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
-  AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
+  AddCommand('LIKES',     '[category]~List your likes~[category] is one of books,games,movies,music,television'); //2
+  AddCommand('LINKS',     '<no parameters>~Display your posted links');
+  AddCommand('LOADNOTE',  'title filename~Same as POSTNOTE but loads the contents from a file');
   AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist'); //2
-  AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
   AddCommand('MUTUAL',    'friendid~List friend you have in common with another friend');
-  AddCommand('MYWALL',    '[count|new]~Show the posts from other users to your wall');
-  AddCommand('NEWS',      'Display News Feed Items');
-  AddCommand('NOTES',     'Display your[T] notes');
-  AddCommand('NOTICES',   '[unread|markread]~See notifications from facebook, applications & users');
-  AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
-  //1 AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
-  AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
-  //1 AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
-  //1 AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
-  AddCommand('POST',      '<extra args> message [name] [link_url] [caption] [description]~Post a story on your[T] feed.~<extra args> include:~  [IMG url] add a picture.~  [SRC url] add a source (eg: for videos, url for flash source)'); //2
-  AddCommand('POSTS',     'Display your[T] posts');
-  AddCommand('POSTLINK',  'link_url [message] [name] [caption] [description]~Share a link on your[T] news feed');
+  AddCommand('NEWS',      '<no parameters>~Display News Feed Items');
+  AddCommand('NOTES',     'Display your notes');
+  AddCommand('POST',      '<extra args> message [name] [link_url] [caption] [description]~Post a story on your feed.~<extra args> include:~  [IMG url] add a picture.~  [SRC url] add a source (eg: for videos, url for flash source)'); //2
+  AddCommand('POSTS',     '<no parameters>~Display your posts');
+  AddCommand('POSTLINK',  'link_url [message] [name] [caption] [description]~Share a link on your news feed');
   AddCommand('POSTNOTE',  'title body~Share a note on your news feed');
-  AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed resolved id'); //2
-  AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
   AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');//2
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
   AddCommand('RESOLVE',   'objname~Try to resolve a name to an object'); //2
-  AddCommand('RESTATUS',  'message~Replace your status (deletes your status and adds a new status)');
-  AddCommand('RSVP',      'event_id yes|no|maybe~RSVP to an Event from the EVENTS command');
-  //1 AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
-  //1 AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
   AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
-  AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
-  AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
   AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
   AddCommand('STATUS',    '[text message]~Set your status'); //2
-  AddCommand('STATUSES',  'Display your[T] statuses');
-  AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
-  AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
-  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND (look for [T]) for the target objname~(for example: TARGET bob POST Hello)'); //2
+  AddCommand('STATUSES',  '<no parameters>~Display your statuses');
+  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for/on the objname~(can also use @objname syntax instead of target objname)~(e.g.: fbcmd @bob post "Hello, Bob!")'); //2
   AddCommand('TEST',      '<no parameters>~Test your installation'); //2
-  //1 AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
-  AddCommand('TPICS',     '[savedir]~List [and optionally save] all photos where you[T] are tagged');
+  AddCommand('TPICS',     '[savedir]~List [and optionally save] all photos where you are tagged');
   AddCommand('UNLIKE',    'objname~Unlike an object'); //2
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
-  //1 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
-  AddCommand('WALL',      'Display items posted on your[T] wall');
+  AddCommand('WALL',      '<no parameters>~Display items posted on your wall');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
+
+  //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
+  //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
+  //1 AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
+  //1 AddCommand('FEED1',     'title~Add a one-line story to your news feed');
+  //1 AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
+  //1 AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
+  //1 AddCommand('FGROUPS',   '[flist]~List groups that friend(s) are members of');
+  //1 AddCommand('FINFO',     'fields [flist]~List information fields for friend(s) (see UFIELDS)');
+  //1 AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
+  //1 AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
+  //1 AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
+  //1 AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
+  //1 AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
+  //1 AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
+  //1 AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
+  //1 AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
+  //1 AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
+  //1 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
 
   if (isset($fbcmd_include_newCommands)) {
     foreach ($fbcmd_include_newCommands as $c) {
@@ -624,35 +637,22 @@
   $urlAuth = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
   $urlAccess = "https://www.facebook.com/dialog/oauth?client_id={$fbcmdPrefs['appkey']}&redirect_uri=http://www.facebook.com/connect/login_success.html";
 
+  AddGoDestination('[objname]',   'The page for [objname], can be # (eg: from prev)');
   AddGoDestination('access',      'Allow fbcmd to (initially) access your account',$urlAccess);
-  AddGoDestination('album',       '#An album from the ALBUM command');
   AddGoDestination('app',         'The fbcmd page on facebook','http://facebook.com/fbcmd');
   AddGoDestination('auth',        'Authorize fbcmd for permanent access',$urlAuth);
   AddGoDestination('contribute',  'The fbcmd contact page','http://fbcmd.dtompkins.com/contribute');
   AddGoDestination('editapps',    'The facebook edit applications page','http://www.facebook.com/editapps.php');
-  AddGoDestination('event',       '#An event from the EVENT command');
   AddGoDestination('faq',         'The fbcmd FAQ','http://fbcmd.dtompkins.com/faq');
-  AddGoDestination('friend.name', 'The facebook page of your friend...uses status tagging','http://fbcmd.dtompkins.com/faq');
   AddGoDestination('github',      'The source repository at github','http://github.com/dtompkins/fbcmd');
   AddGoDestination('group',       'The fbcmd discussion group','http://groups.google.com/group/fbcmd');
   AddGoDestination('help',        'the fbcmd help page','http://fbcmd.dtompkins.com/help');
   AddGoDestination('home',        'The fbcmd home page','http://fbcmd.dtompkins.com');
   AddGoDestination('inbox',       'Your facebook inbox','http://www.facebook.com/inbox');
   AddGoDestination('install',     'The fbcmd installation page','http://fbcmd.dtompkins.com/installation');
-  AddGoDestination('link',        '#A link from a post from the STREAM command');
-  AddGoDestination('msg',         '#A mail thread from he INBOX command');
-  AddGoDestination('notice',      '#A notice from the NOTICES command');
-  AddGoDestination('post',        '#A post from the STREAM command');
-  AddGoDestination('stream',      'Your facebook home page','http://www.facebook.com/home.php');
+  AddGoDestination('me',          'Your facebook profile','http://fbcmd.dtompkins.com/me');
+  AddGoDestination('news',        'Your facebook home page','http://www.facebook.com/home.php');
   AddGoDestination('update',      'The fbcmd update page','http://fbcmd.dtompkins.com/update');
-  AddGoDestination('wall',        'Your facebook profile');
-  AddGoDestination('wiki',        'The fbcmd wiki','http://fbcmd.dtompkins.com');
-  AddGoDestination('a',           '#shortcut for [album]');
-  AddGoDestination('e',           '#shortcut for [event]');
-  AddGoDestination('m',           '#shortcut for [msg]');
-  AddGoDestination('n',           '#shortcut for [notice]');
-  AddGoDestination('p',           '#shortcut for [post]');
-  AddGoDestination('l',           '#shortcut for [link]');
 
 
   if ($fbcmdCommand == 'GO') {
@@ -799,25 +799,24 @@
     SetDefaultParam(1,$fbcmdPrefs['default_as']);
     $asId = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST'))) {
-      FbcmdFatalError("AS does not support the command {$fbcmdCommand}");
+    if (!in_array($fbcmdCommand,$asCommands)) {
+      FbcmdFatalError("AS does not support the command {$fbcmdCommand}.\nSupported commands: " . implode(',',$asCommands));
     }
     $newtoken = '';
     if (Resolve($asId,true,'number,prev,alias,accounts')) {
       try {
         $fbReturn = $facebook->api('/me/accounts');
-        //TraceReturn(); //2
-        if (isset($fbReturn['data'])) {
-          foreach ($fbReturn['data'] as $a) {
-            if ((isset($a['id']))&&(isset($a['access_token']))) {
-              if ($a['id'] == $resolvedId) {
-                $newtoken = $a['access_token'];
-              }
+      } catch (FacebookApiException $e) {
+        FbcmdException($e);
+      }
+      if (isset($fbReturn['data'])) {
+        foreach ($fbReturn['data'] as $a) {
+          if ((isset($a['id']))&&(isset($a['access_token']))) {
+            if ($a['id'] == $resolvedId) {
+              $newtoken = $a['access_token'];
             }
           }
         }
-      } catch (FacebookApiException $e) {
-        FbcmdException($e);
       }
     }
     if ($newtoken) {
@@ -837,15 +836,22 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdTargetId = 'me';
+  if ($fbcmdCommand == 'COUNT') {
+    print "Dave hasn't implemented COUNT yet... but it will be cool!\n";
+    //2 ensure doesn't try to work with included commands
+    exit;
+  }
 
+////////////////////////////////////////////////////////////////////////////////
+
+  $fbcmdTargetId = 'me';
   if ($fbcmdCommand == 'TARGET') { //2
     ValidateParamCount(2,99);
     SetDefaultParam(1,$fbcmdPrefs['default_target']);
     $target = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL'))) {
-      FbcmdFatalError("TARGET does not support the command {$fbcmdCommand}");
+    if (!in_array($fbcmdCommand,$targetCommands)) {
+      FbcmdFatalError("TARGET does not support the command {$fbcmdCommand}.\nSupported commands: " . implode(',',$targetCommands));
     }
     if (Resolve($target,true)) {
       $fbcmdTargetId = $resolvedId;
@@ -1272,75 +1278,88 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'GO') { //1
-    global $goDestinations;
-    $hasLaunched = false;
-    ValidateParamCount(1,2);
-    if ((ParamCount() == 1) && (is_numeric($fbcmdParams[1]))) {
-      $fbcmdParams[2] = $fbcmdParams[1];
-      $fbcmdParams[1] = $fbcmdPrefs['go_default_numeric'];
-    }
-    $go = $fbcmdParams[1];
-    if (ParamCount() == 1) {
-      if (in_array(strtolower($go),$goDestinations)) {
-        $go = strtoupper($go);
-        if ($go == 'WALL') {
-          LaunchBrowser("http://www.facebook.com/profile.php?id={$fbUser}");
-        }
-      } else {
-        OLD_MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
-        $tagList = OLD_MatchTag($fbcmdParams[1]);
-        if ($tagList) {
-          LaunchBrowser("http://www.facebook.com/profile.php?id={$tagList[0][0]}");
+  if ($fbcmdCommand == 'GO') { //2
+    ValidateParamCount(1);
+    if (Resolve($fbcmdParams[1],true)) {
+      $go = $resolvedId;
+      if (strpos($go,'_') !== false) {
+        $go = substr($go,strpos($go,'_')+1);
+        if (strpos($go,'_') !== false) {
+          $go = substr($go,0,strpos($go,'_'));
         }
       }
-    } else {
-      $go = strtoupper($go);
-      if ($fbcmdParams[2]) {
-        if (($go == 'ALBUM')||($go == 'A')) {
-          $lastNoticeData = LoadDataFile('albumfile','album_save');
-          if (isset($lastNoticeData['link'][$fbcmdParams[2]])) {
-            LaunchBrowser($lastNoticeData['link'][$fbcmdParams[2]]);
-          }
-        }
-        if (($go == 'EVENT')||($go == 'E')) {
-          $lastEventData = LoadDataFile('eventfile','event_save');
-          if (isset($lastEventData['ids'][$fbcmdParams[2]])) {
-            LaunchBrowser('http://www.facebook.com/event.php?eid=' . $lastEventData['ids'][$fbcmdParams[2]]);
-          }
-        }
-        if (($go == 'LINK')||($go == 'L')) {
-          $lastPostData = LoadDataFile('postfile','stream_save');
-          if (isset($lastPostData['link'][$fbcmdParams[2]])) {
-            LaunchBrowser($lastPostData['link'][$fbcmdParams[2]]);
-          } else {
-            $go = 'POST';
-          }
-        }
-        if (($go == 'NOTICE')||($go == 'N')) {
-          $lastNoticeData = LoadDataFile('noticefile','notices_save');
-          if (isset($lastNoticeData['href'][$fbcmdParams[2]])) {
-            LaunchBrowser($lastNoticeData['href'][$fbcmdParams[2]]);
-          }
-        }
-        if (($go == 'MSG')||($go == 'M')) {
-          $curThreadId = OLD_GetThreadId($fbcmdParams[2]);
-          if ($curThreadId) {
-            LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
-          }
-        }
-        if (($go == 'POST')||($go == 'P')) {
-          $lastPostData = LoadDataFile('postfile','stream_save');
-          if (isset($lastPostData['url'][$fbcmdParams[2]])) {
-            LaunchBrowser($lastPostData['url'][$fbcmdParams[2]]);
-          }
-        }
-      }
-    }
-    if (!$hasLaunched) {
-      FbcmdWarning("Problem with your GO requeset");
+      LaunchBrowser("http://www.facebook.com/{$go}");
     }
   }
+
+    // global $goDestinations;
+    // $hasLaunched = false;
+    // ValidateParamCount(1,2);
+    // if ((ParamCount() == 1) && (is_numeric($fbcmdParams[1]))) {
+      // $fbcmdParams[2] = $fbcmdParams[1];
+      // $fbcmdParams[1] = $fbcmdPrefs['go_default_numeric'];
+    // }
+    // $go = $fbcmdParams[1];
+    // if (ParamCount() == 1) {
+      // if (in_array(strtolower($go),$goDestinations)) {
+        // $go = strtoupper($go);
+        // if ($go == 'WALL') {
+          // LaunchBrowser("http://www.facebook.com/profile.php?id={$fbUser}");
+        // }
+      // } else {
+        // OLD_MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
+        // $tagList = OLD_MatchTag($fbcmdParams[1]);
+        // if ($tagList) {
+          // LaunchBrowser("http://www.facebook.com/profile.php?id={$tagList[0][0]}");
+        // }
+      // }
+    // } else {
+      // $go = strtoupper($go);
+      // if ($fbcmdParams[2]) {
+        // if (($go == 'ALBUM')||($go == 'A')) {
+          // $lastNoticeData = LoadDataFile('albumfile','album_save');
+          // if (isset($lastNoticeData['link'][$fbcmdParams[2]])) {
+            // LaunchBrowser($lastNoticeData['link'][$fbcmdParams[2]]);
+          // }
+        // }
+        // if (($go == 'EVENT')||($go == 'E')) {
+          // $lastEventData = LoadDataFile('eventfile','event_save');
+          // if (isset($lastEventData['ids'][$fbcmdParams[2]])) {
+            // LaunchBrowser('http://www.facebook.com/event.php?eid=' . $lastEventData['ids'][$fbcmdParams[2]]);
+          // }
+        // }
+        // if (($go == 'LINK')||($go == 'L')) {
+          // $lastPostData = LoadDataFile('postfile','stream_save');
+          // if (isset($lastPostData['link'][$fbcmdParams[2]])) {
+            // LaunchBrowser($lastPostData['link'][$fbcmdParams[2]]);
+          // } else {
+            // $go = 'POST';
+          // }
+        // }
+        // if (($go == 'NOTICE')||($go == 'N')) {
+          // $lastNoticeData = LoadDataFile('noticefile','notices_save');
+          // if (isset($lastNoticeData['href'][$fbcmdParams[2]])) {
+            // LaunchBrowser($lastNoticeData['href'][$fbcmdParams[2]]);
+          // }
+        // }
+        // if (($go == 'MSG')||($go == 'M')) {
+          // $curThreadId = OLD_GetThreadId($fbcmdParams[2]);
+          // if ($curThreadId) {
+            // LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
+          // }
+        // }
+        // if (($go == 'POST')||($go == 'P')) {
+          // $lastPostData = LoadDataFile('postfile','stream_save');
+          // if (isset($lastPostData['url'][$fbcmdParams[2]])) {
+            // LaunchBrowser($lastPostData['url'][$fbcmdParams[2]]);
+          // }
+        // }
+      // }
+    // }
+    // if (!$hasLaunched) {
+      // FbcmdWarning("Problem with your GO requeset");
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4944,7 +4963,7 @@
     }
 
     print "=====================================================================\n";
-    print "PARTIAL SUPPORT IN 2.0\n";
+    print "SUPPORT IN 2.0\n";
     print "=====================================================================\n\n";
 
     foreach ($fbcmdCommandList as $cmd) {

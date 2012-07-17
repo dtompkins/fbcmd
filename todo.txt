@@ -30,11 +30,12 @@ WEBSITE / Google Group
 * add CPIC
 * add automatic (periodic) REFRESH
 * update test_fb_connect.php
-* get rid of Warning: session_start() with bad parameters.
 * clean up help syntaxes
 * clean up LAST output... move to l.?
 * migrate showpref,version,?? to new output
 * something for activities, friendrequests, checkins, 
+
+* look into why POSTLINK works, but POST does not :(
 
 PRINT
 * add csv
