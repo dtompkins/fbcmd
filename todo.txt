@@ -28,6 +28,12 @@ WEBSITE / Google Group
 * add behaviour to show current status
 * add support for \n within posts, etc.
 * add CPIC
+* add automatic (periodic) REFRESH
+* update test_fb_connect.php
+* get rid of Warning: session_start() with bad parameters.
+* clean up help syntaxes
+* clean up LAST output... move to l.?
+* migrate showpref,version,?? to new output
 
 OLD pre 2.0 FEATURE REQUESTS
 ============================
