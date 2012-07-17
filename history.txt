@@ -13,12 +13,18 @@ Version 2.0-beta1
 * new command AS + prefs
 * new command GROUPS
 * new command INFO
+* new command LIKES
+* new command NEWS
+* new command NOTES
+* new command POSTS
 * new command PREV + prefs + file
 * new command REFRESH + cache* prefs + file
 * new command RESOLVE + prefs
+* new command STATUSES
 * new command TARGET + prefs
 * new command TEST
 * new command UNLIKE
+* new command WALL
 * ren command FPICS -> TPICS (to reflect 'tagging')
 * modified syntax for: POST, MUTUAL
 * fixed URLs to point to new github area

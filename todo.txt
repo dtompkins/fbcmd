@@ -34,6 +34,11 @@ WEBSITE / Google Group
 * clean up help syntaxes
 * clean up LAST output... move to l.?
 * migrate showpref,version,?? to new output
+* something for activities, friendrequests, checkins, 
+
+PRINT
+* add csv
+* add field col sizes
 
 OLD pre 2.0 FEATURE REQUESTS
 ============================

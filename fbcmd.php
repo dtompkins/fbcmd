@@ -137,7 +137,7 @@
   AddPreference('event_save','1','esave');
   AddPreference('events_attend_mask','15','emask');
   //1 AddPreference('facebook_debug','0','debug');
-  AddPreference('feed_template','60736970450');
+  //1 AddPreference('feed_template','60736970450');
   //AddPreference('fevents_attend_mask','1','fmask');
   //AddPreference('fgroups_show_id','1','gid');
   AddPreference('flist_chunksize','10','ch');
@@ -152,7 +152,7 @@
   AddPreference('launch_exec','');
   AddPreference('last_length','10'); //2
   AddPreference('last_save','1'); //2
-  AddPreference('lastfile',"[datadir]last.txt"); //2 alias  
+  AddPreference('lastfile',"[datadir]last.txt"); //2 alias
   AddPreference('mail_save','1','msave');
   AddPreference('mailfile',"[datadir]maildata.txt",'mfile');
   AddPreference('mkdir_mode',0777);
@@ -168,7 +168,7 @@
   AddPreference('online_idle','1','idle');
   AddPreference('opics_filename','[pid].jpg','of');
   AddPreference('pic_dateformat','M d Y','pdf');
-  AddPreference('pic_ext','jpg'); //2  
+  AddPreference('pic_ext','jpg'); //2
   AddPreference('pic_retry_count','10','pr');
   AddPreference('pic_retry_delay','2','prd');
   AddPreference('pic_show_albumid','0','paid');
@@ -280,9 +280,9 @@
   AddPreference('default_post_link',null);
   AddPreference('default_post_caption',null);
   AddPreference('default_post_description',null);
-  AddPreference('default_post_img_url',null); //2  
+  AddPreference('default_post_img_url',null); //2
   AddPreference('default_post_src_url',null); //2
-  //1 AddPreference('default_postimg_imgsrc',''); 
+  //1 AddPreference('default_postimg_imgsrc','');
   //1 AddPreference('default_postimg_imglink','0');
   //1 AddPreference('default_postmp3_mp3src','');
   //1 AddPreference('default_postmp3_mp3title','');
@@ -305,22 +305,22 @@
   AddPreference('default_tagpic_target','=ME');
   AddPreference('default_tagpic_x','50');
   AddPreference('default_tagpic_y','50');
-  AddPreference('default_target',''); //2  
-  AddPreference('default_tpics_savedir',false); //2  
+  AddPreference('default_target',''); //2
+  AddPreference('default_tpics_savedir',false); //2
   AddPreference('default_updates_count','10');
   //2 AddPreference('default_wallpost_flist','=ME');
-  
+
   //2 Output Format Preferences :: TODO add warning in SAVEPREF
-  
+
   AddPreference('output','','o');
   AddPreference('show','');
   AddPreference('cols','');
-  
+
   AddPreference('print_flatten','0','flat');
   AddPreference('print_flat_arrayname','0');
-  
+
   // todo CRLF conversion
-  
+
   AddPreference('print_fields_crumbs','0');
   AddPreference('print_fields_space','1');
 
@@ -341,10 +341,7 @@
   AddPreference('comment_output','fields');
   AddPreference('comment_show','all');
   AddPreference('del_output','fields');
-  AddPreference('del_show','all');  
-  AddPreference('feed_output','col');
-  AddPreference('feed_show','all');
-  AddPreference('feed_cols','index:6,from.name:18,(message)|(story):50');
+  AddPreference('del_show','all');
   AddPreference('friends_output','col');
   AddPreference('friends_show','all');
   AddPreference('friends_cols','index:6,name:70');
@@ -355,26 +352,46 @@
   AddPreference('info_show','all');
   AddPreference('like_output','fields');
   AddPreference('like_show','all');
+  AddPreference('likes_output','col');
+  AddPreference('likes_show','all');
+  AddPreference('likes_cols','index:6,name:70');
+  AddPreference('links_output','fields');
+  AddPreference('links_show','index,message,link');
   AddPreference('loadnote_output','fields');
   AddPreference('loadnote_show','all');
   AddPreference('mutual_output','col');
   AddPreference('mutual_show','all');
   AddPreference('mutual_cols','index:6,name:70');
+  AddPreference('news_output','col');
+  AddPreference('news_show','all');
+  AddPreference('news_cols','index:6,from.name:18,(message)|(story):50');
+  AddPreference('notes_output','col');
+  AddPreference('notes_show','all');
+  AddPreference('notes_cols','index:6,from.name:18,(message)|(story):50');
   AddPreference('post_output','fields');
   AddPreference('post_show','all');
   AddPreference('postlink_output','fields');
   AddPreference('postlink_show','all');
   AddPreference('postnote_output','fields');
   AddPreference('postnote_show','all');
+  AddPreference('posts_output','col');
+  AddPreference('posts_show','all');
+  AddPreference('posts_cols','index:6,from.name:18,(message)|(story):50');
   AddPreference('showperm_output','fields');
   AddPreference('showperm_show','all');
   AddPreference('status_output','fields');
-  AddPreference('status_show','all');  
+  AddPreference('status_show','all');
+  AddPreference('statuses_output','col');
+  AddPreference('statuses_show','all');
+  AddPreference('statuses_cols','index:6,from.name:18,(message)|(story):50');
   AddPreference('tpics_output','col');
   AddPreference('tpics_show','index,id,name');
   AddPreference('tpics_cols','index:6,id:18,name:50');
   AddPreference('unlike_output','fields');
-  AddPreference('unlike_show','all');  
+  AddPreference('unlike_show','all');
+  AddPreference('wall_output','col');
+  AddPreference('wall_show','all');
+  AddPreference('wall_cols','index:6,from.name:18,(message)|(story):50');
   AddPreference('whoami_output','col');
   AddPreference('whoami_show','name,id');
   AddPreference('whoami_cols','id:18,name:50');
@@ -425,11 +442,12 @@
   $notYet = array('EVENTS','FINBOX','FLAST','FONLINE','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM','TAGPIC');
   $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
+  AddCommand('ACCOUNTS',  '<no parameters>~List your accounts (e.g.: your pages)');
   AddCommand('ADDALBUM',  'title [description]~Create a new photo album');
   AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
   AddCommand('ADDPIC',    'filename [album_id] [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id]~Upload (add) all *.jpg files in a directory to an album');
-  AddCommand('ALBUMS',    'List all photo albums');
+  AddCommand('ALBUMS',    'List all your[T] photo albums');
   AddCommand('ALIAS',     'aliasname objname~Create a new alias for an object (or display all if no arg)');//2
   //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
@@ -440,7 +458,6 @@
   //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
   //1 AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
   AddCommand('EVENTS',    '[time]~Display your events');
-  AddCommand('FEED',      'Display News Feed Items');
   //1 AddCommand('FEED1',     'title~Add a one-line story to your news feed');
   //1 AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
   //AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
@@ -450,19 +467,21 @@
   AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
   AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
   AddCommand('FQL',       'statement [flist]~Perform a custom FQL Query');
-  AddCommand('FRIENDS',   'List all your friends');
+  AddCommand('FRIENDS',   'List your friends');
   AddCommand('FSTATUS',   '[flist]~List current status of friend(s)');
   AddCommand('FSTREAM',   '[flist] [count|new]~Show stream stories for friend(s)');
   AddCommand('FULLPOST',  'post_id~Displays a stream post with all of the comments');
   AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
-  AddCommand('GROUPS',    '<no parameters>~List your (or your TARGET\'s) groups');
+  AddCommand('GROUPS',    '<no parameters>~List your[T] groups');
   AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
   AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
   AddCommand('INBOX',     '[count|unread|new]~Display the latest messages from the inbox');
-  AddCommand('INFO',       'objname~Display info for a facebook object (friend, me, page, event, etc.)');//2  
+  AddCommand('INFO',       'objname~Display info for a facebook object (friend, me, page, event, etc.)');//2
   AddCommand('LAST',      '[N]~Show results from [Nth] successful command'); //2
   AddCommand('LIKE',      'objname~Like an object (can\'t like pages)'); //2
+  AddCommand('LIKES',     '[category]~List your[T] likes~[category] is one of books,games,movies,music,television'); //2
   //1 AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
+  AddCommand('LINKS',      'Display your[T] posted links');
   //1 AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
   //1 AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
   AddCommand('LOADNOTE',  'title filename~Same as FEEDNOTE but loads the contents from a file');
@@ -470,15 +489,18 @@
   AddCommand('MSG',       'message_id~Displays a full message thread (e.g.: after an INBOX)');
   AddCommand('MUTUAL',    'friendid~List friend you have in common with another friend');
   AddCommand('MYWALL',    '[count|new]~Show the posts from other users to your wall');
+  AddCommand('NEWS',      'Display News Feed Items');
+  AddCommand('NOTES',     'Display your[T] notes');
   AddCommand('NOTICES',   '[unread|markread]~See notifications from facebook, applications & users');
   AddCommand('NOTIFY',    '<no parameters>~See (simple) notifications such as # of unread messages');
   //1 AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
   AddCommand('OPICS',     'flist [savedir]~List [and optionally save] all photos owned by friend(s)');
   //1 AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
   //1 AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
-  AddCommand('POST',      '<extra args> message [name] [link_url] [caption] [description]~Post a story in your feed.~<extra args> include:~  [IMG url] add a picture.~  [SRC url] add a source (eg: for videos, url for flash source)'); //2
-  AddCommand('POSTLINK',  'link_url [message] [name] [caption] [description]~Share a link in your news feed');
-  AddCommand('POSTNOTE',  'title body~Share a note in your news feed');
+  AddCommand('POST',      '<extra args> message [name] [link_url] [caption] [description]~Post a story on your[T] feed.~<extra args> include:~  [IMG url] add a picture.~  [SRC url] add a source (eg: for videos, url for flash source)'); //2
+  AddCommand('POSTS',     'Display your[T] posts');
+  AddCommand('POSTLINK',  'link_url [message] [name] [caption] [description]~Share a link on your[T] news feed');
+  AddCommand('POSTNOTE',  'title body~Share a note on your news feed');
   AddCommand('PPICS',     '[flist] [savedir]~List [and optionally save] all profile photos of friend(s)');
   AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed resolved id'); //2
   AddCommand('RECENT',    '[flist] [count]~Shows the [count] most recent friend status updates');
@@ -495,17 +517,19 @@
   AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
   AddCommand('STATUS',    '[text message]~Set your status'); //2
+  AddCommand('STATUSES',  'Display your[T] statuses');
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
-  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for the target objname~(for example: TARGET bob POST Hello)'); //2
+  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND (look for [T]) for the target objname~(for example: TARGET bob POST Hello)'); //2
   AddCommand('TEST',      '<no parameters>~Test your installation'); //2
   //1 AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
-  AddCommand('TPICS',     '[savedir]~List [and optionally save] all photos where target is tagged');
+  AddCommand('TPICS',     '[savedir]~List [and optionally save] all photos where you[T] are tagged');
   AddCommand('UNLIKE',    'objname~Unlike an object'); //2
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
   //1 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
+  AddCommand('WALL',      'Display items posted on your[T] wall');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -778,7 +802,7 @@
     if (!in_array($fbcmdCommand,array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST'))) {
       FbcmdFatalError("AS does not support the command {$fbcmdCommand}");
     }
-    $newtoken = '';    
+    $newtoken = '';
     if (Resolve($asId,true,'number,prev,alias,accounts')) {
       try {
         $fbReturn = $facebook->api('/me/accounts');
@@ -814,13 +838,13 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdTargetId = 'me';
-  
+
   if ($fbcmdCommand == 'TARGET') { //2
     ValidateParamCount(2,99);
     SetDefaultParam(1,$fbcmdPrefs['default_target']);
     $target = $fbcmdParams[1];
     RemoveParams(0,1);
-    if (!in_array($fbcmdCommand,array('ALBUMS','APICS','FEED','FRIENDS','GROUPS','POST','TPICS'))) {
+    if (!in_array($fbcmdCommand,array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL'))) {
       FbcmdFatalError("TARGET does not support the command {$fbcmdCommand}");
     }
     if (Resolve($target,true)) {
@@ -872,11 +896,21 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'ACCOUNTS') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/accounts");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no accounts');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'ADDALBUM') { //2
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_addalbum_name']);
     SetDefaultParam(2,$fbcmdPrefs['default_addalbum_message']);
-    
+
     OpenGraphAPI("/me/albums",'POST',array('name' => $fbcmdParams[1], 'message' => $fbcmdParams[2]));
     if (isset($fbReturn['id'])) {
       NewLast('album', $fbReturn['id'], $fbcmdParams[1]);
@@ -884,7 +918,7 @@
       FbcmdWarning('no return ID');
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'ADDPERM') {
@@ -895,12 +929,12 @@
     }
     $url = "{$urlAccess}&scope={$fbcmdParams[1]}";
     LaunchBrowser($url);
-    
+
     print "This command should launch a browser to grant permissions.\n";
     print "in case it doesn't, here is the messy url:\n\n{$url}\n\n";
     print "(note: this grants only you access to your information and nobody else)\n\n";
-    print "after granting permssions, execute: fbcmd test\n\n\n";    
-    
+    print "after granting permssions, execute: fbcmd test\n\n\n";
+
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -979,7 +1013,7 @@
 
   // $allUserInfoFields = "about_me,activities,affiliations,allowed_restrictions,birthday,birthday_date,books,current_location,education_history,email_hashes,family,first_name,has_added_app,hometown_location,hs_info,interests,is_app_user,is_blocked,last_name,locale,meeting_for,meeting_sex,movies,music,name,notes_count,online_presence,pic,pic_big,pic_big_with_logo,pic_small,pic_small_with_logo,pic_square,pic_square_with_logo,pic_with_logo,political,profile_blurb,profile_update_time,profile_url,proxied_email,quotes,relationship_status,religion,sex,significant_other_id,status,timezone,tv,uid,username,verified,wall_count,website,work_history";
 
-  // if ($fbcmdCommand == 'ALLINFO') {  
+  // if ($fbcmdCommand == 'ALLINFO') {
     // ValidateParamCount(0,1);
     // SetDefaultParam(1,$fbcmdPrefs['default_allinfo_flist']);
     // OLD_GetFlistIds($fbcmdParams[1]);
@@ -1046,7 +1080,7 @@
       }
     }
   }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'EVENTS') { //1
@@ -1065,16 +1099,6 @@
         OLD_PrintRow(OLD_PrintIfPref('event_save','[' . $eventNum . ']'),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$indexEventMember[$event['eid']]['rsvp_status'],$event['name']);
       }
       OLD_SaveEventData($dataEvent);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'FEED') { //2
-    ValidateParamCount(0);
-    OpenGraphAPI("/{$fbcmdTargetId}/feed");
-    if (!ReturnDataToPrev()) {
-      FbcmdWarning('no feed');
     }
   }
 
@@ -1248,47 +1272,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'GROUPS') { //2
-    ValidateParamCount(0);
-    OpenGraphAPI("/{$fbcmdTargetId}/groups");
-    if (!ReturnDataToPrev()) {
-      FbcmdWarning('no groups');
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'MYWALL') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_mywall_count']);
-    if (strtoupper($fbcmdParams[1]) == 'NEW') {
-      OLD_CheckStreamTimeStamp();
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
-    } else {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} LIMIT {$fbcmdParams[1]}";
-    }
-    $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream)';
-    $keyStreamNames = 'id';
-    OLD_MultiFQL(array('Stream','StreamNames'));
-    if (!empty($dataStream)) {
-      OLD_PrintHeader(OLD_PrintIfPref('stream_save','[#]'),OLD_PrintIfPref('stream_show_postid','POST_ID'),OLD_PrintIfPref('show_id','UID'),'NAME',OLD_PrintIfPref('stream_show_date','DATE'),'MESSAGE');
-      if ($fbcmdPrefs['stream_blankrow']) {
-        OLD_PrintRow('');
-      }
-      $postNum = 0;
-      foreach ($dataStream as $a) {
-        $postNum++;
-        OLD_PrintRow(OLD_PrintIfPref('stream_save','[' . $postNum . ']'),OLD_PrintIfPref('stream_show_postid',$a['post_id']),OLD_PrintIfPref('show_id',$a['actor_id']),OLD_ProfileName($a['actor_id']),OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$a['created_time'])),$a['message']);
-        if ($fbcmdPrefs['stream_blankrow']) {
-          OLD_PrintRow('');
-        }
-      }
-      OLD_SavePostData($dataStream);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
   if ($fbcmdCommand == 'GO') { //1
     global $goDestinations;
     $hasLaunched = false;
@@ -1361,6 +1344,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'GROUPS') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/groups");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no groups');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'INBOX') { //1
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
@@ -1404,7 +1397,7 @@
       FbcmdException($e);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'LAST') { //2
@@ -1422,6 +1415,30 @@
       if (!$fbReturn) {
         FbcmdWarning("did not like");
       }
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'LIKES') { //2
+    ValidateParamCount(0,1);
+    if (ParamCount() == 0) {
+      OpenGraphAPI("/{$fbcmdTargetId}/likes");
+    } else {
+      OpenGraphAPI("/{$fbcmdTargetId}/$fbcmdParams[1]");
+    }
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no likes');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'LINKS') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/links");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no links');
     }
   }
 
@@ -1505,6 +1522,57 @@
         // }
       // }
     // } while ($curChunkIds);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'MYWALL') { //1
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_mywall_count']);
+    if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      OLD_CheckStreamTimeStamp();
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+    } else {
+      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} LIMIT {$fbcmdParams[1]}";
+    }
+    $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream)';
+    $keyStreamNames = 'id';
+    OLD_MultiFQL(array('Stream','StreamNames'));
+    if (!empty($dataStream)) {
+      OLD_PrintHeader(OLD_PrintIfPref('stream_save','[#]'),OLD_PrintIfPref('stream_show_postid','POST_ID'),OLD_PrintIfPref('show_id','UID'),'NAME',OLD_PrintIfPref('stream_show_date','DATE'),'MESSAGE');
+      if ($fbcmdPrefs['stream_blankrow']) {
+        OLD_PrintRow('');
+      }
+      $postNum = 0;
+      foreach ($dataStream as $a) {
+        $postNum++;
+        OLD_PrintRow(OLD_PrintIfPref('stream_save','[' . $postNum . ']'),OLD_PrintIfPref('stream_show_postid',$a['post_id']),OLD_PrintIfPref('show_id',$a['actor_id']),OLD_ProfileName($a['actor_id']),OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$a['created_time'])),$a['message']);
+        if ($fbcmdPrefs['stream_blankrow']) {
+          OLD_PrintRow('');
+        }
+      }
+      OLD_SavePostData($dataStream);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'NEWS') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/home");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no news feed');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'NOTES') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/notes");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no notes');
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -1603,7 +1671,17 @@
       FbcmdWarning("no return id");
     }
   }
-  
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'POSTS') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/posts");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no posts');
+    }
+  }
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'POSTLINK') { //2
@@ -1877,6 +1955,16 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'STATUSES') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/statuses");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no statuses');
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'STREAM') { //1
     ValidateParamCount(0,2);
     SetDefaultParam(1,$fbcmdPrefs['default_stream_filter']);
@@ -1988,8 +2076,8 @@
       FbcmdException($e);
     }
   }
-  
-////////////////////////////////////////////////////////////////////////////////  
+
+////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'TPICS') { //1
     ValidateParamCount(0,1);
@@ -2018,7 +2106,7 @@
       }
     }
   }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'VERSION') { //1
@@ -2026,6 +2114,16 @@
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
     OLD_PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH');
     OLD_PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch']);
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'WALL') { //2
+    ValidateParamCount(0);
+    OpenGraphAPI("/{$fbcmdTargetId}/feed");
+    if (!ReturnDataToPrev()) {
+      FbcmdWarning('no wall posts');
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2080,7 +2178,7 @@
       $fbcmdPrefAliases[$shortcut] = $pref;
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2114,7 +2212,7 @@
     }
     return $obj;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2189,7 +2287,7 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 
   function BuildRefCache($showMsg) { //2
     global $fbcmdRefCache;
@@ -2440,7 +2538,7 @@
     $showFields = explode(',',strtolower($show));
     if (in_array('none',$showFields)) return array();
     if ($fbFlatten) {
-      $arr = AddToProcessed(array_flatten_to_keys($inArr)); // ADD tolower ? 
+      $arr = AddToProcessed(array_flatten_to_keys($inArr)); // ADD tolower ?
     } else {
       $arr = AddToProcessed($inArr);
     }
@@ -2453,8 +2551,8 @@
     }
     return $ret;
   }
-  
-////////////////////////////////////////////////////////////////////////////////  
+
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function OLD_FlistMatch($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
@@ -2568,7 +2666,7 @@
       return $default;
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3028,7 +3126,7 @@
     }
     return $arr;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3256,10 +3354,10 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function NewLast($type,$id,$text) {
-  
+
     global $fbcmdPrefs;
     global $fbcmdLast;
-    
+
     if ($fbcmdPrefs['last_save']) {
       if (!isset($fbcmdLast)) {
         $fbcmdLast = array();
@@ -3304,12 +3402,12 @@
       $fbReturn = $facebook->api($path, $method, $params);
       TraceReturn();
       ProcessReturn();
-      PrintReturn();      
+      PrintReturn();
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -3351,12 +3449,21 @@
         if (isset($fbcmdPrefs[$switchKey])) {
           $fbcmdPrefs[$switchKey] = $switchValue;
         } else {
-          FbcmdWarning("Ignoring Parameter {$i}: Unknown Switch [{$switchKey}]\n"); 
+          FbcmdWarning("Ignoring Parameter {$i}: Unknown Switch [{$switchKey}]\n");
         }
       } else {
         if ($fbcmdCommand == '') {
+          if (substr($curArg,0,1) == '@') {
+            $nextArg = substr($curArg,1);
+            $curArg = 'TARGET';
+          } else {
+            $nextArg = '';
+          }
           $fbcmdCommand = strtoupper($curArg);
           $fbcmdParams[] = $fbcmdCommand;
+          if ($nextArg) {
+            $fbcmdParams[] = $nextArg;
+          }
         } else {
           $fbcmdParams[] = $curArg;
         }
@@ -3399,21 +3506,21 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function PostCore() {
     global $fbcmdParams;
     global $fbcmdPrefs;
-    global $fbcmdTargetId;    
+    global $fbcmdTargetId;
     global $facebook;
     global $fbReturn;
     global $addToProcessed;
 
-    $args = array();    
+    $args = array();
     $firstParam = strtoupper($fbcmdParams[1]);
-    
+
     if (strtoupper($fbcmdParams[1]) == 'MP3') {
       FbcmdFatalError("2.0: POST MP3 not done yet / not supported");
     }
@@ -3470,13 +3577,13 @@
     SetDefaultParam(3, $fbcmdPrefs['default_post_link']);
     SetDefaultParam(4, $fbcmdPrefs['default_post_caption']);
     SetDefaultParam(5, $fbcmdPrefs['default_post_description']);
-    
+
     $args['message'] = $fbcmdParams[1];
     if ($fbcmdParams[2]) $args['name'] = $fbcmdParams[2];
     if ($fbcmdParams[3]) $args['link'] = $fbcmdParams[3];
     if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
     if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
-    
+
     // $addToProcessed = array('index' => 'lastpost');// 2 TODO: revisit this
     OpenGraphAPI("/{$fbcmdTargetId}/feed",'POST',$args);
   }
@@ -3491,7 +3598,7 @@
     }
     return false;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4004,7 +4111,7 @@
     global $printMatrix;
     $printMatrix = array();
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4014,9 +4121,9 @@
     global $printColSpacing;
     global $printColFields;
     global $printColWidths;
-    
+
     $printColSpacing = 2;
-    
+
     $cols = GetCommandPref('cols','index:6,name:70'); // index?
     $colpairs = explode(',',strtolower($cols));
     $printColFields = array();
@@ -4041,7 +4148,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function PrintColObj($o) {
     global $printColFields;
     $cols = array();
@@ -4055,7 +4162,7 @@
             if ($k == 'index') {
               $cols[$i] = '[' . str_pad($v,4,' ',STR_PAD_LEFT) . ']';
             } else {
-              $cols[$i] = $v;            
+              $cols[$i] = $v;
             }
           }
         }
@@ -4066,7 +4173,7 @@
       PrintTxtRowWrap($cols);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4078,22 +4185,22 @@
     global $printFieldsIndex;
     global $printColWidths;
     global $fbcmdPrefs;
-    
+
     if (($fbReturnType == 'array')&&(isset($fbProcessed[1]))) {
       $sample = $fbProcessed[1];
     } else {
       $sample = $fbProcessed;
     }
-    
+
     if (isset($sample['index'])) {
       $printFieldsIndex = 1;
     } else {
       $printFieldsIndex = 0;
     }
-    
+
     $printColSpacing = 2;
     $printFieldsDupIndex = false;
-    
+
     if ($printFieldsIndex) {
       $printColWidths = array(6,29,40);
     } else {
@@ -4116,11 +4223,11 @@
 
   function PrintFieldsObj($arr) {
     global $printColSpacing;
-    global $printFieldsIndex;    
+    global $printFieldsIndex;
     global $printFieldsDupIndex;
     global $printColWidths;
     global $fbcmdPrefs;
-    
+
     $first = true;
     $matrix = array();
     foreach ($arr as $k => $v) {
@@ -4149,10 +4256,10 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function PrintLast($upto = 0) { //2 todo: prettier print, offset by one
     global $fbcmdLast;
     foreach ($fbcmdLast as $cat => $list) {
@@ -4167,7 +4274,7 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4191,14 +4298,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function PrintReturn() {
     global $fbReturn;
     global $fbReturnType;
     global $fbProcessed;
     global $fbcmdPrefs;
     global $fbPrintFormat;
-    
+
     if ($fbPrintFormat == 'yaml') {
       if (function_exists('yaml_emit')) {
         print yamil_emit($fbProcessed) . "\n"; // dave can't test this :(
@@ -4210,23 +4317,23 @@
     if ($fbPrintFormat == 'json') print json_encode($fbProcessed) . "\n";
     if ($fbPrintFormat == 'php') print_r($fbProcessed) . "\n";
     if ($fbPrintFormat == 'serial') print serialize($fbProcessed) . "\n";
-    
+
     if ($fbPrintFormat == 'col') PrintCol();
     if ($fbPrintFormat == 'fields') PrintFields();
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function PrintTxtRowWrap($cols) { // this became rediculously messy -sigh-
     global $printColSpacing;
     global $printColWidths;
-    
+
     $nextrow = array();
     $wrap = false;
     for ($i=0; $i<count($cols); $i++) {
       $txt = $cols[$i];
-      $next = '';      
+      $next = '';
       $max = $printColWidths[$i];
       $len = strlen($txt);
       $nlpos = strpos($txt,"\n");
@@ -4251,11 +4358,11 @@
           $txt = substr($txt,0,$spos);
         }
       }
-      $nextrow[] = $next;      
+      $nextrow[] = $next;
       if ($i < count($cols) - 1) {
         $max += $printColSpacing;
       }
-      print str_pad($txt, $max, ' ');      
+      print str_pad($txt, $max, ' ');
     }
     print "\n";
     if ($wrap) {
@@ -4282,8 +4389,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function ProcessReturn() { 
-    // fbReturnType: three possibilities 
+  function ProcessReturn() {
+    // fbReturnType: three possibilities
     // 'value', 'obj', 'array'
     global $fbReturn;
     global $fbReturnType;
@@ -4291,7 +4398,7 @@
     global $fbFlatten;
     global $fbPrintFormat;
     global $fbcmdPrefs;
-    
+
     $fbPrintFormat = strtolower(GetCommandPref('output','col'));
     $fbFlatten = false;
     if ($fbcmdPrefs['print_flatten']) {
@@ -4299,7 +4406,7 @@
     } elseif (in_array($fbPrintFormat,array('col','csv','fields','fieldscsv'))) {
       $fbFlatten = true;
     }
-  
+
     if (!is_array($fbReturn)) {
       $fbReturnType = 'value';
       $fbProcessed = AddToProcessed(array('retval' => $fbReturn));
@@ -4317,7 +4424,7 @@
     $fbReturnType = 'obj';
     $fbProcessed = FilterShowFields($fbReturn);
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4354,7 +4461,7 @@
 
   function RemoveParam($a) {
     global $fbcmdParams;
-    global $fbcmdCommand;    
+    global $fbcmdCommand;
     $cur = $a;
     $count = ParamCount();
     if (($a >= 0)&&($a <= $count)) {
@@ -4368,10 +4475,10 @@
     }
     $fbcmdCommand = strtoupper($fbcmdParams[0]);
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function RemoveParams($a, $b=null)
   {
     global $fbcmdParams;
@@ -4382,7 +4489,7 @@
       RemoveParam($a);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4503,7 +4610,7 @@
     }
     return false;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4652,7 +4759,7 @@
 
     return true;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4824,11 +4931,11 @@
     print "  fbcmd COMMAND required_parameter(s) [optional_parameter(s)] -switch=value\n\n";
 
     print "commands: (can be in lower case)\n\n";
-    
+
     print "=====================================================================\n";
     print "NOT SUPPORTED YET IN 2.0 (may be depricated or merged into others)\n"  ;
     print "=====================================================================\n\n";
-    
+
 
     foreach ($fbcmdCommandList as $cmd) {
       if (in_array($cmd,$notYet)) {
