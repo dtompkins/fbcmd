@@ -26,6 +26,7 @@ Todo in beta1
 * migrate showpref,version,?? to new output
 * something for activities, friendrequests, checkins,
 * add a savepref reset
+* revisit defaults: null vs. '' :: add 'default' as valid argument
 
 PRINT
 * add csv
@@ -38,8 +39,29 @@ WEBSITE / Google Group
 * respond to http://fbcmd.dtompkins.com/feedback posts, and then redirect to new app page
 * respond to most google group responses
 * remove individual help page for each preference... have one big page
-* remove depricated pages: DELPOST, WALLPOST
 * add new "SYNTAX" page
+
+depricate the following:
+
+  //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
+  //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
+  //1 AddCommand('DISPLAY',   'fbml~Sets the content of your FBCMD profile box');
+  //1 AddCommand('FEED1',     'title~Add a one-line story to your news feed');
+  //1 AddCommand('FEED2',     'title body [img_src img_link]~Add a short story to your news feed with optional picture');
+  //1 AddCommand('FEVENTS',   'flist [time]~List events for friend(s)');
+  //1 AddCommand('FGROUPS',   '[flist]~List groups that friend(s) are members of');
+  //1 AddCommand('FINFO',     'fields [flist]~List information fields for friend(s) (see UFIELDS)');
+  //1 AddCommand('LIMITS',    '<no parameters>~Display current limits on FBCMD usage');
+  //1 AddCommand('LOADDISP',  'fbml_filename~Same as DISPLAY but loads the contents from a file');
+  //1 AddCommand('LOADINFO',  'info_filename~Sets the content of the FBCMD section on your Info Tab');
+  //1 AddCommand('NSEND',     'flist message~Send a notification message to friend(s)');
+  //1 AddCommand('PINBOX',    '[count|unread|new]~Display the inbox (latest updates) from pages you are a fan of');
+  //1 AddCommand('PPOST',     'page_id [POST parameters]~Post a message to a your page (for page administrators)');
+  //1 AddCommand('SAVEDISP',  'fbml_filename~Saves the content of your FBCMD profile box to a file');
+  //1 AddCommand('SAVEINFO',  'info_filename~Saves the content of the FBCMD section on your Info Tab to a file');
+  //1 AddCommand('UFIELDS',   '<no parameters>~List current user table fields (for use with FINFO)');
+  //1 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
+
 
 
 OLD pre 2.0 FEATURE REQUESTS
