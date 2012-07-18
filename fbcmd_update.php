@@ -45,7 +45,7 @@
 
 // Note: The Installer version is independent of the fbcmd version
 
-  $fbcmdUpdateVersion = '2.92';
+  $fbcmdUpdateVersion = '3.0';
   TraceVar('fbcmdUpdateVersion');
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -95,11 +95,11 @@
     $fbcmdPrefs['install_copy_to_bin'] = '1';
     $fbcmdPrefs['install_bin_dir'] = '/usr/local/bin/';
   }
-  $fbcmdPrefs['install_lib_mkdir_mode'] = 0777;
-  $fbcmdPrefs['install_data_mkdir_mode'] = 0700;
+  $fbcmdPrefs['install_lib_mkdir_mode'] = '0777';
+  $fbcmdPrefs['install_data_mkdir_mode'] = '0700';
   $fbcmdPrefs['install_auto_restart'] = '1';
   $defaultLibDir = $fbcmdPrefs['install_lib_dir'];
-  $fbcmdPrefs['mkdir_mode'] = 0777;
+  $fbcmdPrefs['mkdir_mode'] = '0777';
   TraceVar('defaultLibDir');
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -211,14 +211,14 @@
 
   if (($isIncludeFile == false)&&($specifiedBranch != 'remove')&&($specifiedBranch != 'clear')&&($isSudo == false)) {
     if (!file_exists($fbcmdBaseDir)) {
-      if (mkdir($fbcmdBaseDir,$fbcmdPrefs['install_data_mkdir_mode'],true)) {
+      if (mkdir($fbcmdBaseDir,octdec($fbcmdPrefs['install_data_mkdir_mode']),true)) {
         Trace("creating directory [{$fbcmdBaseDir}]");
       } else {
         print "Error: cound not create directory: [{$fbcmdBaseDir}]\n";
         FatalError();
       }
       if (!$isWindows) {
-        if (chmod($fbcmdBaseDir,$fbcmdPrefs['install_data_mkdir_mode'])) {
+        if (chmod($fbcmdBaseDir,octdec($fbcmdPrefs['install_data_mkdir_mode']))) {
           Trace("chmod [{$fbcmdBaseDir}]");
         } else {
           Trace("Error: chmod [{$fbcmdBaseDir}] (non-fatal)");
@@ -355,7 +355,7 @@
     if (file_put_contents($fullScriptName,$contentsBatch)) {
       Trace ("created script: [{$fullScriptName}]");
       if (!$isWindows) {
-        if (chmod($fullScriptName,$fbcmdPrefs['install_lib_mkdir_mode'])) {
+        if (chmod($fullScriptName,octdec($fbcmdPrefs['install_lib_mkdir_mode']))) {
           Trace ("chmod script: [{$fullScriptName}]");
         } else {
           print "error chmod: [{$fullScriptName}] (non-fatal)\n";
@@ -392,7 +392,7 @@
             print "error chown: [{$fullBinScript}] [{$sudoUser}] (non-fatal)\n";
           }
         }
-        if (chmod($fullBinScript,$fbcmdPrefs['install_lib_mkdir_mode'])) {
+        if (chmod($fullBinScript,octdec($fbcmdPrefs['install_lib_mkdir_mode']))) {
           Trace ("chmod script: [{$fullBinScript}]");
         } else {
           print "error chmod: [{$fullBinScript}] (non-fatal)\n";
@@ -591,7 +591,7 @@
   function CheckPath($filePath) {
     global $fbcmdPrefs;
     if (!file_exists($filePath)) {
-      if (mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
+      if (mkdir($filePath,octdec($fbcmdPrefs['mkdir_mode']),true)) {
         Trace("creating [{$filePath}]");
       } else {
         print "Error creating [{$filePath}]\n";
@@ -609,7 +609,7 @@
     $dir = $fbcmdPrefs['install_lib_dir'];
 
     if (!file_exists($dir)) {
-      if (mkdir($dir,$fbcmdPrefs['install_lib_mkdir_mode'],true)) {
+      if (mkdir($dir,octdec($fbcmdPrefs['install_lib_mkdir_mode']),true)) {
         Trace("creating directory [{$dir}]");
       } else {
         print "Error: cound not create directory: [{$dir}]\n";
@@ -625,7 +625,7 @@
             print "error chown: [{$dir}] [{$sudoUser}] (non-fatal)\n";
           }
         }
-        if (chmod($dir,$fbcmdPrefs['install_lib_mkdir_mode'])) {
+        if (chmod($dir,octdec($fbcmdPrefs['install_lib_mkdir_mode']))) {
           Trace ("chmod [{$dir}]");
         } else {
           print "error chmod: [{$dir}] (non-fatal)\n";
@@ -645,11 +645,7 @@
 
   function PrintPref($key) {
     global $fbcmdPrefs;
-    if ($key == 'mkdir_mode') {
-      print str_pad($key,25,' ') . '[' . decoct($fbcmdPrefs[$key]) . "]\n";
-    } else {
-      print str_pad($key,25,' ') . '[' . $fbcmdPrefs[$key] . "]\n";
-    }
+    print str_pad($key,25,' ') . '[' . $fbcmdPrefs[$key] . "]\n";
   }
 
   function Trace($line) {
@@ -673,11 +669,7 @@
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (strpos($switchKey,'mkdir_mode') === false) {
-          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
-        } else {
-          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
-        }
+        $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
       }
     }
     $fileContents .= "?>\n";
