@@ -5,6 +5,33 @@ the most recent version of this file is at:
 https://raw.github.com/dtompkins/fbcmd/dev/todo.txt
 ---------------------------------------------------
 
+Moved to beta2
+==============
+* implement COUNT / work on paging: use parse_url & parse_str
+* implement LOOP
+* Try to get tags working in POST
+
+Todo in beta1
+=============
+* look into why POSTLINK works, but POST does not :(
+* finalize nail down auto/last? & current syntaxes
+* clean up output -- fix [1] for showperm ??
+* add behaviour to show current status
+* add support for \n within posts, etc.
+* add CPIC
+* add automatic (periodic) REFRESH
+* update test_fb_connect.php
+* clean up help syntaxes
+* clean up LAST output... move to l.?
+* migrate showpref,version,?? to new output
+* something for activities, friendrequests, checkins,
+* add a savepref reset
+
+PRINT
+* add csv
+* add field col sizes
+
+
 WEBSITE / Google Group
 ======================
 
@@ -14,32 +41,6 @@ WEBSITE / Google Group
 * remove depricated pages: DELPOST, WALLPOST
 * add new "SYNTAX" page
 
-
-2.0 MIGRATION
-=============
-
-* nail down auto/last? & recent syntaxes
-* enable more commands
-* remove depricated commands
-* Try to get tags working in POST
-* add the save behaviour for apics
-* work on paging: use parse_url & parse_str
-* clean up txt output -- fix . for showperm
-* add behaviour to show current status
-* add support for \n within posts, etc.
-* add CPIC
-* add automatic (periodic) REFRESH
-* update test_fb_connect.php
-* clean up help syntaxes
-* clean up LAST output... move to l.?
-* migrate showpref,version,?? to new output
-* something for activities, friendrequests, checkins, 
-
-* look into why POSTLINK works, but POST does not :(
-
-PRINT
-* add csv
-* add field col sizes
 
 OLD pre 2.0 FEATURE REQUESTS
 ============================

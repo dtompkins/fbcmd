@@ -121,217 +121,121 @@
 
   // STEP ONE: System Defaults
 
-  // If you want to change your own defaults, modify your own prefs.php
+  // If you want to customize your defaults:
+  // a) modify your own prefs.php directly, or
+  // b) use the SAVEPREF command
   // Do NOT change them here, as they will get blown away on updates
 
-  AddPreference('albumfile',"[datadir]albumdata.txt",'afile');
-  AddPreference('album_save','1','asave');
+  // currently in 2.0
   AddPreference('aliasfile',"[datadir]aliases.php"); //2
-  AddPreference('apics_filename','[pid].jpg','af');
+  AddPreference('apics_filename','[pid].jpg','apf');
+  AddPreference('addpicd_ext','jpg','pext'); //2
   AddPreference('appkey','42463270450'); // was: d96ea311638cf65f04b33c87eacf371e (depricated?)
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b'); // shh!
-  AddPreference('authfile',"[datadir]auth.txt"); //2  add short
+  AddPreference('authfile',"[datadir]auth.txt"); //2
   AddPreference('auto_mkdir','1');
   AddPreference('cache_refs','1'); //2
-  AddPreference('cachefile',"[datadir]refcache.txt",'cfile'); //2
-  AddPreference('csv_bookend','"');
-  AddPreference('csv_escaped_bookend','""');
-  AddPreference('csv_force_bookends','0','csvf');
-  AddPreference('csv_separator',',');
-  //1 AddPreference('delpost_comment_fail','1');
-  AddPreference('eventfile',"[datadir]eventdata.txt",'efile');
-  AddPreference('event_dateformat','D M d H:i','edf');
-  AddPreference('event_save','1','esave');
-  AddPreference('events_attend_mask','15','emask');
-  //1 AddPreference('facebook_debug','0','debug');
-  //1 AddPreference('feed_template','60736970450');
-  //AddPreference('fevents_attend_mask','1','fmask');
-  //AddPreference('fgroups_show_id','1','gid');
-  AddPreference('flist_chunksize','10','ch');
-  AddPreference('folder_blankrow','1','fbr');
-  AddPreference('folder_dateformat','M d H:i','fdf');
-  AddPreference('folder_show_date','0','fd');
-  AddPreference('folder_show_snippet','1','snip');
-  AddPreference('folder_show_threadid','0','tid');
-  AddPreference('tpics_filename','[pid].jpg','ff');
-  AddPreference('go_default_numeric','link');
+  AddPreference('cachefile',"[datadir]refcache.txt"); //2
   AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
-  AddPreference('launch_exec','');
   AddPreference('last_length','10'); //2
   AddPreference('last_save','1'); //2
   AddPreference('lastfile',"[datadir]last.txt"); //2 alias
-  AddPreference('mail_save','1','msave');
-  AddPreference('mailfile',"[datadir]maildata.txt",'mfile');
-  AddPreference('mkdir_mode',0777);
-  AddPreference('msg_blankrow','1','mbr');
-  AddPreference('msg_dateformat','M d H:i','mdf');
-  AddPreference('msg_show_date','0','md');
-  AddPreference('noticefile',"[datadir]noticedata.txt",'nfile');
-  AddPreference('notices_blankrow','1','nbr');
-  AddPreference('notices_dateformat','M d H:i','ndf');
-  AddPreference('notices_save','1','nsave');
-  AddPreference('notices_show_date','0','nd');
-  AddPreference('notices_show_id','0','nid');
-  AddPreference('online_idle','1','idle');
-  AddPreference('opics_filename','[pid].jpg','of');
-  AddPreference('pic_dateformat','M d Y','pdf');
-  AddPreference('pic_ext','jpg'); //2
+  AddPreference('launch_exec','');
+  AddPreference('mkdir_mode','0777');
   AddPreference('pic_retry_count','10','pr');
   AddPreference('pic_retry_delay','2','prd');
-  AddPreference('pic_show_albumid','0','paid');
-  AddPreference('pic_show_date','0','pd');
-  AddPreference('pic_show_links','0','plink');
-  AddPreference('pic_show_src','0','psrc');
   AddPreference('pic_size','0','psize');
   AddPreference('pic_skip_exists','1','pskip');
-  AddPreference('postfile',"[datadir]postdata.txt",'pfile');
-  AddPreference('ppic_size','1','ppsize');
-  AddPreference('ppics_filename','[tid].jpg','pf');
-  AddPreference('prefix_filter','#');
-  AddPreference('prefix_friendlist','_');
-  AddPreference('prefix_group','~');
-  AddPreference('prefix_page','+');
-  AddPreference('prefix_tag','@');
-  AddPreference('prefix_username','!');
   AddPreference('prefs','');
   AddPreference('prev_length','10'); //2
   AddPreference('prev_save','1'); //2
   AddPreference('prevfile',"[datadir]prev.txt"); //2 alias
-  AddPreference('print_blanks','0','bl');
+  AddPreference('tpics_filename','[pid].jpg','tpf');
+  AddPreference('trace','0','t');
+  AddPreference('update_branch','master');
+
+  // maybe in 2.0 (TBD)
+  //2 AddPreference('event_dateformat','D M d H:i','edf');
+  //2 AddPreference('events_attend_mask','15','emask');
+  //2 AddPreference('opics_filename','[pid].jpg','of');
+  //2 AddPreference('pic_dateformat','M d Y','pdf');
+  //2 AddPreference('ppic_size','1','ppsize');
+  //2 AddPreference('ppics_filename','[tid].jpg','ppf');
+  //2 AddPreference('restatus_comment_new','1');
+
+  // Parameter Defaults
+
+  AddPreference('default_addalbum_message','');
+  AddPreference('default_addalbum_name','');
+  AddPreference('default_addperm','all');
+  AddPreference('default_addpicd_albumid',null);
+  AddPreference('default_addpicd_dirname','');
+  AddPreference('default_addpic_albumid',null);
+  AddPreference('default_addpic_filename','');
+  AddPreference('default_addpic_message','');
+  AddPreference('default_apics_albumid',null);
+  AddPreference('default_apics_savedir',false);
+  AddPreference('default_as',''); //2
+  AddPreference('default_comment_message','');
+  AddPreference('default_loadnote_filename','');
+  AddPreference('default_loadnote_title','');
+  AddPreference('default_postlink_link','');
+  AddPreference('default_postlink_message',''); //2
+  AddPreference('default_postnote_body','');
+  AddPreference('default_postnote_title','');
+  AddPreference('default_post_caption',null);
+  AddPreference('default_post_description',null);
+  AddPreference('default_post_img_url',null); //2
+  AddPreference('default_post_link',null);
+  AddPreference('default_post_message','');
+  AddPreference('default_post_name',null);
+  AddPreference('default_post_src_url',null); //2
+  AddPreference('default_showpref_defaults','0');
+  AddPreference('default_target',''); //2
+  AddPreference('default_tpics_savedir',false); //2
+  //2 AddPreference('default_loop','');
+  //2 AddPreference('default_ppics_savedir',false);
+  //2 AddPreference('default_tagpic_pid','');
+  //2 AddPreference('default_tagpic_target','=ME');
+  //2 AddPreference('default_tagpic_x','50');
+  //2 AddPreference('default_tagpic_y','50');
+
+
+  //2 Output Format Preferences :: TODO add warning in SAVEPREF
+
+  // these are all a mess. - big TODO cleanup
+  AddPreference('cols','');
+  AddPreference('output','','o');
+  AddPreference('show','');
+
+  AddPreference('print_flatten','0','flat');
+  AddPreference('print_flat_arrayname','0');
+
+
   AddPreference('print_clean','1','clean');
   AddPreference('print_col_padding','2','pad');
   AddPreference('print_csv','0','csv');
   AddPreference('print_header','1','hdr');
-  AddPreference('print_linefeed_subst',' ');
+  AddPreference('print_linefeed_subst',' '); // revisit CRLF conversion
   AddPreference('print_wrap','1','wrap');
   AddPreference('print_wrap_cut','1','cut');
   AddPreference('print_wrap_env_var','COLUMNS');
   AddPreference('print_wrap_min_width','20');
   AddPreference('print_wrap_width','80','col');
+
   AddPreference('quiet','0','q');
-  AddPreference('restatus_comment_new','1');
-  AddPreference('sharepost','0','share');
-  AddPreference('show_id','0','id');
-  AddPreference('status_dateformat','D M d H:i','stdf');
-  AddPreference('status_show_date','0','std');
-  AddPreference('status_tag','1','tag');
-  AddPreference('status_tag_order','friends:username:0,friends:name:0,pages:username:0,pages:name:0,friends:name:1,pages:name:1,groups:name:0,groups:name:1');
-  AddPreference('status_tag_syntax','/@(\S+)/');
-  AddPreference('stream_blankrow','1','sbr');
-  AddPreference('stream_dateformat','D H:i','sdf');
-  AddPreference('stream_new_from','created_time');
-  AddPreference('stream_save','1','ssave');
-  AddPreference('stream_show_appdata','0','sapp');
-  AddPreference('stream_show_attachments','0','satt');
-  AddPreference('stream_show_comments','1','scom');
-  AddPreference('stream_show_date','0','sd');
-  AddPreference('stream_show_likes','1','slikes');
-  AddPreference('stream_show_postid','0','sid');
-  AddPreference('trace','0','t');
-  AddPreference('update_branch','master');
 
-  // Parameter Defaults
-  AddPreference('default_addalbum_name','');
-  AddPreference('default_addalbum_message','');
-  //1 AddPreference('default_addalbum_location','');
-  //1 AddPreference('default_addalbum_privacy','everyone');
-  AddPreference('default_addperm','all');
-  AddPreference('default_addpic_filename','');
-  AddPreference('default_addpic_albumid',null);
-  AddPreference('default_addpic_message','');
-  AddPreference('default_addpicd_dirname','');
-  AddPreference('default_addpicd_albumid',null);
-  AddPreference('default_albums_flist','=ME');
-  //1 AddPreference('default_allinfo_flist','=ME');
-  AddPreference('default_apics_albumid',null);
-  AddPreference('default_apics_savedir',false);
-  AddPreference('default_as',''); //2
-  AddPreference('default_comment_text','');
-  //1 AddPreference('default_display_text','FBCMD: The Command Line Interface for Facebook');
-  //1 AddPreference('default_feed1_text','');
-  //1 AddPreference('default_feed2_title','');
-  //1 AddPreference('default_feed2_body','');
-  //1 AddPreference('default_feed2_imgsrc','');
-  //1 AddPreference('default_feed2_imglink','');
-  AddPreference('default_postlink_link','');
-  AddPreference('default_postlink_message',''); //2
-  AddPreference('default_postnote_title','');
-  AddPreference('default_postnote_body','');
-  //AddPreference('default_fevents_flist','=ME');
-  //AddPreference('default_fgroups_flist','=ME');
-  //1 AddPreference('default_finfo_fields','birthday_date');
-  //1 AddPreference('default_finfo_flist','=ALL');
-  AddPreference('default_flast_flist','=ME');
-  AddPreference('default_flast_count','10');
-  AddPreference('default_fonline_flist','=ALL');
-  //1 AddPreference('default_fpics_flist','=ME');
-  AddPreference('default_friends_flist','=ALL');
-  AddPreference('default_fstatus_flist','=ALL');
-  AddPreference('default_fstream_flist','=ALL');
-  AddPreference('default_fstream_count','10');
-  AddPreference('default_inbox_count','10');
-  //1 AddPreference('default_loaddisp_filename','');
-  //1 AddPreference('default_loadinfo_filename','');
-  AddPreference('default_loadnote_title','');
-  AddPreference('default_loadnote_filename','');
-  AddPreference('default_loop',''); //2
-  AddPreference('default_mutual_flist','=ALL');
-  AddPreference('default_mywall_count','10');
-  AddPreference('default_notices_type','');
-  //1 AddPreference('default_nsend_flist','=ME');
-  //1 AddPreference('default_nsend_message','');
-  AddPreference('default_opics_flist','=ME');
-  AddPreference('default_opics_savedir',false);
-  AddPreference('default_post_message','');
-  AddPreference('default_post_name',null);
-  AddPreference('default_post_link',null);
-  AddPreference('default_post_caption',null);
-  AddPreference('default_post_description',null);
-  AddPreference('default_post_img_url',null); //2
-  AddPreference('default_post_src_url',null); //2
-  //1 AddPreference('default_postimg_imgsrc','');
-  //1 AddPreference('default_postimg_imglink','0');
-  //1 AddPreference('default_postmp3_mp3src','');
-  //1 AddPreference('default_postmp3_mp3title','');
-  //1 AddPreference('default_postmp3_mp3artist','');
-  //1 AddPreference('default_postmp3_mp3album','');
-  //1 AddPreference('default_postflash_swfsrc',false);
-  //1 AddPreference('default_postflash_imgsrc',false);
-  AddPreference('default_ppics_flist','=ALL');
-  AddPreference('default_ppics_savedir',false);
-  //1 AddPreference('default_ppost_id',null);
-  AddPreference('default_recent_flist','=ALL');
-  AddPreference('default_recent_count','10');
-  //1 AddPreference('default_savedisp_filename','');
-  //1 AddPreference('default_saveinfo_filename','');
-  AddPreference('default_sentmail_count','10');
-  AddPreference('default_showpref_defaults','0');
-  AddPreference('default_stream_filter','1');
-  AddPreference('default_stream_count','10');
-  AddPreference('default_tagpic_pid','');
-  AddPreference('default_tagpic_target','=ME');
-  AddPreference('default_tagpic_x','50');
-  AddPreference('default_tagpic_y','50');
-  AddPreference('default_target',''); //2
-  AddPreference('default_tpics_savedir',false); //2
-  AddPreference('default_updates_count','10');
-  //2 AddPreference('default_wallpost_flist','=ME');
+  AddPreference('csv_bookend','"');
+  AddPreference('csv_escaped_bookend','""');
+  AddPreference('csv_force_bookends','0','csvf');
+  AddPreference('csv_separator',',');
+  AddPreference('csv_newline',',');
 
-  //2 Output Format Preferences :: TODO add warning in SAVEPREF
 
-  AddPreference('output','','o');
-  AddPreference('show','');
-  AddPreference('cols','');
-
-  AddPreference('print_flatten','0','flat');
-  AddPreference('print_flat_arrayname','0');
-
-  // todo CRLF conversion
 
   AddPreference('print_fields_crumbs','0');
   AddPreference('print_fields_space','1');
 
-  //2 add remaining commands
   AddPreference('addalbum_output','fields');
   AddPreference('addalbum_show','all');
   AddPreference('addpic_output','fields');
@@ -374,7 +278,7 @@
   AddPreference('news_cols','index:6,from.name:18,(message)|(story):50');
   AddPreference('notes_output','col');
   AddPreference('notes_show','all');
-  AddPreference('notes_cols','index:6,from.name:18,(message)|(story):50');
+  AddPreference('notes_cols','index:6,message:70');
   AddPreference('post_output','fields');
   AddPreference('post_show','all');
   AddPreference('postlink_output','fields');
@@ -383,14 +287,16 @@
   AddPreference('postnote_show','all');
   AddPreference('posts_output','col');
   AddPreference('posts_show','all');
-  AddPreference('posts_cols','index:6,from.name:18,(message)|(story):50');
+  AddPreference('posts_cols','index:6,(message)|(story):70');
   AddPreference('showperm_output','fields');
   AddPreference('showperm_show','all');
+  AddPreference('showpref_output','fields');
+  AddPreference('showpref_show','all');
   AddPreference('status_output','fields');
   AddPreference('status_show','all');
   AddPreference('statuses_output','col');
   AddPreference('statuses_show','all');
-  AddPreference('statuses_cols','index:6,from.name:18,(message)|(story):50');
+  AddPreference('statuses_cols','index:6,message:70');
   AddPreference('tpics_output','col');
   AddPreference('tpics_show','index,id,name');
   AddPreference('tpics_cols','index:6,id:18,name:50');
@@ -402,6 +308,120 @@
   AddPreference('whoami_output','col');
   AddPreference('whoami_show','name,id');
   AddPreference('whoami_cols','id:18,name:50');
+
+  // OLD 1.1 preferences
+  //1 AddPreference('albumfile',"[datadir]albumdata.txt",'afile');
+  //1 AddPreference('album_save','1','asave');
+  //1 AddPreference('delpost_comment_fail','1');
+  //1 AddPreference('eventfile',"[datadir]eventdata.txt",'efile');
+  //1 AddPreference('event_save','1','esave');
+  //1 AddPreference('facebook_debug','0','debug');
+  //1 AddPreference('feed_template','60736970450');
+  //1 AddPreference('fevents_attend_mask','1','fmask');
+  //1 AddPreference('fgroups_show_id','1','gid');
+  //1 AddPreference('flist_chunksize','10','ch');
+  //1 AddPreference('folder_blankrow','1','fbr');
+  //1 AddPreference('folder_dateformat','M d H:i','fdf');
+  //1 AddPreference('folder_show_date','0','fd');
+  //1 AddPreference('folder_show_snippet','1','snip');
+  //1 AddPreference('folder_show_threadid','0','tid');
+  //1 AddPreference('go_default_numeric','link');
+  //1 AddPreference('mail_save','1','msave');
+  //1 AddPreference('mailfile',"[datadir]maildata.txt",'mfile');
+  //1 AddPreference('msg_blankrow','1','mbr');
+  //1 AddPreference('msg_dateformat','M d H:i','mdf');
+  //1 AddPreference('msg_show_date','0','md');
+  //1 AddPreference('noticefile',"[datadir]noticedata.txt",'nfile');
+  //1 AddPreference('notices_blankrow','1','nbr');
+  //1 AddPreference('notices_dateformat','M d H:i','ndf');
+  //1 AddPreference('notices_save','1','nsave');
+  //1 AddPreference('notices_show_date','0','nd');
+  //1 AddPreference('notices_show_id','0','nid');
+  //1 AddPreference('online_idle','1','idle');
+  //1 AddPreference('pic_show_albumid','0','paid');
+  //1 AddPreference('pic_show_date','0','pd');
+  //1 AddPreference('pic_show_links','0','plink');
+  //1 AddPreference('pic_show_src','0','psrc');
+  //1 AddPreference('postfile',"[datadir]postdata.txt",'pfile');
+  //1 AddPreference('prefix_filter','#');
+  //1 AddPreference('prefix_friendlist','_');
+  //1 AddPreference('prefix_group','~');
+  //1 AddPreference('prefix_page','+');
+  //1 AddPreference('prefix_tag','@');
+  //1 AddPreference('prefix_username','!');
+  //1 AddPreference('print_blanks','0','bl');
+  //1 AddPreference('sharepost','0','share');
+  //1 AddPreference('show_id','0','id');
+  //1 AddPreference('status_dateformat','D M d H:i','stdf');
+  //1 AddPreference('status_show_date','0','std');
+  //1 AddPreference('status_tag','1','tag');
+  //1 AddPreference('status_tag_order','friends:username:0,friends:name:0,pages:username:0,pages:name:0,friends:name:1,pages:name:1,groups:name:0,groups:name:1');
+  //1 AddPreference('status_tag_syntax','/@(\S+)/');
+  //1 AddPreference('stream_blankrow','1','sbr');
+  //1 AddPreference('stream_dateformat','D H:i','sdf');
+  //1 AddPreference('stream_new_from','created_time');
+  //1 AddPreference('stream_save','1','ssave');
+  //1 AddPreference('stream_show_appdata','0','sapp');
+  //1 AddPreference('stream_show_attachments','0','satt');
+  //1 AddPreference('stream_show_comments','1','scom');
+  //1 AddPreference('stream_show_date','0','sd');
+  //1 AddPreference('stream_show_likes','1','slikes');
+  //1 AddPreference('stream_show_postid','0','sid');
+
+  //1 AddPreference('default_addalbum_location','');
+  //1 AddPreference('default_addalbum_privacy','everyone');
+  //1 AddPreference('default_albums_flist','=ME');
+  //1 AddPreference('default_allinfo_flist','=ME');
+  //1 AddPreference('default_display_text','FBCMD: The Command Line Interface for Facebook');
+  //1 AddPreference('default_feed1_text','');
+  //1 AddPreference('default_feed2_title','');
+  //1 AddPreference('default_feed2_body','');
+  //1 AddPreference('default_feed2_imgsrc','');
+  //1 AddPreference('default_feed2_imglink','');
+  //1 AddPreference('default_fevents_flist','=ME');
+  //1 AddPreference('default_fgroups_flist','=ME');
+  //1 AddPreference('default_finfo_fields','birthday_date');
+  //1 AddPreference('default_finfo_flist','=ALL');
+  //1 AddPreference('default_flast_flist','=ME');
+  //1 AddPreference('default_flast_count','10');
+  //1 AddPreference('default_fonline_flist','=ALL');
+  //1 AddPreference('default_fpics_flist','=ME');
+  //1 AddPreference('default_friends_flist','=ALL');
+  //1 AddPreference('default_fstatus_flist','=ALL');
+  //1 AddPreference('default_fstream_flist','=ALL');
+  //1 AddPreference('default_fstream_count','10');
+  //1 AddPreference('default_inbox_count','10');
+  //1 AddPreference('default_loaddisp_filename','');
+  //1 AddPreference('default_loadinfo_filename','');
+  //1 AddPreference('default_mutual_flist','=ALL');
+  //1 AddPreference('default_mywall_count','10');
+  //1 AddPreference('default_notices_type','');
+  //1 AddPreference('default_nsend_flist','=ME');
+  //1 AddPreference('default_nsend_message','');
+  //1 AddPreference('default_opics_flist','=ME');
+  //1 AddPreference('default_opics_savedir',false);
+  //1 AddPreference('default_postimg_imgsrc','');
+  //1 AddPreference('default_postimg_imglink','0');
+  //1 AddPreference('default_postmp3_mp3src','');
+  //1 AddPreference('default_postmp3_mp3title','');
+  //1 AddPreference('default_postmp3_mp3artist','');
+  //1 AddPreference('default_postmp3_mp3album','');
+  //1 AddPreference('default_postflash_swfsrc',false);
+  //1 AddPreference('default_postflash_imgsrc',false);
+  //1 AddPreference('default_ppics_flist','=ALL');
+  //1 AddPreference('default_ppost_id',null);
+  //1 AddPreference('default_recent_flist','=ALL');
+  //1 AddPreference('default_recent_count','10');
+  //1 AddPreference('default_savedisp_filename','');
+  //1 AddPreference('default_saveinfo_filename','');
+  //1 AddPreference('default_sentmail_count','10');
+  //1 AddPreference('default_stream_filter','1');
+  //1 AddPreference('default_stream_count','10');
+  //1 AddPreference('default_updates_count','10');
+  //1 AddPreference('default_wallpost_flist','=ME');
+
+////////////////////////////////////////////////////////////////////////////////
+
   // STEP TWO: Load preferences from prefs.php in the base directory
 
   if (file_exists("{$fbcmdBaseDir}prefs.php")) {
@@ -446,12 +466,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdCommandList = array();
+
+  // the following are 1.1 commands that haven't been done yet, or will be changed
+
   $notYet = array('EVENTS','FINBOX','FLAST','FONLINE','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM','TAGPIC');
-  $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
-
-  $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
-  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST');
-
+  AddCommand('EVENTS',    '[time]~Display your events');
   AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
   AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
   AddCommand('FONLINE',   '[flist]~List any friends who are currently online');
@@ -474,11 +493,13 @@
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
   AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
 
+  // The following are 2.0 commands (not all complete yet)
+
   AddCommand('ACCOUNTS',  '<no parameters>~List your accounts (e.g.: your pages)');
   AddCommand('ADDALBUM',  'title [description]~Create a new photo album');
   AddCommand('ADDPERM',   '[permissions_list]~(Launch a website to) grant FBCMD extended permissions.');
   AddCommand('ADDPIC',    'filename [album_id] [caption]~Upload (add) a photo to an album');
-  AddCommand('ADDPICD',   'dirname [album_id]~Upload (add) all *.jpg files in a directory to an album');
+  AddCommand('ADDPICD',   'dirname [album_id]~Upload (add) all *.jpg files in a directory to an album~(change to *.png with -pext=png)');
   AddCommand('ALBUMS',    '<no parameters>~List all your photo albums');
   AddCommand('ALIAS',     '[aliasname objname]~Create a new alias for an object~or list all aliases if no parameters');//2
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
@@ -487,7 +508,6 @@
   AddCommand('COMMENT',   'objname text~Add a comment to a post, picture, etc.');
   AddCommand('COUNT',     '[N|all] COMMAND <parameters>~retrieve N results for COMMAND'); //2
   AddCommand('DEL',       'objname~Deletes a facebook object');
-  AddCommand('EVENTS',    '[time]~Display your events');
   AddCommand('FRIENDS',   '<no parameters>~List your friends');
   AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
   AddCommand('GROUPS',    '<no parameters>~List your groups');
@@ -525,6 +545,11 @@
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
   AddCommand('WALL',      '<no parameters>~Display items posted on your wall');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
+
+  $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST');
+
+  $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
@@ -581,7 +606,7 @@
       return;
     }
     if (isset($fbcmdPrefs[$fbcmdParams[1]])) {
-      LaunchBrowser('http://fbcmd.dtompkins.com/preferences/' . strtolower($fbcmdParams[1]));
+      LaunchBrowser('http://fbcmd.dtompkins.com/preferences/');
       return;
     }
     FbcmdWarning("HELP: did not recognize [{$fbcmdParams[1]}]");
@@ -971,7 +996,7 @@
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_addpicd_dirname']);
     SetDefaultParam(2,$fbcmdPrefs['default_addpicd_albumid']);
-    $fileList = FileMatches($fbcmdParams[1],$fbcmdPrefs['pic_ext']);
+    $fileList = FileMatches($fbcmdParams[1],$fbcmdPrefs['addpicd_ext']);
     $albumId = GetAlbumId($fbcmdParams[2]);
     if (count($fileList) > 0) {
       foreach ($fileList as $fileName) {
@@ -1065,6 +1090,7 @@
 
   if ($fbcmdCommand == 'COMMENT') { //2
     ValidateParamCount(2);
+    SetDefaultParam(2,$fbcmdPrefs['default_comment_message']);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
       OpenGraphAPI("/{$resolvedId}/comments",'POST',array('message' => $fbcmdParams[2]));
       if (isset($fbReturn['id'])) {
@@ -1924,16 +1950,18 @@
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SHOWPREF') { //1
+  if ($fbcmdCommand == 'SHOWPREF') { //2
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_showpref_defaults']);
-    OLD_PrintHeader('PREFERANCE','VALUE');
-    foreach ($fbcmdPrefs as $switchKey => $switchValue) {
-      if ($switchKey != 'prefs') {
-        if ((substr($switchKey,0,8) != 'default_')||($fbcmdParams[1]))
-        OLD_PrintRow($switchKey,var_export($switchValue,true));
+    $fbReturn = array();
+    foreach ($fbcmdPrefs as $k => $v) {
+      if ($k != 'prefs') {
+        if ((substr($k,0,8) != 'default_')||($fbcmdParams[1]))
+        $fbReturn[$k] = var_export($v,true);
       }
     }
+    ProcessReturn();
+    PrintReturn();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4868,11 +4896,7 @@
     $fileContents = "<?php\n";
     foreach ($fbcmdPrefs as $switchKey => $switchValue) {
       if ($switchKey != 'prefs') {
-        if (strpos($switchKey,'mkdir_mode') === false) {
-          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
-        } else {
-          $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = 0" . decoct($switchValue) . ";\n";
-        }
+        $fileContents .= "  \$fbcmdPrefs['{$switchKey}'] = " . var_export($switchValue,true) . ";\n";
       }
     }
     $fileContents .= "?>\n";
@@ -5185,7 +5209,7 @@
       $filePath = CleanPath(substr($fileName,0,strrpos($fileName,'/')));
       if (!file_exists($filePath)) {
         if ($fbcmdPrefs['auto_mkdir']) {
-          if (!mkdir($filePath,$fbcmdPrefs['mkdir_mode'],true)) {
+          if (!mkdir($filePath,octdec($fbcmdPrefs['mkdir_mode']),true)) {
             FbcmdFatalError("Could Not Create Path: {$filePath}");
           }
         } else {
