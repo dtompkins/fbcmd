@@ -175,7 +175,7 @@
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
-  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE');
   $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -219,8 +219,8 @@
   // Do NOT change them here, as they will get blown away on updates
 
   // STEP ONE Set System Defaults
-  
-  // --------------------------------------------------------------------------  
+
+  // --------------------------------------------------------------------------
 
   // STEP ONE (part A) Universal Preferences
 
@@ -259,21 +259,21 @@
   //2 AddPreference('ppic_size','1','ppsize');
   //2 AddPreference('ppics_filename','[tid].jpg','ppf');
   //2 AddPreference('restatus_comment_new','1');
-  
-  // --------------------------------------------------------------------------  
+
+  // --------------------------------------------------------------------------
 
   // STEP ONE (part B) Command Argument Defaults
 
   AddPreference('default_addalbum_message','');
   AddPreference('default_addalbum_name','');
   AddPreference('default_addperm','all');
-  AddPreference('default_addpicd_albumid',null);
+  AddPreference('default_addpicd_albumid','');
   AddPreference('default_addpicd_dirname','');
-  AddPreference('default_addpic_albumid',null);
+  AddPreference('default_addpic_albumid','');
   AddPreference('default_addpic_filename','');
   AddPreference('default_addpic_message','');
-  AddPreference('default_apics_albumid',null);
-  AddPreference('default_apics_savedir',false);
+  AddPreference('default_apics_albumid','');
+  AddPreference('default_apics_savedir','');
   AddPreference('default_as_obj',''); //2
   AddPreference('default_comment_message','');
   AddPreference('default_loadnote_filename','');
@@ -282,16 +282,16 @@
   AddPreference('default_postlink_message',''); //2
   AddPreference('default_postnote_body','');
   AddPreference('default_postnote_title','');
-  AddPreference('default_post_caption',null);
-  AddPreference('default_post_description',null);
-  AddPreference('default_post_img_url',null); //2
-  AddPreference('default_post_link',null);
+  AddPreference('default_post_caption','');
+  AddPreference('default_post_description','');
+  AddPreference('default_post_img_url',''); //2
+  AddPreference('default_post_link','');
   AddPreference('default_post_message','');
-  AddPreference('default_post_name',null);
-  AddPreference('default_post_src_url',null); //2
+  AddPreference('default_post_name','');
+  AddPreference('default_post_src_url',''); //2
   AddPreference('default_showpref_defaults','0');
   AddPreference('default_target_obj',''); //2
-  AddPreference('default_tpics_savedir',false); //2
+  AddPreference('default_tpics_savedir',''); //2
   //2 AddPreference('default_count','');
   //2 AddPreference('default_loop','');
   //2 AddPreference('default_ppics_savedir',false);
@@ -300,14 +300,14 @@
   //2 AddPreference('default_tagpic_x','50');
   //2 AddPreference('default_tagpic_y','50');
 
-  // --------------------------------------------------------------------------  
-  
+  // --------------------------------------------------------------------------
+
   // STEP ONE (part C) Output Parameters
 
   AddPreference('output_json_flat','0');
   AddPreference('output_php_flat','0');
   AddPreference('output_serial_flat','0');
-  
+
   AddPreference('output_header','0','hdr');
   AddPreference('output_pad','2','pad');
   AddPreference('output_rec_crumbs','0','crumb');
@@ -322,11 +322,11 @@
   AddPreference('csv_force_bookends','0','csvf');
   AddPreference('csv_newline_subst','\\n');
   AddPreference('csv_separator',',');
-  
-  // --------------------------------------------------------------------------  
+
+  // --------------------------------------------------------------------------
 
   // STEP ONE (part D) Command Output Defaults
-  
+
   // the following will override other settings if set
   AddPreference('output_format','','o');
   AddPreference('output_show','','oshow');
@@ -334,7 +334,7 @@
   AddPreference('output_rec','','orec');
   AddPreference('output_flat','','oflat');
 
-  $noOutputCommands = array('ADDPERM','AS','AUTH','COUNT','GO','HELP','HOME','LOOP','REFRESH','RESET','SAVEPREF','TARGET','TEST','UPDATE','USAGE','VERSION');
+  $noOutputCommands = array('ADDPERM','AS','AUTH','COUNT','GO','HELP','HOME','LOOP','REFRESH','RESET','SAVEPREF','TARGET','TEST','UPDATE','USAGE');
 
   foreach ($fbcmdCommandList as $cmd) {
     if (!in_array($cmd,$noOutputCommands)) {
@@ -345,40 +345,43 @@
       AddPreference("output_rec_{$c}",'!default');
     }
   }
-  
+
   AddPreference('output_col_default','index:6,name/message/story:0');
   AddPreference('output_col_id','index:6,id:20,name:0');
   AddPreference('output_col_fromname','index:6,from.name:20,message/story:0');
-  
   AddPreference('output_rec_default','index:6,key:25,value');
-  
-  // --------------------------------------------------------------------------  
+
+  // --------------------------------------------------------------------------
 
   // STEP ONE (part E) Set Command Specific Output Defaults
 
   AddPreference('output_format_addpicd','col');
-  AddPreference('output_col_addpicd','filename,id:18,post_id:33');
   AddPreference('output_format_albums','col');
   AddPreference('output_format_apics','col');
-  AddPreference('output_col_apics','!id');
   AddPreference('output_format_friends','col');
   AddPreference('output_format_groups','col');
   AddPreference('output_format_likes','col');
   AddPreference('output_format_mutual','col');
   AddPreference('output_format_news','col');
-  AddPreference('output_col_news','!fromname');
-  AddPreference('output_format_posts','col');  
-  AddPreference('output_format_statuses','col');  
+  AddPreference('output_format_posts','col');
+  AddPreference('output_format_statuses','col');
   AddPreference('output_format_tpics','col');
-  AddPreference('output_col_tpics','!id');
   AddPreference('output_format_wall','col');
-  AddPreference('output_col_wall','!fromname');
   AddPreference('output_format_whoami','col');
+  
+  AddPreference('output_col_addpicd','filename,id:18,post_id:33');
+  AddPreference('output_col_apics','!id');
+  AddPreference('output_col_news','!fromname');
+  AddPreference('output_col_tpics','!id');
+  AddPreference('output_col_wall','!fromname');
   AddPreference('output_col_whoami','id:20,name');
   
+  AddPreference('output_rec_alias','key:20,value');
   AddPreference('output_rec_links','index:6,key:7,value');
-  AddPreference('output_show_links','index,message,link,name');
   AddPreference('output_rec_notes','index:6,key:7,value');
+  AddPreference('output_rec_showperm','key:30,value');
+  
+  AddPreference('output_show_links','index,message,link,name');
   AddPreference('output_show_notes','index,subject,message');
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -596,36 +599,6 @@
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
-
-    // ValidateParamCount(1);
-    // try {
-      // $fbObject = new FacebookDesktop($fbcmdPrefs['appkey'], $fbcmdPrefs['appsecret']);
-      // $session = $fbObject->do_get_session($fbcmdParams[1]);
-      // TraceReturn($session);
-    // } catch (Exception $e) {
-      // OLD_FbcmdException($e,'Invalid AUTH code / could not authorize session');
-    // }
-    // $fbcmdUserSessionKey = $session['session_key'];
-    // $fbcmdUserSecretKey = $session['secret'];
-    // VerifyOutputDir($fbcmdOldKeyFileName);
-    // if (@file_put_contents ($fbcmdOldKeyFileName,"{$fbcmdUserSessionKey}\n{$fbcmdUserSecretKey}\n# only the first two lines of this file are read\n# use fbcmd RESET to replace this file\n") == false) {
-      // FbcmdFatalError("Could not generate keyfile {$fbcmdOldKeyFileName}");
-    // }
-    // try {
-      // $fbObject->api_client->session_key = $fbcmdUserSessionKey;
-      // $fbObject->secret = $fbcmdUserSecretKey;
-      // $fbObject->api_client->secret = $fbcmdUserSecretKey;
-      // $fbUser = $fbObject->api_client->users_getLoggedInUser();
-      // $fbReturn = $fbObject->api_client->users_getInfo($fbUser,array('name'));
-      // TraceReturn();
-    // } catch (Exception $e) {
-      // OLD_FbcmdException($e,'Invalid AUTH code / could not generate session key');
-    // }
-    // if (!$fbcmdPrefs['quiet']) {
-      // print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\nWelcome to FBCMD, {$fbReturn[0]['name']}!\n\n";
-      // print "most FBCMD commands require additional permissions.\n";
-      // print "to grant default permissions, execute: fbcmd addperm\n";
-    // }
     return;
   }
 
@@ -641,21 +614,6 @@
     ShowAuth();
     return;
   }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  //1
-  // $fbcmdKeyFile = file($fbcmdOldKeyFileName,FILE_IGNORE_NEW_LINES);
-  // if (count($fbcmdKeyFile) < 2) {
-    // FbcmdFatalError("Invalid keyfile {$fbcmdOldKeyFileName}");
-  // }
-  // $fbcmdUserSessionKey = $fbcmdKeyFile[0];
-  // $fbcmdUserSecretKey = $fbcmdKeyFile[1];
-
-  // if (strncmp($fbcmdUserSessionKey,'EMPTY',5) == 0) {
-    // ShowAuth();
-    // return;
-  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -718,8 +676,8 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   $fbcmdTargetId = 'me';
-  $fbcmdExtraFields = array();
-  
+  $fbcmdExtraOutput = array();
+
   if ($fbcmdCommand == 'TARGET') { //2
     ValidateParamCount(2,99);
     SetDefaultParam(1,$fbcmdPrefs['default_target_obj']);
@@ -760,10 +718,6 @@
   // $OLD_FlistMatchIdString = '';
 
   $allPermissions = 'ads_management,create_event,email,friends_about_me,friends_actions.music,friends_actions.news,friends_actions.video,friends_activities,friends_birthday,friends_checkins,friends_education_history,friends_events,friends_games_activity,friends_groups,friends_hometown,friends_interests,friends_likes,friends_location,friends_notes,friends_online_presence,friends_photos,friends_questions,friends_relationship_details,friends_relationships,friends_religion_politics,friends_status,friends_subscriptions,friends_videos,friends_website,friends_work_history,manage_friendlists,manage_notifications,manage_pages,offline_access,publish_actions,publish_checkins,publish_stream,read_friendlists,read_insights,read_mailbox,read_requests,read_stream,rsvp_event,user_about_me,user_actions.music,user_actions.news,user_actions.video,user_activities,user_birthday,user_checkins,user_education_history,user_events,user_games_activity,user_groups,user_hometown,user_interests,user_likes,user_location,user_notes,user_online_presence,user_photos,user_questions,user_relationship_details,user_relationships,user_religion_politics,user_status,user_subscriptions,user_videos,user_website,user_work_history,xmpp_login';
-
-////////////////////////////////////////////////////////////////////////////////
-
-  //1 OLD_PrintStart();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -850,7 +804,7 @@
     $albumId = GetAlbumId($fbcmdParams[2]);
     if (count($fileList) > 0) {
       foreach ($fileList as $fileName) {
-        $fbcmdExtraFields['filename'] = $fileName;
+        $fbcmdExtraOutput['filename'] = $fileName;
         OpenGraphAPI("/{$albumId}/photos",'POST',array('source' => '@' . $fileName));
         if (!isset($fbReturn['id'])) {
           FbcmdWarning('no return ID [$fileName]');
@@ -876,11 +830,9 @@
   if ($fbcmdCommand == 'ALIAS') { //2
     ValidateParamCount(array(0,2));
     if (ParamCount() == 0) {
-      $i = 1;
-      foreach ($fbcmdAlias as $key => $val) {
-        print "{$key} => {$val}\n";
-        $i++;
-      }
+      $fbReturn = $fbcmdAlias;
+      ProcessReturn();
+      PrintReturn();
     } else {
       if (Resolve($fbcmdParams[2],true)) {
         $fbcmdAlias[$fbcmdParams[1]] = $resolvedId;
@@ -889,29 +841,6 @@
       }
     }
   }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  // $allUserInfoFields = "about_me,activities,affiliations,allowed_restrictions,birthday,birthday_date,books,current_location,education_history,email_hashes,family,first_name,has_added_app,hometown_location,hs_info,interests,is_app_user,is_blocked,last_name,locale,meeting_for,meeting_sex,movies,music,name,notes_count,online_presence,pic,pic_big,pic_big_with_logo,pic_small,pic_small_with_logo,pic_square,pic_square_with_logo,pic_with_logo,political,profile_blurb,profile_update_time,profile_url,proxied_email,quotes,relationship_status,religion,sex,significant_other_id,status,timezone,tv,uid,username,verified,wall_count,website,work_history";
-
-  // if ($fbcmdCommand == 'ALLINFO') {
-    // ValidateParamCount(0,1);
-    // SetDefaultParam(1,$fbcmdPrefs['default_allinfo_flist']);
-    // OLD_GetFlistIds($fbcmdParams[1]);
-    // $fql = "SELECT {$allUserInfoFields} from user where uid in ({$OLD_FlistMatchIdString}) ORDER BY last_name";
-    // try {
-      // $fbReturn = $fbObject->api_client->fql_query($fql);
-      // TraceReturn();
-    // } catch(Exception $e) {
-      // OLD_FbcmdException($e);
-    // }
-    // if (!empty($fbReturn)) {
-      // OLD_PrintHeader(OLD_PrintIfPref('show_id','UID'),'NAME','FIELD','VALUE');
-      // foreach ($fbReturn as $a) {
-        // OLD_PrintRecursiveObject(array(OLD_PrintIfPref('show_id',$a['uid']),OLD_ProfileName($a['uid'])),'',$a);
-      // }
-    // }
-  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -932,9 +861,6 @@
       }
     }
   }
-    //if (!empty($fbReturn)) {
-      //OLD_PrintHeader(OLD_PrintIfpref('pic_show_albumid','aid'),'pid',OLD_PrintIfpref('pic_show_date','created'),'caption',OLD_PrintIfpref('pic_show_links','link'),OLD_PrintIfpref('pic_show_src','src'));
-        //OLD_PrintRow(OLD_PrintIfpref('pic_show_albumid',$pic['aid']),$pic['pid'],OLD_PrintIfpref('pic_show_date',date($fbcmdprefs['pic_dateformat'],$pic['created'])),$pic['caption'],OLD_PrintIfpref('pic_show_links',$pic['link']),OLD_PrintIfpref('pic_show_src',photosrc($pic)));
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -965,108 +891,108 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'EVENTS') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,time());
-    $eventAttend = OLD_ProcessEventMask($fbcmdPrefs['events_attend_mask']);
-    $fqlEventMember = "SELECT eid,rsvp_status FROM event_member WHERE uid={$fbUser} AND rsvp_status IN ({$eventAttend})";
-    $keyEventMember = 'eid';
-    $fqlEvent = "SELECT eid,name,start_time FROM event WHERE eid IN (SELECT eid FROM #fqlEventMember) AND start_time > {$fbcmdParams[1]} ORDER BY start_time";
-    OLD_MultiFQL(array('EventMember','Event'));
-    if (!empty($dataEvent)) {
-      OLD_PrintHeader(OLD_PrintIfPref('event_save','[#]'),'START_TIME','RSVP','EVENT');
-      $eventNum = 0;
-      foreach ($dataEvent as $event) {
-        $eventNum++;
-        OLD_PrintRow(OLD_PrintIfPref('event_save','[' . $eventNum . ']'),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$indexEventMember[$event['eid']]['rsvp_status'],$event['name']);
-      }
-      OLD_SaveEventData($dataEvent);
-    }
-  }
+  // if ($fbcmdCommand == 'EVENTS') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,time());
+    // $eventAttend = OLD_ProcessEventMask($fbcmdPrefs['events_attend_mask']);
+    // $fqlEventMember = "SELECT eid,rsvp_status FROM event_member WHERE uid={$fbUser} AND rsvp_status IN ({$eventAttend})";
+    // $keyEventMember = 'eid';
+    // $fqlEvent = "SELECT eid,name,start_time FROM event WHERE eid IN (SELECT eid FROM #fqlEventMember) AND start_time > {$fbcmdParams[1]} ORDER BY start_time";
+    // OLD_MultiFQL(array('EventMember','Event'));
+    // if (!empty($dataEvent)) {
+      // OLD_PrintHeader(OLD_PrintIfPref('event_save','[#]'),'START_TIME','RSVP','EVENT');
+      // $eventNum = 0;
+      // foreach ($dataEvent as $event) {
+        // $eventNum++;
+        // OLD_PrintRow(OLD_PrintIfPref('event_save','[' . $eventNum . ']'),date($fbcmdPrefs['event_dateformat'],$event['start_time']),$indexEventMember[$event['eid']]['rsvp_status'],$event['name']);
+      // }
+      // OLD_SaveEventData($dataEvent);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FINBOX') { //1
-    ValidateParamCount(1);
-    OLD_GetFlistIds($fbcmdParams[1],true);
-    $matchInRecipients = "('" . implode("' in recipients OR '",$OLD_FlistMatchArray) . "' in recipients)";
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
-    $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE (folder_id = 0 OR folder_id = 1 OR folder_id = 4) and $matchInRecipients";
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-    $keyMessageNames = 'id';
-    OLD_MultiFQL(array('Thread','MessageNames'));
-    if (!empty($dataThread)) {
-      OLD_PrintFolderHeader();
-      $threadNum = 0;
-      foreach ($dataThread as $t) {
-        OLD_PrintFolderObject(++$threadNum,$t);
-      }
-      OLD_SaveMailData($dataThread);
-    }
-  }
+  // if ($fbcmdCommand == 'FINBOX') { //1
+    // ValidateParamCount(1);
+    // OLD_GetFlistIds($fbcmdParams[1],true);
+    // $matchInRecipients = "('" . implode("' in recipients OR '",$OLD_FlistMatchArray) . "' in recipients)";
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
+    // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE (folder_id = 0 OR folder_id = 1 OR folder_id = 4) and $matchInRecipients";
+    // $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    // $keyMessageNames = 'id';
+    // OLD_MultiFQL(array('Thread','MessageNames'));
+    // if (!empty($dataThread)) {
+      // OLD_PrintFolderHeader();
+      // $threadNum = 0;
+      // foreach ($dataThread as $t) {
+        // OLD_PrintFolderObject(++$threadNum,$t);
+      // }
+      // OLD_SaveMailData($dataThread);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FLAST') { //1
-    ValidateParamCount(1,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_flast_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_flast_count']);
-    OLD_GetFlistIds($fbcmdParams[1],true);
-    OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('status_show_date','TIME'),'STATUS');
-    do {
-      $curChunkIds = OLD_GetNextChunkIds();
-      if ($curChunkIds) {
-        $results = OLD_MultiFQLById($curChunkIds,"SELECT uid,message,time FROM status WHERE uid=[id] ORDER BY time DESC LIMIT {$fbcmdParams[2]}");
-        foreach ($curChunkIds as $id) {
-          if ($results[$id]) {
-            foreach ($results[$id] as $status) {
-              OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',date($fbcmdPrefs['status_dateformat'],$status['time'])),$status['message']);
-            }
-          }
-        }
-      }
-    } while ($curChunkIds);
-  }
+  // if ($fbcmdCommand == 'FLAST') { //1
+    // ValidateParamCount(1,2);
+    // SetDefaultParam(1,$fbcmdPrefs['default_flast_flist']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_flast_count']);
+    // OLD_GetFlistIds($fbcmdParams[1],true);
+    // OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('status_show_date','TIME'),'STATUS');
+    // do {
+      // $curChunkIds = OLD_GetNextChunkIds();
+      // if ($curChunkIds) {
+        // $results = OLD_MultiFQLById($curChunkIds,"SELECT uid,message,time FROM status WHERE uid=[id] ORDER BY time DESC LIMIT {$fbcmdParams[2]}");
+        // foreach ($curChunkIds as $id) {
+          // if ($results[$id]) {
+            // foreach ($results[$id] as $status) {
+              // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',date($fbcmdPrefs['status_dateformat'],$status['time'])),$status['message']);
+            // }
+          // }
+        // }
+      // }
+    // } while ($curChunkIds);
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FONLINE') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_fonline_flist']);
-    OLD_GetFlistIds($fbcmdParams[1]);
-    OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME','ONLINE_PRESENCE');
-    foreach ($OLD_FlistMatchArray as $id) {
-      if (($indexFriendBaseInfo[$id]['online_presence'] == 'active')||(($indexFriendBaseInfo[$id]['online_presence'] == 'idle')&&($fbcmdPrefs['online_idle']))) {
-        OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),$indexFriendBaseInfo[$id]['online_presence']);
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'FONLINE') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_fonline_flist']);
+    // OLD_GetFlistIds($fbcmdParams[1]);
+    // OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME','ONLINE_PRESENCE');
+    // foreach ($OLD_FlistMatchArray as $id) {
+      // if (($indexFriendBaseInfo[$id]['online_presence'] == 'active')||(($indexFriendBaseInfo[$id]['online_presence'] == 'idle')&&($fbcmdPrefs['online_idle']))) {
+        // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),$indexFriendBaseInfo[$id]['online_presence']);
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FQL') { //1
-    ValidateParamCount(1,2);
-    $fql = $fbcmdParams[1];
-    $fql = str_replace('[me]', $fbUser, $fql);
-    SetDefaultParam(2,'');
-    if ($fbcmdParams[2]) {
-      OLD_GetFlistIds($fbcmdParams[2]);
-      $fql = str_replace('[flist]', "({$OLD_FlistMatchIdString})", $fql);
-    }
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      OLD_PrintHeader('INDEX','FIELD','VALUE');
-      for ($i = 0; $i < count($fbReturn); $i++) {
-        OLD_PrintRecursiveObject(array($i+1),'',$fbReturn[$i]);
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'FQL') { //1
+    // ValidateParamCount(1,2);
+    // $fql = $fbcmdParams[1];
+    // $fql = str_replace('[me]', $fbUser, $fql);
+    // SetDefaultParam(2,'');
+    // if ($fbcmdParams[2]) {
+      // OLD_GetFlistIds($fbcmdParams[2]);
+      // $fql = str_replace('[flist]', "({$OLD_FlistMatchIdString})", $fql);
+    // }
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // if (!empty($fbReturn)) {
+      // OLD_PrintHeader('INDEX','FIELD','VALUE');
+      // for ($i = 0; $i < count($fbReturn); $i++) {
+        // OLD_PrintRecursiveObject(array($i+1),'',$fbReturn[$i]);
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1080,77 +1006,77 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FSTATUS') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_fstatus_flist']);
-    OLD_GetFlistIds($fbcmdParams[1]);
-    $header = array();
-    OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('status_show_date','TIME'),'STATUS');
-    foreach ($OLD_FlistMatchArray as $id) {
-      $status = $indexFriendBaseInfo[$id]['status'];
-      if ($status) {
-        if ($status['message']) {
-          OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',date($fbcmdPrefs['status_dateformat'],$status['time'])),$status['message']);
-        } else {
-          if ($fbcmdPrefs['print_blanks']) {
-            OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',''),'[blank]');
-          }
-        }
-      } else {
-        if ($fbcmdPrefs['print_blanks']) {
-          OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',''),'[n/a]');
-        }
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'FSTATUS') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_fstatus_flist']);
+    // OLD_GetFlistIds($fbcmdParams[1]);
+    // $header = array();
+    // OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('status_show_date','TIME'),'STATUS');
+    // foreach ($OLD_FlistMatchArray as $id) {
+      // $status = $indexFriendBaseInfo[$id]['status'];
+      // if ($status) {
+        // if ($status['message']) {
+          // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',date($fbcmdPrefs['status_dateformat'],$status['time'])),$status['message']);
+        // } else {
+          // if ($fbcmdPrefs['print_blanks']) {
+            // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',''),'[blank]');
+          // }
+        // }
+      // } else {
+        // if ($fbcmdPrefs['print_blanks']) {
+          // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('status_show_date',''),'[n/a]');
+        // }
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FSTREAM') { //1
-    ValidateParamCount(0,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_fstream_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_fstream_count']);
-    OLD_GetFlistIds($fbcmdParams[1],true);
-    if (strtoupper($fbcmdParams[2]) == 'NEW') {
-      OLD_CheckStreamTimeStamp();
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id IN ({$OLD_FlistMatchIdString}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
-    } else {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id IN ({$OLD_FlistMatchIdString}) LIMIT {$fbcmdParams[2]}";
-    }
-    $queries = array('Stream');
-    if ($fbcmdPrefs['stream_show_comments']) {
-      $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id, comments.comment_list.fromid FROM #fqlStream)';
-      $keyStreamNames = 'id';
-      $queries[] = 'StreamNames';
-    }
-    OLD_MultiFQL($queries);
-    if (!empty($dataStream)) {
-      OLD_PrintPostHeader();
-      $postNum = 0;
-      foreach ($dataStream as $a) {
-        OLD_PrintPostObject(++$postNum,$a);
-      }
-      OLD_SavePostData($dataStream);
-    }
-  }
+  // if ($fbcmdCommand == 'FSTREAM') { //1
+    // ValidateParamCount(0,2);
+    // SetDefaultParam(1,$fbcmdPrefs['default_fstream_flist']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_fstream_count']);
+    // OLD_GetFlistIds($fbcmdParams[1],true);
+    // if (strtoupper($fbcmdParams[2]) == 'NEW') {
+      // OLD_CheckStreamTimeStamp();
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id IN ({$OLD_FlistMatchIdString}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+    // } else {
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id IN ({$OLD_FlistMatchIdString}) LIMIT {$fbcmdParams[2]}";
+    // }
+    // $queries = array('Stream');
+    // if ($fbcmdPrefs['stream_show_comments']) {
+      // $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id, comments.comment_list.fromid FROM #fqlStream)';
+      // $keyStreamNames = 'id';
+      // $queries[] = 'StreamNames';
+    // }
+    // OLD_MultiFQL($queries);
+    // if (!empty($dataStream)) {
+      // OLD_PrintPostHeader();
+      // $postNum = 0;
+      // foreach ($dataStream as $a) {
+        // OLD_PrintPostObject(++$postNum,$a);
+      // }
+      // OLD_SavePostData($dataStream);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FULLPOST') { //1
-    ValidateParamCount(1);
-    $curPostId = OLD_GetPostId($fbcmdParams[1],true);
-    if ($curPostId) {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE post_id='{$curPostId}'";
-      $fqlComments = "SELECT fromid, time, text FROM comment WHERE post_id='{$curPostId}' ORDER BY time";
-      $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream) OR id IN (SELECT fromid FROM #fqlComments)';
-      $keyStreamNames = 'id';
-      OLD_MultiFQL(array('Stream','Comments','StreamNames'));
-      if (!empty($dataStream)) {
-        OLD_PrintPostHeader();
-        OLD_PrintPostObject($fbcmdParams[1],$dataStream[0],$dataComments);
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'FULLPOST') { //1
+    // ValidateParamCount(1);
+    // $curPostId = OLD_GetPostId($fbcmdParams[1],true);
+    // if ($curPostId) {
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE post_id='{$curPostId}'";
+      // $fqlComments = "SELECT fromid, time, text FROM comment WHERE post_id='{$curPostId}' ORDER BY time";
+      // $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream) OR id IN (SELECT fromid FROM #fqlComments)';
+      // $keyStreamNames = 'id';
+      // OLD_MultiFQL(array('Stream','Comments','StreamNames'));
+      // if (!empty($dataStream)) {
+        // OLD_PrintPostHeader();
+        // OLD_PrintPostObject($fbcmdParams[1],$dataStream[0],$dataComments);
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1168,75 +1094,6 @@
     }
   }
 
-    // global $goDestinations;
-    // $hasLaunched = false;
-    // ValidateParamCount(1,2);
-    // if ((ParamCount() == 1) && (is_numeric($fbcmdParams[1]))) {
-      // $fbcmdParams[2] = $fbcmdParams[1];
-      // $fbcmdParams[1] = $fbcmdPrefs['go_default_numeric'];
-    // }
-    // $go = $fbcmdParams[1];
-    // if (ParamCount() == 1) {
-      // if (in_array(strtolower($go),$goDestinations)) {
-        // $go = strtoupper($go);
-        // if ($go == 'WALL') {
-          // LaunchBrowser("http://www.facebook.com/profile.php?id={$fbUser}");
-        // }
-      // } else {
-        // OLD_MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
-        // $tagList = OLD_MatchTag($fbcmdParams[1]);
-        // if ($tagList) {
-          // LaunchBrowser("http://www.facebook.com/profile.php?id={$tagList[0][0]}");
-        // }
-      // }
-    // } else {
-      // $go = strtoupper($go);
-      // if ($fbcmdParams[2]) {
-        // if (($go == 'ALBUM')||($go == 'A')) {
-          // $lastNoticeData = LoadDataFile('albumfile','album_save');
-          // if (isset($lastNoticeData['link'][$fbcmdParams[2]])) {
-            // LaunchBrowser($lastNoticeData['link'][$fbcmdParams[2]]);
-          // }
-        // }
-        // if (($go == 'EVENT')||($go == 'E')) {
-          // $lastEventData = LoadDataFile('eventfile','event_save');
-          // if (isset($lastEventData['ids'][$fbcmdParams[2]])) {
-            // LaunchBrowser('http://www.facebook.com/event.php?eid=' . $lastEventData['ids'][$fbcmdParams[2]]);
-          // }
-        // }
-        // if (($go == 'LINK')||($go == 'L')) {
-          // $lastPostData = LoadDataFile('postfile','stream_save');
-          // if (isset($lastPostData['link'][$fbcmdParams[2]])) {
-            // LaunchBrowser($lastPostData['link'][$fbcmdParams[2]]);
-          // } else {
-            // $go = 'POST';
-          // }
-        // }
-        // if (($go == 'NOTICE')||($go == 'N')) {
-          // $lastNoticeData = LoadDataFile('noticefile','notices_save');
-          // if (isset($lastNoticeData['href'][$fbcmdParams[2]])) {
-            // LaunchBrowser($lastNoticeData['href'][$fbcmdParams[2]]);
-          // }
-        // }
-        // if (($go == 'MSG')||($go == 'M')) {
-          // $curThreadId = OLD_GetThreadId($fbcmdParams[2]);
-          // if ($curThreadId) {
-            // LaunchBrowser("http://www.facebook.com/inbox/?folder=[fb]messages&tid={$curThreadId}");
-          // }
-        // }
-        // if (($go == 'POST')||($go == 'P')) {
-          // $lastPostData = LoadDataFile('postfile','stream_save');
-          // if (isset($lastPostData['url'][$fbcmdParams[2]])) {
-            // LaunchBrowser($lastPostData['url'][$fbcmdParams[2]]);
-          // }
-        // }
-      // }
-    // }
-    // if (!$hasLaunched) {
-      // FbcmdWarning("Problem with your GO requeset");
-    // }
-  // }
-
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'GROUPS') { //2
@@ -1249,31 +1106,31 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'INBOX') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
-    if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 AND unread > 0";
-    } else {
-      if (strtoupper($fbcmdParams[1]) == 'NEW') {
-        OLD_CheckMailTimeStamp();
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 AND updated_time > {$lastMailData['timestamp']}";
-      } else {
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
-      }
-    }
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-    $keyMessageNames = 'id';
-    OLD_MultiFQL(array('Thread','MessageNames'));
-    if (!empty($dataThread)) {
-      OLD_PrintFolderHeader();
-      $threadNum = 0;
-      foreach ($dataThread as $t) {
-        OLD_PrintFolderObject(++$threadNum,$t);
-      }
-      OLD_SaveMailData($dataThread);
-    }
-  }
+  // if ($fbcmdCommand == 'INBOX') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_inbox_count']);
+    // if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
+      // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 AND unread > 0";
+    // } else {
+      // if (strtoupper($fbcmdParams[1]) == 'NEW') {
+        // OLD_CheckMailTimeStamp();
+        // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 AND updated_time > {$lastMailData['timestamp']}";
+      // } else {
+        // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 0 LIMIT {$fbcmdParams[1]}";
+      // }
+    // }
+    // $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    // $keyMessageNames = 'id';
+    // OLD_MultiFQL(array('Thread','MessageNames'));
+    // if (!empty($dataThread)) {
+      // OLD_PrintFolderHeader();
+      // $threadNum = 0;
+      // foreach ($dataThread as $t) {
+        // OLD_PrintFolderObject(++$threadNum,$t);
+      // }
+      // OLD_SaveMailData($dataThread);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1339,7 +1196,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'LOADNOTE') { //1
+  if ($fbcmdCommand == 'LOADNOTE') { //2
     ValidateParamCount(2);
     SetDefaultParam(1,$fbcmdPrefs['default_loadnote_title']);
     SetDefaultParam(2,$fbcmdPrefs['default_loadnote_filename']);
@@ -1355,40 +1212,40 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MSG') { //1
-    ValidateParamCount(1);
-    $curThreadId = OLD_GetThreadId($fbcmdParams[1]);
-    if ($curThreadId) {
-      $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
-      $fqlMessage = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$curThreadId}";
-      $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-      $keyMessageNames = 'id';
-      OLD_MultiFQL(array('Thread','Message','MessageNames'));
-      if (!empty($dataMessage)) {
-        OLD_PrintHeader(OLD_PrintIfPref('show_id','USER_ID'),'FROM',OLD_PrintIfPref('msg_show_date','DATE'),'MESSAGE');
-        if ($fbcmdPrefs['msg_blankrow']) {
-          OLD_PrintRow('');
-        }
-        if ($dataThread[0]['subject'] != '') {
-          OLD_PrintRow(OLD_PrintIfPref('show_id',''),'Subject',OLD_PrintIfPref('msg_show_date',''),$dataThread[0]['subject']);
-          if ($fbcmdPrefs['msg_blankrow']) {
-            OLD_PrintRow('');
-          }
-        }
-        foreach ($dataMessage as $m) {
-          if ($m['created_time'] == '') { // note: the created_time field appears to be flakey
-            $displayDate = '';
-          } else {
-            $displayDate = date($fbcmdPrefs['msg_dateformat'],$m['created_time']);
-          }
-          OLD_PrintRow(OLD_PrintIfPref('show_id',$m['author_id']),OLD_ProfileName($m['author_id']),OLD_PrintIfPref('msg_show_date',$displayDate),$m['body']);
-          if ($fbcmdPrefs['msg_blankrow']) {
-            OLD_PrintRow('');
-          }
-        }
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'MSG') { //1
+    // ValidateParamCount(1);
+    // $curThreadId = OLD_GetThreadId($fbcmdParams[1]);
+    // if ($curThreadId) {
+      // $fqlThread = "SELECT subject,recipients,message_count,snippet,unread FROM thread WHERE thread_id = {$curThreadId}";
+      // $fqlMessage = "SELECT message_id,thread_id,author_id,body,created_time,attachment,viewer_id FROM message WHERE thread_id = {$curThreadId}";
+      // $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+      // $keyMessageNames = 'id';
+      // OLD_MultiFQL(array('Thread','Message','MessageNames'));
+      // if (!empty($dataMessage)) {
+        // OLD_PrintHeader(OLD_PrintIfPref('show_id','USER_ID'),'FROM',OLD_PrintIfPref('msg_show_date','DATE'),'MESSAGE');
+        // if ($fbcmdPrefs['msg_blankrow']) {
+          // OLD_PrintRow('');
+        // }
+        // if ($dataThread[0]['subject'] != '') {
+          // OLD_PrintRow(OLD_PrintIfPref('show_id',''),'Subject',OLD_PrintIfPref('msg_show_date',''),$dataThread[0]['subject']);
+          // if ($fbcmdPrefs['msg_blankrow']) {
+            // OLD_PrintRow('');
+          // }
+        // }
+        // foreach ($dataMessage as $m) {
+          // if ($m['created_time'] == '') { // note: the created_time field appears to be flakey
+            // $displayDate = '';
+          // } else {
+            // $displayDate = date($fbcmdPrefs['msg_dateformat'],$m['created_time']);
+          // }
+          // OLD_PrintRow(OLD_PrintIfPref('show_id',$m['author_id']),OLD_ProfileName($m['author_id']),OLD_PrintIfPref('msg_show_date',$displayDate),$m['body']);
+          // if ($fbcmdPrefs['msg_blankrow']) {
+            // OLD_PrintRow('');
+          // }
+        // }
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1400,55 +1257,38 @@
         FbcmdWarning('no friends');
       }
     }
-    // ValidateParamCount(1);
-    // SetDefaultParam(1,$fbcmdPrefs['default_mutual_flist']);
-    // OLD_GetFlistIds($fbcmdParams[1]);
-    // OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('show_id','FRIEND_ID'),'FRIEND_NAME');
-    // do {
-      // $curChunkIds = OLD_GetNextChunkIds();
-      // if ($curChunkIds) {
-        // $results = OLD_MultiFQLById($curChunkIds,"SELECT uid,name FROM user WHERE uid IN (SELECT uid1 FROM friend WHERE uid1 IN (SELECT uid2 FROM friend WHERE uid1={$fbUser}) AND uid2=[id])");
-        // foreach ($curChunkIds as $id) {
-          // if ($results[$id]) {
-            // foreach ($results[$id] as $user) {
-              // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('show_id',$id),$user['name']);
-            // }
-          // }
-        // }
-      // }
-    // } while ($curChunkIds);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MYWALL') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_mywall_count']);
-    if (strtoupper($fbcmdParams[1]) == 'NEW') {
-      OLD_CheckStreamTimeStamp();
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
-    } else {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} LIMIT {$fbcmdParams[1]}";
-    }
-    $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream)';
-    $keyStreamNames = 'id';
-    OLD_MultiFQL(array('Stream','StreamNames'));
-    if (!empty($dataStream)) {
-      OLD_PrintHeader(OLD_PrintIfPref('stream_save','[#]'),OLD_PrintIfPref('stream_show_postid','POST_ID'),OLD_PrintIfPref('show_id','UID'),'NAME',OLD_PrintIfPref('stream_show_date','DATE'),'MESSAGE');
-      if ($fbcmdPrefs['stream_blankrow']) {
-        OLD_PrintRow('');
-      }
-      $postNum = 0;
-      foreach ($dataStream as $a) {
-        $postNum++;
-        OLD_PrintRow(OLD_PrintIfPref('stream_save','[' . $postNum . ']'),OLD_PrintIfPref('stream_show_postid',$a['post_id']),OLD_PrintIfPref('show_id',$a['actor_id']),OLD_ProfileName($a['actor_id']),OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$a['created_time'])),$a['message']);
-        if ($fbcmdPrefs['stream_blankrow']) {
-          OLD_PrintRow('');
-        }
-      }
-      OLD_SavePostData($dataStream);
-    }
-  }
+  // if ($fbcmdCommand == 'MYWALL') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_mywall_count']);
+    // if (strtoupper($fbcmdParams[1]) == 'NEW') {
+      // OLD_CheckStreamTimeStamp();
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+    // } else {
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE source_id={$fbUser} AND target_id={$fbUser} LIMIT {$fbcmdParams[1]}";
+    // }
+    // $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id FROM #fqlStream)';
+    // $keyStreamNames = 'id';
+    // OLD_MultiFQL(array('Stream','StreamNames'));
+    // if (!empty($dataStream)) {
+      // OLD_PrintHeader(OLD_PrintIfPref('stream_save','[#]'),OLD_PrintIfPref('stream_show_postid','POST_ID'),OLD_PrintIfPref('show_id','UID'),'NAME',OLD_PrintIfPref('stream_show_date','DATE'),'MESSAGE');
+      // if ($fbcmdPrefs['stream_blankrow']) {
+        // OLD_PrintRow('');
+      // }
+      // $postNum = 0;
+      // foreach ($dataStream as $a) {
+        // $postNum++;
+        // OLD_PrintRow(OLD_PrintIfPref('stream_save','[' . $postNum . ']'),OLD_PrintIfPref('stream_show_postid',$a['post_id']),OLD_PrintIfPref('show_id',$a['actor_id']),OLD_ProfileName($a['actor_id']),OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$a['created_time'])),$a['message']);
+        // if ($fbcmdPrefs['stream_blankrow']) {
+          // OLD_PrintRow('');
+        // }
+      // }
+      // OLD_SavePostData($dataStream);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1472,94 +1312,126 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'NOTICES') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
-    if ((strtoupper($fbcmdParams[1]) == 'UNREAD')||(strtoupper($fbcmdParams[1]) == 'MARKREAD')) {
-      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time,is_unread FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0 AND is_unread = 1";
-    } else {
-      $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time,is_unread FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0";
-    }
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT sender_id FROM #fqlNotification)';
-    $keyMessageNames = 'id';
-    $fqlApplicationNames = 'SELECT app_id,display_name FROM application WHERE app_id IN (SELECT app_id FROM #fqlNotification)';
-    $keyApplicationNames = 'app_id';
-    OLD_MultiFQL(array('Notification','MessageNames','ApplicationNames'));
+  // if ($fbcmdCommand == 'NOTICES') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_notices_type']);
+    // if ((strtoupper($fbcmdParams[1]) == 'UNREAD')||(strtoupper($fbcmdParams[1]) == 'MARKREAD')) {
+      // $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time,is_unread FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0 AND is_unread = 1";
+    // } else {
+      // $fqlNotification = "SELECT notification_id,sender_id,title_html,title_text,body_html,body_text,href,app_id,created_time,is_unread FROM notification WHERE recipient_id={$fbUser} AND is_hidden = 0";
+    // }
+    // $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT sender_id FROM #fqlNotification)';
+    // $keyMessageNames = 'id';
+    // $fqlApplicationNames = 'SELECT app_id,display_name FROM application WHERE app_id IN (SELECT app_id FROM #fqlNotification)';
+    // $keyApplicationNames = 'app_id';
+    // OLD_MultiFQL(array('Notification','MessageNames','ApplicationNames'));
 
-    if (!empty($dataNotification)) {
-      OLD_PrintNotificationHeader();
-      $threadNum = 0;
-      foreach ($dataNotification as $n) {
-        OLD_PrintNotificationObject(++$threadNum,$n);
-      }
-      if (strtoupper($fbcmdParams[1]) == 'MARKREAD') {
-        $unreadIds = array();
-        foreach ($dataNotification as $n) {
-          $unreadIds[] = $n['notification_id'];
-        }
-        if (count($unreadIds) > 0) {
-          $fbReturn = $fbObject->api_client->call_method('facebook.Notifications.markRead',array('notification_ids' => implode(',',$unreadIds)));
-          TraceReturn();
-        }
-      }
-      OLD_SaveNoticeData($dataNotification);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'NOTIFY') { //1
-    ValidateParamCount(0);
-    try {
-      $fbReturn = $fbObject->api_client->notifications_get();
-      TraceReturn();
-    } catch (Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    OLD_PrintHeader('FIELD','VALUE');
-    OLD_PrintRow('MESSAGES_UNREAD',$fbReturn['messages']['unread']);
-    OLD_PrintRow('POKES',$fbReturn['pokes']['unread']);
-    OLD_PrintRow('SHARES_UNREAD',$fbReturn['shares']['unread']);
-    $fqlNotifyFriends = 'SELECT uid,name FROM user WHERE uid in (' . array_implode_safe(',',$fbReturn['friend_requests']) . ')';
-    $fqlNotifyGroups = 'SELECT gid,name FROM group WHERE gid in (' . array_implode_safe(',',$fbReturn['group_invites']) . ')';
-    $fqlNotifyEvents = 'SELECT eid,name FROM event WHERE eid in (' . array_implode_safe(',',$fbReturn['event_invites']) . ')';
-    OLD_MultiFQL(array('NotifyFriends','NotifyGroups','NotifyEvents'));
-    OLD_NotifyHelper($fbReturn['friend_requests'],$dataNotifyFriends,'FRIEND','REQUESTS');
-    OLD_NotifyHelper($fbReturn['group_invites'],$dataNotifyGroups,'GROUP','INVITES');
-    OLD_NotifyHelper($fbReturn['event_invites'],$dataNotifyEvents,'EVENT','INVITES');
-  }
+    // if (!empty($dataNotification)) {
+      // OLD_PrintNotificationHeader();
+      // $threadNum = 0;
+      // foreach ($dataNotification as $n) {
+        // OLD_PrintNotificationObject(++$threadNum,$n);
+      // }
+      // if (strtoupper($fbcmdParams[1]) == 'MARKREAD') {
+        // $unreadIds = array();
+        // foreach ($dataNotification as $n) {
+          // $unreadIds[] = $n['notification_id'];
+        // }
+        // if (count($unreadIds) > 0) {
+          // $fbReturn = $fbObject->api_client->call_method('facebook.Notifications.markRead',array('notification_ids' => implode(',',$unreadIds)));
+          // TraceReturn();
+        // }
+      // }
+      // OLD_SaveNoticeData($dataNotification);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'OPICS') { //1 can only be done by fql ?
-    ValidateParamCount(1,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_opics_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_opics_savedir']);
-    OLD_GetFlistIds($fbcmdParams[1],true);
-    OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('pic_show_albumid','AID'),'PID',OLD_PrintIfPref('pic_show_date','CREATED'),'CAPTION',OLD_PrintIfPref('pic_show_links','LINK'),OLD_PrintIfPref('pic_show_src','SRC'));
-    do {
-      $curChunkIds = OLD_GetNextChunkIds();
-      if ($curChunkIds) {
-        $results = OLD_MultiFQLById($curChunkIds,"SELECT pid,aid,owner,src_small,src_big,src,link,caption,created FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner=[id])");
-        foreach ($curChunkIds as $id) {
-          if ($results[$id]) {
-            foreach ($results[$id] as $pic) {
-              OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('pic_show_albumid',$pic['aid']),$pic['pid'],OLD_PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$pic['created'])),$pic['caption'],OLD_PrintIfPref('pic_show_links',$pic['link']),OLD_PrintIfPref('pic_show_src',PhotoSrc($pic)));
-              if ($fbcmdParams[2]) {
-                SavePhoto(PhotoSrc($pic),$pic,'',$fbcmdParams[2],$fbcmdPrefs['opics_filename']);
-              }
-            }
-          }
-        }
-      }
-    } while ($curChunkIds);
-  }
+  // if ($fbcmdCommand == 'NOTIFY') { //1
+    // ValidateParamCount(0);
+    // try {
+      // $fbReturn = $fbObject->api_client->notifications_get();
+      // TraceReturn();
+    // } catch (Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // OLD_PrintHeader('FIELD','VALUE');
+    // OLD_PrintRow('MESSAGES_UNREAD',$fbReturn['messages']['unread']);
+    // OLD_PrintRow('POKES',$fbReturn['pokes']['unread']);
+    // OLD_PrintRow('SHARES_UNREAD',$fbReturn['shares']['unread']);
+    // $fqlNotifyFriends = 'SELECT uid,name FROM user WHERE uid in (' . array_implode_safe(',',$fbReturn['friend_requests']) . ')';
+    // $fqlNotifyGroups = 'SELECT gid,name FROM group WHERE gid in (' . array_implode_safe(',',$fbReturn['group_invites']) . ')';
+    // $fqlNotifyEvents = 'SELECT eid,name FROM event WHERE eid in (' . array_implode_safe(',',$fbReturn['event_invites']) . ')';
+    // OLD_MultiFQL(array('NotifyFriends','NotifyGroups','NotifyEvents'));
+    // OLD_NotifyHelper($fbReturn['friend_requests'],$dataNotifyFriends,'FRIEND','REQUESTS');
+    // OLD_NotifyHelper($fbReturn['group_invites'],$dataNotifyGroups,'GROUP','INVITES');
+    // OLD_NotifyHelper($fbReturn['event_invites'],$dataNotifyEvents,'EVENT','INVITES');
+  // }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  // if ($fbcmdCommand == 'OPICS') { //1 can only be done by fql ?
+    // ValidateParamCount(1,2);
+    // SetDefaultParam(1,$fbcmdPrefs['default_opics_flist']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_opics_savedir']);
+    // OLD_GetFlistIds($fbcmdParams[1],true);
+    // OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('pic_show_albumid','AID'),'PID',OLD_PrintIfPref('pic_show_date','CREATED'),'CAPTION',OLD_PrintIfPref('pic_show_links','LINK'),OLD_PrintIfPref('pic_show_src','SRC'));
+    // do {
+      // $curChunkIds = OLD_GetNextChunkIds();
+      // if ($curChunkIds) {
+        // $results = OLD_MultiFQLById($curChunkIds,"SELECT pid,aid,owner,src_small,src_big,src,link,caption,created FROM photo WHERE aid IN (SELECT aid FROM album WHERE owner=[id])");
+        // foreach ($curChunkIds as $id) {
+          // if ($results[$id]) {
+            // foreach ($results[$id] as $pic) {
+              // OLD_PrintRow(OLD_PrintIfPref('show_id',$id),OLD_ProfileName($id),OLD_PrintIfPref('pic_show_albumid',$pic['aid']),$pic['pid'],OLD_PrintIfPref('pic_show_date',date($fbcmdPrefs['pic_dateformat'],$pic['created'])),$pic['caption'],OLD_PrintIfPref('pic_show_links',$pic['link']),OLD_PrintIfPref('pic_show_src',PhotoSrc($pic)));
+              // if ($fbcmdParams[2]) {
+                // SavePhoto(PhotoSrc($pic),$pic,'',$fbcmdParams[2],$fbcmdPrefs['opics_filename']);
+              // }
+            // }
+          // }
+        // }
+      // }
+    // } while ($curChunkIds);
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'POST') { //1
     ValidateParamCount(1,10);
-    PostCore();
+    $args = array();
+    $firstParam = strtoupper($fbcmdParams[1]);
+    if (strtoupper($fbcmdParams[1]) == 'MP3') {
+      FbcmdFatalError("2.0: POST MP3 not done yet / not supported");
+    }
+    if (strtoupper($fbcmdParams[1]) == 'SRC') {
+      ValidateParamCount(2,9);
+      SetDefaultParam(2,$fbcmdPrefs['default_post_src_url']);
+      $args['source'] = $fbcmdParams[2];
+      RemoveParams(1,2);
+    }
+    if (strtoupper($fbcmdParams[1]) == 'IMG') {
+      ValidateParamCount(2,7);
+      SetDefaultParam(2,$fbcmdPrefs['default_post_img_url']);
+      $args['picture'] = $fbcmdParams[2];
+      RemoveParams(1,2);
+    }
+    ValidateParamCount(1,5);
+    SetDefaultParam(1,$fbcmdPrefs['default_post_message']);
+    //2 todo: tagging ?
+    SetDefaultParam(2, $fbcmdPrefs['default_post_name']); //1 //2 consider changing order: link before name ??
+    SetDefaultParam(3, $fbcmdPrefs['default_post_link']);
+    SetDefaultParam(4, $fbcmdPrefs['default_post_caption']);
+    SetDefaultParam(5, $fbcmdPrefs['default_post_description']);
+
+    $args['message'] = $fbcmdParams[1];
+    if ($fbcmdParams[2]) $args['name'] = $fbcmdParams[2];
+    if ($fbcmdParams[3]) $args['link'] = $fbcmdParams[3];
+    if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
+    if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
+
+    //$fbcmdExtraOutput['index']  = 'lastpost';// 2 TODO: revisit this
+    OpenGraphAPI("/{$fbcmdTargetId}/feed",'POST',$args);
     if (isset($fbReturn['id'])) {
       NewLast('post', $fbReturn['id'], $fbcmdParams[1]);
     } else {
@@ -1597,52 +1469,52 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'PPICS') { //1
-    ValidateParamCount(0,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_ppics_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_ppics_savedir']);
-    OLD_GetFlistIds($fbcmdParams[1]);
-    $fql = "SELECT uid,pic,pic_big,pic_small,pic_square FROM user WHERE uid IN ({$OLD_FlistMatchIdString}) ORDER BY last_name";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    if (!empty($fbReturn)) {
-      OLD_PrintHeader(OLD_PrintIfPref('show_id','UID'),'NAME','SRC');
-      foreach ($fbReturn as $user) {
-        if ((OLD_UserPhotoSrc($user))||($fbcmdPrefs['print_blanks'])) {
-          OLD_PrintRow(OLD_PrintIfPref('show_id',$user['uid']),OLD_ProfileName($user['uid']),OLD_UserPhotoSrc($user));
-        }
-        if (($fbcmdParams[2])&&(OLD_UserPhotoSrc($user))) {
-          SavePhoto(OLD_UserPhotoSrc($user),null,$user['uid'],$fbcmdParams[2],$fbcmdPrefs['ppics_filename'],false);
-        }
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'PPICS') { //1
+    // ValidateParamCount(0,2);
+    // SetDefaultParam(1,$fbcmdPrefs['default_ppics_flist']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_ppics_savedir']);
+    // OLD_GetFlistIds($fbcmdParams[1]);
+    // $fql = "SELECT uid,pic,pic_big,pic_small,pic_square FROM user WHERE uid IN ({$OLD_FlistMatchIdString}) ORDER BY last_name";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // if (!empty($fbReturn)) {
+      // OLD_PrintHeader(OLD_PrintIfPref('show_id','UID'),'NAME','SRC');
+      // foreach ($fbReturn as $user) {
+        // if ((OLD_UserPhotoSrc($user))||($fbcmdPrefs['print_blanks'])) {
+          // OLD_PrintRow(OLD_PrintIfPref('show_id',$user['uid']),OLD_ProfileName($user['uid']),OLD_UserPhotoSrc($user));
+        // }
+        // if (($fbcmdParams[2])&&(OLD_UserPhotoSrc($user))) {
+          // SavePhoto(OLD_UserPhotoSrc($user),null,$user['uid'],$fbcmdParams[2],$fbcmdPrefs['ppics_filename'],false);
+        // }
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'RECENT') { //1
-    ValidateParamCount(0,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_recent_flist']);
-    SetDefaultParam(2,$fbcmdPrefs['default_recent_count']);
-    OLD_GetFlistIds($fbcmdParams[1],true);
-    $fql = "SELECT uid,message,time FROM status WHERE uid in ({$OLD_FlistMatchIdString}) ORDER BY time DESC LIMIT {$fbcmdParams[2]}";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    if ($fbReturn) {
-      OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('status_show_date','TIME'),'STATUS');
-      foreach ($fbReturn as $status) {
-        OLD_PrintRow(OLD_PrintIfPref('show_id',$status['uid']),OLD_ProfileName($status['uid']),OLD_PrintIfPref('status_show_date',date($fbcmdPrefs['status_dateformat'],$status['time'])),$status['message']);
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'RECENT') { //1
+    // ValidateParamCount(0,2);
+    // SetDefaultParam(1,$fbcmdPrefs['default_recent_flist']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_recent_count']);
+    // OLD_GetFlistIds($fbcmdParams[1],true);
+    // $fql = "SELECT uid,message,time FROM status WHERE uid in ({$OLD_FlistMatchIdString}) ORDER BY time DESC LIMIT {$fbcmdParams[2]}";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // if ($fbReturn) {
+      // OLD_PrintHeader(OLD_PrintIfPref('show_id','ID'),'NAME',OLD_PrintIfPref('status_show_date','TIME'),'STATUS');
+      // foreach ($fbReturn as $status) {
+        // OLD_PrintRow(OLD_PrintIfPref('show_id',$status['uid']),OLD_ProfileName($status['uid']),OLD_PrintIfPref('status_show_date',date($fbcmdPrefs['status_dateformat'],$status['time'])),$status['message']);
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1664,132 +1536,132 @@
   if ($fbcmdCommand == 'RESOLVE') { //2
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true)) {
-      print "{$resolvedId}  {$resolvedText}\n";
+      print "{$resolvedId}  {$resolvedText}\n"; // revisit
     }
   }
 
   ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'RESTATUS') { //1
-    ValidateParamCount(1);
-    OLD_GetCurrentStatus();
-    if ($userStatus != '') {
-      $fql = "SELECT post_id,comments.count FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
-      try {
-        $fbReturn = $fbObject->api_client->fql_query($fql);
-        TraceReturn();
-      } catch(Exception $e) {
-        OLD_FbcmdException($e,'GET-POST');
-      }
-      if (isset($fbReturn[0]['post_id'])) {
-        $postID = $fbReturn[0]['post_id'];
-      } else {
-        FbcmdFatalError("RESTATUS: Could not retrieve previous status post_id");
-      }
-      $deletePost = true;
-      if ($fbcmdPrefs['restatus_comment_new']) {
-        if (isset($fbReturn[0]['comments']['count'])) {
-          if ($fbReturn[0]['comments']['count'] > 0) {
-            $deletePost = false;
-          }
-        } else {
-          FbcmdWarning ("Can not retreive comment count for post_id = {$p}");
-        }
-      }
-      if ($deletePost) {
-        try {
-          $fbReturn = $fbObject->api_client->stream_remove($postID);
-          TraceReturn();
-        } catch (Exception $e) {
-          OLD_FbcmdException($e);
-        }
-        if (!$fbReturn) {
-          FbcmdFatalError("RESTATUS: Could not remove previous status");
-        }
-      }
-    }
-    if ($fbcmdPrefs['status_tag']) {
-      $statusText = OLD_TagText($fbcmdParams[1]);
-    } else {
-      $statusText = $fbcmdParams[1];
-    }
-    try {
-      $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-  }
+  // if ($fbcmdCommand == 'RESTATUS') { //1
+    // ValidateParamCount(1);
+    // OLD_GetCurrentStatus();
+    // if ($userStatus != '') {
+      // $fql = "SELECT post_id,comments.count FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+      // try {
+        // $fbReturn = $fbObject->api_client->fql_query($fql);
+        // TraceReturn();
+      // } catch(Exception $e) {
+        // OLD_FbcmdException($e,'GET-POST');
+      // }
+      // if (isset($fbReturn[0]['post_id'])) {
+        // $postID = $fbReturn[0]['post_id'];
+      // } else {
+        // FbcmdFatalError("RESTATUS: Could not retrieve previous status post_id");
+      // }
+      // $deletePost = true;
+      // if ($fbcmdPrefs['restatus_comment_new']) {
+        // if (isset($fbReturn[0]['comments']['count'])) {
+          // if ($fbReturn[0]['comments']['count'] > 0) {
+            // $deletePost = false;
+          // }
+        // } else {
+          // FbcmdWarning ("Can not retreive comment count for post_id = {$p}");
+        // }
+      // }
+      // if ($deletePost) {
+        // try {
+          // $fbReturn = $fbObject->api_client->stream_remove($postID);
+          // TraceReturn();
+        // } catch (Exception $e) {
+          // OLD_FbcmdException($e);
+        // }
+        // if (!$fbReturn) {
+          // FbcmdFatalError("RESTATUS: Could not remove previous status");
+        // }
+      // }
+    // }
+    // if ($fbcmdPrefs['status_tag']) {
+      // $statusText = OLD_TagText($fbcmdParams[1]);
+    // } else {
+      // $statusText = $fbcmdParams[1];
+    // }
+    // try {
+      // $fbReturn = $fbObject->api_client->call_method('facebook.users.setStatus',array('status' => $statusText,'status_includes_verb' => true));
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'RSVP') { //1
-    ValidateParamCount(2);
-    $eid = OLD_GetEventId($fbcmdParams[1]);
-    $rsvp = $fbcmdParams[2];
-    if (strtoupper($rsvp) == 'YES') {
-      $rsvp = 'attending';
-    }
-    if (strtoupper($rsvp) == 'NO') {
-      $rsvp = 'declined';
-    }
-    if (strtoupper($rsvp) == 'MAYBE') {
-      $rsvp = 'unsure';
-    }
-    try {
-      $fbReturn = $fbObject->api_client->events_rsvp($eid,$rsvp);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-  }
+  // if ($fbcmdCommand == 'RSVP') { //1
+    // ValidateParamCount(2);
+    // $eid = OLD_GetEventId($fbcmdParams[1]);
+    // $rsvp = $fbcmdParams[2];
+    // if (strtoupper($rsvp) == 'YES') {
+      // $rsvp = 'attending';
+    // }
+    // if (strtoupper($rsvp) == 'NO') {
+      // $rsvp = 'declined';
+    // }
+    // if (strtoupper($rsvp) == 'MAYBE') {
+      // $rsvp = 'unsure';
+    // }
+    // try {
+      // $fbReturn = $fbObject->api_client->events_rsvp($eid,$rsvp);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SENTMAIL') { //1
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_sentmail_count']);
-    if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
-      $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 AND unread > 0";
-    } else {
-      if (strtoupper($fbcmdParams[1]) == 'NEW') {
-        OLD_CheckMailTimeStamp();
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 AND updated_time > {$lastMailData['timestamp']}";
-      } else {
-        $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 LIMIT {$fbcmdParams[1]}";
-      }
-    }
-    $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
-    $keyMessageNames = 'id';
-    OLD_MultiFQL(array('Thread','MessageNames'));
-    if (!empty($dataThread)) {
-      OLD_PrintFolderHeader();
-      $threadNum = 0;
-      foreach ($dataThread as $t) {
-        OLD_PrintFolderObject(++$threadNum,$t);
-      }
-      OLD_SaveMailData($dataThread);
-    }
-  }
+  // if ($fbcmdCommand == 'SENTMAIL') { //1
+    // ValidateParamCount(0,1);
+    // SetDefaultParam(1,$fbcmdPrefs['default_sentmail_count']);
+    // if (strtoupper($fbcmdParams[1]) == 'UNREAD') {
+      // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 AND unread > 0";
+    // } else {
+      // if (strtoupper($fbcmdParams[1]) == 'NEW') {
+        // OLD_CheckMailTimeStamp();
+        // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 AND updated_time > {$lastMailData['timestamp']}";
+      // } else {
+        // $fqlThread = "SELECT thread_id,folder_id,subject,recipients,updated_time,parent_message_id,parent_thread_id,message_count,snippet,snippet_author,object_id,unread,viewer_id FROM thread WHERE folder_id = 1 LIMIT {$fbcmdParams[1]}";
+      // }
+    // }
+    // $fqlMessageNames = 'SELECT id,name FROM profile WHERE id IN (SELECT recipients FROM #fqlThread)';
+    // $keyMessageNames = 'id';
+    // OLD_MultiFQL(array('Thread','MessageNames'));
+    // if (!empty($dataThread)) {
+      // OLD_PrintFolderHeader();
+      // $threadNum = 0;
+      // foreach ($dataThread as $t) {
+        // OLD_PrintFolderObject(++$threadNum,$t);
+      // }
+      // OLD_SaveMailData($dataThread);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SFILTERS') { //1
-    ValidateParamCount(0);
-    $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    if ($fbReturn) {
-      OLD_PrintHeader('KEY','RANK','NAME','TYPE');
-      foreach ($fbReturn as $filter) {
-        OLD_PrintRow($filter['filter_key'],$filter['rank']+1,$filter['name'],$filter['type']);
-      }
-    }
-  }
+  // if ($fbcmdCommand == 'SFILTERS') { //1
+    // ValidateParamCount(0);
+    // $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // if ($fbReturn) {
+      // OLD_PrintHeader('KEY','RANK','NAME','TYPE');
+      // foreach ($fbReturn as $filter) {
+        // OLD_PrintRow($filter['filter_key'],$filter['rank']+1,$filter['name'],$filter['type']);
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1862,76 +1734,76 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'STREAM') { //1
-    ValidateParamCount(0,2);
-    SetDefaultParam(1,$fbcmdPrefs['default_stream_filter']);
-    SetDefaultParam(2,$fbcmdPrefs['default_stream_count']);
-    if (is_numeric($fbcmdParams[1])) {
-      if ($fbcmdParams[1] > 0) {
-        $fbcmdParams[1] -= 1;
-      }
-      $filterKeyQuery = "SELECT filter_key FROM stream_filter WHERE uid={$fbUser} AND rank={$fbcmdParams[1]}";
-    } else {
-      if (substr($fbcmdParams[1],0,1) == $fbcmdPrefs['prefix_filter']) {
-        $filterKeyQuery = "'" . OLD_GetFilterByName($fbcmdParams[1]) . "'";
-      } else {
-        $filterKeyQuery = "'{$fbcmdParams[1]}'";
-      }
-    }
-    if (strtoupper($fbcmdParams[2]) == 'NEW') {
-      OLD_CheckStreamTimeStamp();
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE filter_key IN ({$filterKeyQuery}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
-    } else {
-      $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE filter_key IN ({$filterKeyQuery}) LIMIT {$fbcmdParams[2]}";
-    }
-    $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id, comments.comment_list.fromid FROM #fqlStream)';
-    $keyStreamNames = 'id';
-    OLD_MultiFQL(array('Stream','StreamNames'));
-    if (!empty($dataStream)) {
-      OLD_PrintPostHeader();
-      $postNum = 0;
-      foreach ($dataStream as $a) {
-        OLD_PrintPostObject(++$postNum,$a);
-      }
-      OLD_SavePostData($dataStream);
-    }
-  }
+  // if ($fbcmdCommand == 'STREAM') { //1
+    // ValidateParamCount(0,2);
+    // SetDefaultParam(1,$fbcmdPrefs['default_stream_filter']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_stream_count']);
+    // if (is_numeric($fbcmdParams[1])) {
+      // if ($fbcmdParams[1] > 0) {
+        // $fbcmdParams[1] -= 1;
+      // }
+      // $filterKeyQuery = "SELECT filter_key FROM stream_filter WHERE uid={$fbUser} AND rank={$fbcmdParams[1]}";
+    // } else {
+      // if (substr($fbcmdParams[1],0,1) == $fbcmdPrefs['prefix_filter']) {
+        // $filterKeyQuery = "'" . OLD_GetFilterByName($fbcmdParams[1]) . "'";
+      // } else {
+        // $filterKeyQuery = "'{$fbcmdParams[1]}'";
+      // }
+    // }
+    // if (strtoupper($fbcmdParams[2]) == 'NEW') {
+      // OLD_CheckStreamTimeStamp();
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE filter_key IN ({$filterKeyQuery}) AND {$fbcmdPrefs['stream_new_from']} > {$lastPostData['timestamp']}";
+    // } else {
+      // $fqlStream = "SELECT post_id,viewer_id,app_id,source_id,created_time,updated_time,actor_id,target_id,message,app_data,attachment,comments,likes,permalink FROM stream WHERE filter_key IN ({$filterKeyQuery}) LIMIT {$fbcmdParams[2]}";
+    // }
+    // $fqlStreamNames = 'SELECT id,name FROM profile WHERE id IN (SELECT actor_id, target_id, comments.comment_list.fromid FROM #fqlStream)';
+    // $keyStreamNames = 'id';
+    // OLD_MultiFQL(array('Stream','StreamNames'));
+    // if (!empty($dataStream)) {
+      // OLD_PrintPostHeader();
+      // $postNum = 0;
+      // foreach ($dataStream as $a) {
+        // OLD_PrintPostObject(++$postNum,$a);
+      // }
+      // OLD_SavePostData($dataStream);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'TAGPIC') { //1
-    ValidateParamCount(array(2,4));
-    SetDefaultParam(1,$fbcmdPrefs['default_tagpic_pid']);
-    SetDefaultParam(2,$fbcmdPrefs['default_tagpic_target']);
-    SetDefaultParam(3,$fbcmdPrefs['default_tagpic_x']);
-    SetDefaultParam(4,$fbcmdPrefs['default_tagpic_y']);
-    $tagId = null;
-    $OLD_TagText = $fbcmdParams[2];
-    if (strtoupper($OLD_TagText) == '=ME') {
-      $tagId = $fbUser;
-      $OLD_TagText = null;
-    } else {
-      if (is_numeric($OLD_TagText)) {
-        $tagId = $OLD_TagText;
-        $OLD_TagText = null;
-      } else {
-        OLD_MultiFQL(array('FriendId','FriendBaseInfo'));
-        foreach ($dataFriendBaseInfo as $friend) {
-          if (strtoupper($OLD_TagText) == strtoupper($friend['name'])) {
-            $tagId = $friend['uid'];
-            $OLD_TagText = null;
-            break;
-          }
-        }
-      }
-    }
-    try {
-      $fbReturn = $fbObject->api_client->photos_addTag($fbcmdParams[1],$tagId,$OLD_TagText,$fbcmdParams[3],$fbcmdParams[4],null,null);
-      TraceReturn();
-    } catch (Exception $e) {
-      OLD_FbcmdException($e);
-    }
-  }
+  // if ($fbcmdCommand == 'TAGPIC') { //1
+    // ValidateParamCount(array(2,4));
+    // SetDefaultParam(1,$fbcmdPrefs['default_tagpic_pid']);
+    // SetDefaultParam(2,$fbcmdPrefs['default_tagpic_target']);
+    // SetDefaultParam(3,$fbcmdPrefs['default_tagpic_x']);
+    // SetDefaultParam(4,$fbcmdPrefs['default_tagpic_y']);
+    // $tagId = null;
+    // $OLD_TagText = $fbcmdParams[2];
+    // if (strtoupper($OLD_TagText) == '=ME') {
+      // $tagId = $fbUser;
+      // $OLD_TagText = null;
+    // } else {
+      // if (is_numeric($OLD_TagText)) {
+        // $tagId = $OLD_TagText;
+        // $OLD_TagText = null;
+      // } else {
+        // OLD_MultiFQL(array('FriendId','FriendBaseInfo'));
+        // foreach ($dataFriendBaseInfo as $friend) {
+          // if (strtoupper($OLD_TagText) == strtoupper($friend['name'])) {
+            // $tagId = $friend['uid'];
+            // $OLD_TagText = null;
+            // break;
+          // }
+        // }
+      // }
+    // }
+    // try {
+      // $fbReturn = $fbObject->api_client->photos_addTag($fbcmdParams[1],$tagId,$OLD_TagText,$fbcmdParams[3],$fbcmdParams[4],null,null);
+      // TraceReturn();
+    // } catch (Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2009,8 +1881,11 @@
   if ($fbcmdCommand == 'VERSION') { //1
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
-    OLD_PrintHeader('LOCAL_VERSION','ONLINE_VERSION','UPDATE_BRANCH');
-    OLD_PrintRow($fbcmdVersion,GetGithubVersion($fbcmdParams[1]),$fbcmdPrefs['update_branch']);
+    $fbReturn['LOCAL_VERSION'] = $fbcmdVersion;
+    $fbReturn['ONLINE_VERSION'] = GetGithubVersion($fbcmdParams[1]);
+    $fbReturn['UPDATE_BRANCH'] = $fbcmdPrefs['update_branch'];
+    ProcessReturn();
+    PrintReturn();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2035,7 +1910,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  //1 OLD_PrintFinish();
   return;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2084,46 +1958,12 @@
     $fbcmdPrev[0][] = array('id' => $id, 'name' => $name);
   }
 
-  function ShiftPrev() {
-    global $fbcmdPrefs;
-    global $fbcmdPrev;
-
-    $k = $fbcmdPrefs['prev_length'];
-    while ($k > 0) {
-      if (isset($fbcmdPrev[$k-1])) {
-        $fbcmdPrev[$k] = $fbcmdPrev[$k-1];
-      }
-      $k--;
-    }
-    $fbcmdPrev[0] = array();
-    $fbcmdPrev[0][] = array('id' => 0, 'name' => '0');
-  }
-
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function AddToProcessed($arr) {
-    global $fbcmdExtraFields;
-    return array_merge($fbcmdExtraFields,$arr);
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_array_flatten($obj) {
-    $ret = array();
-    if (is_array($obj)) {
-      foreach ($obj as $o) {
-        if (is_array($o)) {
-          $ret = array_merge($ret,OLD_array_flatten($o));
-        } else {
-          $ret[] = $o;
-        }
-      }
-    } else {
-      $ret[] = $obj;
-    }
-    return $ret;
+  function AddExtraOutput($arr) {
+    global $fbcmdExtraOutput;
+    return array_merge($fbcmdExtraOutput,$arr);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2162,93 +2002,21 @@
 
   function BuildRefCache($showMsg) { //2
     global $fbcmdRefCache;
-    OLD_PrintQuiet("Building RefCache...\n");
+    if ($showMsg) print "Building RefCache...\n";
     $fbcmdRefCache = array();
-    if ($showMsg) OLD_PrintQuiet("  accounts...\n");
+    if ($showMsg) print "  accounts...\n";
     $fbcmdRefCache['accounts'] = GetRefArray('/me/accounts');
-    if ($showMsg) OLD_PrintQuiet("  friends...\n");
+    if ($showMsg) print "  friends...\n";
     $fbcmdRefCache['friends'] = GetRefArray('/me/friends');
-    if ($showMsg) OLD_PrintQuiet("  likes...\n");
+    if ($showMsg) print "  likes...\n";
     $fbcmdRefCache['friendlists'] = GetRefArray('/me/friendlists');
-    if ($showMsg) OLD_PrintQuiet("  friendlists...\n");
+    if ($showMsg) print "  friendlists...\n";
     $fbcmdRefCache['likes'] = GetRefArray('/me/likes');
-    if ($showMsg) OLD_PrintQuiet("  groups...\n");
+    if ($showMsg) print "  groups...\n";
     $fbcmdRefCache['groups'] = GetRefArray('/me/groups');
-    if ($showMsg) OLD_PrintQuiet("  albums...\n");
+    if ($showMsg) print "  albums...\n";
     $fbcmdRefCache['albums'] = GetRefArray('/me/albums');
     SaveDataFile('cachefile',$fbcmdRefCache,'cache_refs');
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_CheckMailTimeStamp() {
-    global $fbcmdPrefs;
-    global $lastMailData;
-    $lastMailData = LoadDataFile('mailfile','mail_save');
-    if (!isset($lastMailData['timestamp'])) {
-      if ($fbcmdPrefs['mail_save']) {
-        FbcmdFatalError("Unexpected: Could not determine timestamp from last folder command");
-      } else {
-        FbcmdFatalError("NEW requires the preference -mail_save=1");
-      }
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_CheckStreamTimeStamp() {
-    global $fbcmdPrefs;
-    global $lastPostData;
-    $lastPostData = LoadDataFile('postfile','stream_save');
-    if (!isset($lastPostData['timestamp'])) {
-      if ($fbcmdPrefs['stream_save']) {
-        FbcmdFatalError("Unexpected: Could not determine timestamp from last stream command");
-      } else {
-        FbcmdFatalError("NEW requires the preference -stream_save to be set");
-      }
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_CleanColumns($columns) {
-    global $fbcmdPrefs;
-    global $printMatrix;
-
-    if ($fbcmdPrefs['print_clean']) {
-      for ($j=0;$j<count($columns);$j++) {
-        if ($columns[$j] == '') {
-          $match = true;
-        } else {
-          $row = count($printMatrix)-1;
-          $match = false;
-          $search = true;
-          while (($search)&&($row >= 0)) {
-            if (isset($printMatrix[$row][$j])) {
-              if ($printMatrix[$row][$j] == '') {
-                $row--;
-              } else {
-                $search = false;
-                if (strcmp($printMatrix[$row][$j],$columns[$j]) == 0) {
-                  $match = true;
-                }
-              }
-            } else {
-              $search = false;
-            }
-          }
-        }
-        if ($match) {
-          $columns[$j] = '';
-        } else {
-          break;
-        }
-      }
-    }
-    return $columns;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2331,18 +2099,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_FbcmdException(Exception $e, $defaultCommand = true) {
-    if ($defaultCommand) {
-      global $fbcmdCommand;
-      $defaultCommand = $fbcmdCommand;
-    }
-    $eCode = $e->getCode();
-    FbcmdFatalError("{$defaultCommand}\n[{$eCode}] {$e->getMessage()}");
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
   function FbcmdException(Exception $e, $defaultCommand = true) {
     if ($defaultCommand) {
       global $fbcmdCommand;
@@ -2367,7 +2123,6 @@
   function FbcmdFatalError($err) {
     global $fbcmdVersion;
     print "fbcmd [v{$fbcmdVersion}] ERROR: {$err}";
-    OLD_PrintFinish();
     exit;
   }
 
@@ -2401,63 +2156,63 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_FlistMatch($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
+  // function OLD_FlistMatch($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
 
-    $matchList = array();
-    $displayMatch = array();
-    $isExact = false;
+    // $matchList = array();
+    // $displayMatch = array();
+    // $isExact = false;
 
-    if ($isPrefixed) {
-      $matchString = substr($flistItem,1);
-    } else {
-      $matchString = $flistItem;
-    }
-    $matchStringUC = strtoupper($matchString);
-    if ($matchString == '') {
-      FbcmdWarning("Could not match empty flist entry");
-      return array();
-    }
-    // Check for Exact Match
-    foreach ($dataArray as $element) {
-      if ($matchStringUC == strtoupper($element[$keyId])) {
-        $matchList[] = $matchString;
-        $displayMatch[] = $element[$keyMatch];
-        $isExact = true;
-      }
-      if ($matchStringUC == strtoupper($element[$keyMatch])) {
-        $matchList[] = $element[$keyId];
-        $displayMatch[] = $element[$keyMatch];
-        $isExact = true;
-      }
-    }
-    // now match for imperfect matches, including regular expressions
-    if ((!$isExact)&&(!$forceExactMatch)) {
-      foreach ($dataArray as $element) {
-        if (preg_match("/{$matchString}/i",$element[$keyMatch])) {
-          $matchList[] = $element[$keyId];
-          $displayMatch[] = $element[$keyMatch];
-        }
-      }
-    }
-    if (count($matchList) == 0) {
-      if (is_numeric($matchString)) {
-        $matchList[] = $matchString;
-      } else {
-        FbcmdWarning("Could not match entry: {$flistItem}");
-        return array();
-      }
-    }
-    if ((count($matchList) > 1)&&(!$allowMultipleMatches)) {
-      global $fbcmdCommand;
-      FbcmdWarning("{$fbcmdCommand} does not allow Multiple Matches:");
-      print "flist entry {$flistItem} matched:\n";
-      foreach ($displayMatch as $item) {
-        print "{$item}\n";
-      }
-      return array();
-    }
-    return $matchList;
-  }
+    // if ($isPrefixed) {
+      // $matchString = substr($flistItem,1);
+    // } else {
+      // $matchString = $flistItem;
+    // }
+    // $matchStringUC = strtoupper($matchString);
+    // if ($matchString == '') {
+      // FbcmdWarning("Could not match empty flist entry");
+      // return array();
+    // }
+    // // Check for Exact Match
+    // foreach ($dataArray as $element) {
+      // if ($matchStringUC == strtoupper($element[$keyId])) {
+        // $matchList[] = $matchString;
+        // $displayMatch[] = $element[$keyMatch];
+        // $isExact = true;
+      // }
+      // if ($matchStringUC == strtoupper($element[$keyMatch])) {
+        // $matchList[] = $element[$keyId];
+        // $displayMatch[] = $element[$keyMatch];
+        // $isExact = true;
+      // }
+    // }
+    // // now match for imperfect matches, including regular expressions
+    // if ((!$isExact)&&(!$forceExactMatch)) {
+      // foreach ($dataArray as $element) {
+        // if (preg_match("/{$matchString}/i",$element[$keyMatch])) {
+          // $matchList[] = $element[$keyId];
+          // $displayMatch[] = $element[$keyMatch];
+        // }
+      // }
+    // }
+    // if (count($matchList) == 0) {
+      // if (is_numeric($matchString)) {
+        // $matchList[] = $matchString;
+      // } else {
+        // FbcmdWarning("Could not match entry: {$flistItem}");
+        // return array();
+      // }
+    // }
+    // if ((count($matchList) > 1)&&(!$allowMultipleMatches)) {
+      // global $fbcmdCommand;
+      // FbcmdWarning("{$fbcmdCommand} does not allow Multiple Matches:");
+      // print "flist entry {$flistItem} matched:\n";
+      // foreach ($displayMatch as $item) {
+        // print "{$item}\n";
+      // }
+      // return array();
+    // }
+    // return $matchList;
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -2513,301 +2268,301 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_GetCurrentStatus() {
-    global $fbUser;
-    global $fbObject;
-    global $userName;
-    global $userStatus;
-    $fql = "SELECT name,status FROM user WHERE uid={$fbUser}";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    $userName = 'unknown_name';
-    $userStatus = 'unknown_status';
-    if ($fbReturn) {
-      if (isset($fbReturn[0]['name'])) {
-        $userName = $fbReturn[0]['name'];
-      }
-      if (isset($fbReturn[0]['status']['message'])) {
-        $userStatus = $fbReturn[0]['status']['message'];
-      }
-    }
-  }
+  // function OLD_GetCurrentStatus() {
+    // global $fbUser;
+    // global $fbObject;
+    // global $userName;
+    // global $userStatus;
+    // $fql = "SELECT name,status FROM user WHERE uid={$fbUser}";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // $userName = 'unknown_name';
+    // $userStatus = 'unknown_status';
+    // if ($fbReturn) {
+      // if (isset($fbReturn[0]['name'])) {
+        // $userName = $fbReturn[0]['name'];
+      // }
+      // if (isset($fbReturn[0]['status']['message'])) {
+        // $userStatus = $fbReturn[0]['status']['message'];
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_GetEventId($a) {
-    global $lastEventData;
-    global $userStatus;
-    global $fbUser;
-    global $fbObject;
+  // function OLD_GetEventId($a) {
+    // global $lastEventData;
+    // global $userStatus;
+    // global $fbUser;
+    // global $fbObject;
 
-    if ($a < 1001) {
-      $lastEventData = LoadDataFile('eventfile','event_save');
-      if (isset($lastEventData['ids'][$a])) {
-        return $lastEventData['ids'][$a];
-      } else {
-        FbcmdWarning ("Invalid Event ID: {$a}");
-        return false;
-      }
-    } else {
-      return $a;
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_GetFilterByName($filtName) {
-    global $fbUser;
-    global $fbObject;
-    $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
-    try {
-      $fbReturn = $fbObject->api_client->fql_query($fql);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    $matchFilterName = OLD_FlistMatch($filtName,true,$fbReturn,'filter_key','name',false);
-    if (count($matchFilterName) == 0) {
-      FbcmdFatalError("Could not resolve filter name {$filtName}");
-    } else {
-      return $matchFilterName[0];
-    }
-  }
+    // if ($a < 1001) {
+      // $lastEventData = LoadDataFile('eventfile','event_save');
+      // if (isset($lastEventData['ids'][$a])) {
+        // return $lastEventData['ids'][$a];
+      // } else {
+        // FbcmdWarning ("Invalid Event ID: {$a}");
+        // return false;
+      // }
+    // } else {
+      // return $a;
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_GetFlistIds($flistString, $allowPages = false, $allowMultipleMatches = true, $failOnEmpty = true) {
+  // function OLD_GetFilterByName($filtName) {
+    // global $fbUser;
+    // global $fbObject;
+    // $fql = "SELECT filter_key,name,rank,type FROM stream_filter WHERE uid={$fbUser} ORDER BY rank";
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_query($fql);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // $matchFilterName = OLD_FlistMatch($filtName,true,$fbReturn,'filter_key','name',false);
+    // if (count($matchFilterName) == 0) {
+      // FbcmdFatalError("Could not resolve filter name {$filtName}");
+    // } else {
+      // return $matchFilterName[0];
+    // }
+  // }
 
-    global $fbcmdPrefs;
-    global $OLD_FlistMatchArray;
-    global $OLD_FlistMatchIdString;
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
 
-    $unknownNames = array();
+  // function OLD_GetFlistIds($flistString, $allowPages = false, $allowMultipleMatches = true, $failOnEmpty = true) {
 
-    $OLD_FlistMatchArray = array();
+    // global $fbcmdPrefs;
+    // global $OLD_FlistMatchArray;
+    // global $OLD_FlistMatchIdString;
 
-    $flistFQL = array('FriendId','FriendBaseInfo');
-    $flistItems = explode(',',$flistString);
+    // $unknownNames = array();
 
-    // Pre-process to see if Friend Lists or Pages or Groups are required
-    foreach ($flistItems as $item) {
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_friendlist']) {
-        array_push_unique($flistFQL,'FriendListNames');
-        array_push_unique($flistFQL,'FriendListMembers');
-      }
-      if ((substr($item,0,1) == $fbcmdPrefs['prefix_page'])||(strtoupper($item)=='=PAGES')) {
-        array_push_unique($flistFQL,'PageId');
-        array_push_unique($flistFQL,'PageNames');
-      }
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_group']) {
-        array_push_unique($flistFQL,'GroupNames');
-      }
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
-        array_push_unique($flistFQL,'PageId');
-        array_push_unique($flistFQL,'PageNames');
-        array_push_unique($flistFQL,'GroupNames');
-      }
-    }
+    // $OLD_FlistMatchArray = array();
 
-    OLD_MultiFQL($flistFQL);
+    // $flistFQL = array('FriendId','FriendBaseInfo');
+    // $flistItems = explode(',',$flistString);
 
-    global $dataFriendId;
-    global $dataFriendBaseInfo;
-    global $indexFriendBaseInfo;
-    global $fbUser;
-    global $flistChunkCounter;
-    $flistChunkCounter = 0;
+    // // Pre-process to see if Friend Lists or Pages or Groups are required
+    // foreach ($flistItems as $item) {
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_friendlist']) {
+        // array_push_unique($flistFQL,'FriendListNames');
+        // array_push_unique($flistFQL,'FriendListMembers');
+      // }
+      // if ((substr($item,0,1) == $fbcmdPrefs['prefix_page'])||(strtoupper($item)=='=PAGES')) {
+        // array_push_unique($flistFQL,'PageId');
+        // array_push_unique($flistFQL,'PageNames');
+      // }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_group']) {
+        // array_push_unique($flistFQL,'GroupNames');
+      // }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
+        // array_push_unique($flistFQL,'PageId');
+        // array_push_unique($flistFQL,'PageNames');
+        // array_push_unique($flistFQL,'GroupNames');
+      // }
+    // }
 
-    foreach ($flistItems as $item) {
+    // OLD_MultiFQL($flistFQL);
 
-      $itemUC = strtoupper($item);
+    // global $dataFriendId;
+    // global $dataFriendBaseInfo;
+    // global $indexFriendBaseInfo;
+    // global $fbUser;
+    // global $flistChunkCounter;
+    // $flistChunkCounter = 0;
 
-      // =KEYWORDS /////////////////////////////////////////////////////////////
+    // foreach ($flistItems as $item) {
 
-      if (substr($item,0,1) == '=') {
-        if ($itemUC == '=ME') {
-          array_push_unique($OLD_FlistMatchArray,$fbUser);
-          continue;
-        }
-        if ($itemUC == '=ALL') {
-          foreach ($dataFriendId as $fid) {
-            array_push_unique($OLD_FlistMatchArray,$fid['uid2']);
-          }
-          continue;
-        }
-        if (substr($itemUC,0,5) == '=BDAY') {
-          $matchTime = time();
-          if(preg_match("/=BDAY\+(\d+)?$/",$itemUC,$matches)) {
-            if(isset($matches[1])) {
-              $matchTime += 24*60*60 * $matches[1];
-            } else {
-              $matchTime += 24*60*60;
-            }
-          }
-          if(preg_match("/=BDAY-(\d+)?$/",$itemUC,$matches)) {
-            if(isset($matches[1])) {
-              $matchTime -= 24*60*60 * $matches[1];
-            } else {
-              $matchTime -= 24*60*60;
-            }
-          }
-          if(preg_match("/=BDAY=(.+)$/",$itemUC,$matches)) {
-            $matchTime = strtotime($matches[1]);
-            if (!$matchTime) {
-              FbcmdWarning("Bad BDAY Syntax: [{$item}] using today");
-              $matchTime = time();
-            }
-          }
-          $matchDate = date('m/d',$matchTime);
-          foreach ($dataFriendBaseInfo as $fbi) {
-            if (substr($fbi['birthday_date'],0,5) == $matchDate) {
-              array_push_unique($OLD_FlistMatchArray,$fbi['uid']);
-            }
-          }
-          continue;
-        }
-        if ($itemUC == '=ONLINE') {
-          foreach ($dataFriendBaseInfo as $fbi) {
-            if (($fbi['online_presence'] == 'active')||(($fbi['online_presence'] == 'idle')&&($fbcmdPrefs['online_idle']))) {
-              array_push_unique($OLD_FlistMatchArray,$fbi['uid']);
-            }
-          }
-          continue;
-        }
-        if ($itemUC == '=PAGES') {
-          if (!$allowPages) {
-            global $fbcmdCommand;
-            FbcmdWarning("{$fbcmdCommand} does not support pages: {$item} ignored");
-          } else {
-            global $dataPageId;
-            foreach ($dataPageId as $page_id) {
-              array_push_unique($OLD_FlistMatchArray,$page_id['page_id']);
-            }
-          }
-          continue;
-        }
-        FbcmdWarning("Unknown flist entry: {$item}");
-        continue;
-      }
+      // $itemUC = strtoupper($item);
 
-      // _FRIEND LIST //////////////////////////////////////////////////////////
+      // // =KEYWORDS /////////////////////////////////////////////////////////////
 
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_friendlist']) {
-        global $dataFriendListNames;
-        global $dataFriendListMembers;
-        $flidMatches = OLD_FlistMatch($item,true,$dataFriendListNames,'flid','name',$allowMultipleMatches);
-        if (count($flidMatches)) {
-          foreach ($dataFriendListMembers as $flm) {
-            // http://bugs.developers.facebook.com/show_bug.cgi?id=5977
-            // if (in_array($flm[0],$flidMatches)) {
-              // array_push_unique($OLD_FlistMatchArray,$flm[1]);
+      // if (substr($item,0,1) == '=') {
+        // if ($itemUC == '=ME') {
+          // array_push_unique($OLD_FlistMatchArray,$fbUser);
+          // continue;
+        // }
+        // if ($itemUC == '=ALL') {
+          // foreach ($dataFriendId as $fid) {
+            // array_push_unique($OLD_FlistMatchArray,$fid['uid2']);
+          // }
+          // continue;
+        // }
+        // if (substr($itemUC,0,5) == '=BDAY') {
+          // $matchTime = time();
+          // if(preg_match("/=BDAY\+(\d+)?$/",$itemUC,$matches)) {
+            // if(isset($matches[1])) {
+              // $matchTime += 24*60*60 * $matches[1];
+            // } else {
+              // $matchTime += 24*60*60;
             // }
-            if (in_array($flm['flid'],$flidMatches)) {
-              array_push_unique($OLD_FlistMatchArray,$flm['uid']);
-            }
-          }
-        }
-        continue;
-      }
+          // }
+          // if(preg_match("/=BDAY-(\d+)?$/",$itemUC,$matches)) {
+            // if(isset($matches[1])) {
+              // $matchTime -= 24*60*60 * $matches[1];
+            // } else {
+              // $matchTime -= 24*60*60;
+            // }
+          // }
+          // if(preg_match("/=BDAY=(.+)$/",$itemUC,$matches)) {
+            // $matchTime = strtotime($matches[1]);
+            // if (!$matchTime) {
+              // FbcmdWarning("Bad BDAY Syntax: [{$item}] using today");
+              // $matchTime = time();
+            // }
+          // }
+          // $matchDate = date('m/d',$matchTime);
+          // foreach ($dataFriendBaseInfo as $fbi) {
+            // if (substr($fbi['birthday_date'],0,5) == $matchDate) {
+              // array_push_unique($OLD_FlistMatchArray,$fbi['uid']);
+            // }
+          // }
+          // continue;
+        // }
+        // if ($itemUC == '=ONLINE') {
+          // foreach ($dataFriendBaseInfo as $fbi) {
+            // if (($fbi['online_presence'] == 'active')||(($fbi['online_presence'] == 'idle')&&($fbcmdPrefs['online_idle']))) {
+              // array_push_unique($OLD_FlistMatchArray,$fbi['uid']);
+            // }
+          // }
+          // continue;
+        // }
+        // if ($itemUC == '=PAGES') {
+          // if (!$allowPages) {
+            // global $fbcmdCommand;
+            // FbcmdWarning("{$fbcmdCommand} does not support pages: {$item} ignored");
+          // } else {
+            // global $dataPageId;
+            // foreach ($dataPageId as $page_id) {
+              // array_push_unique($OLD_FlistMatchArray,$page_id['page_id']);
+            // }
+          // }
+          // continue;
+        // }
+        // FbcmdWarning("Unknown flist entry: {$item}");
+        // continue;
+      // }
 
-      // !USERNAME /////////////////////////////////////////////////////////////
+      // // _FRIEND LIST //////////////////////////////////////////////////////////
 
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_username']) {
-        $uidMatches = OLD_FlistMatch($item,true,$dataFriendBaseInfo,'uid','username',$allowMultipleMatches);
-        array_merge_unique($OLD_FlistMatchArray,$uidMatches);
-        continue;
-      }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_friendlist']) {
+        // global $dataFriendListNames;
+        // global $dataFriendListMembers;
+        // $flidMatches = OLD_FlistMatch($item,true,$dataFriendListNames,'flid','name',$allowMultipleMatches);
+        // if (count($flidMatches)) {
+          // foreach ($dataFriendListMembers as $flm) {
+            // // http://bugs.developers.facebook.com/show_bug.cgi?id=5977
+            // // if (in_array($flm[0],$flidMatches)) {
+              // // array_push_unique($OLD_FlistMatchArray,$flm[1]);
+            // // }
+            // if (in_array($flm['flid'],$flidMatches)) {
+              // array_push_unique($OLD_FlistMatchArray,$flm['uid']);
+            // }
+          // }
+        // }
+        // continue;
+      // }
 
-      // +PAGES ////////////////////////////////////////////////////////////////
+      // // !USERNAME /////////////////////////////////////////////////////////////
 
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_page']) {
-        if (!$allowPages) {
-          global $fbcmdCommand;
-          FbcmdWarning("{$fbcmdCommand} does not support pages: {$item} ignored");
-        } else {
-          global $dataPageNames;
-          $pidMatches = OLD_FlistMatch($item,true,$dataPageNames,'page_id','name',$allowMultipleMatches);
-          array_merge_unique($OLD_FlistMatchArray,$pidMatches);
-        }
-        continue;
-      }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_username']) {
+        // $uidMatches = OLD_FlistMatch($item,true,$dataFriendBaseInfo,'uid','username',$allowMultipleMatches);
+        // array_merge_unique($OLD_FlistMatchArray,$uidMatches);
+        // continue;
+      // }
 
-      // ~GROUPS ///////////////////////////////////////////////////////////////
+      // // +PAGES ////////////////////////////////////////////////////////////////
 
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_group']) {
-        global $dataGroupNames;
-        global $fbObject;
-        $gidMatches = OLD_FlistMatch($item,true,$dataGroupNames,'gid','name',false);
-        if (isset($gidMatches[0])) {
-          $fql = "SELECT uid FROM group_member WHERE gid={$gidMatches[0]}";
-          try {
-            $fbReturn = $fbObject->api_client->fql_query($fql);
-            TraceReturn();
-          } catch(Exception $e) {
-            OLD_FbcmdException($e);
-          }
-          if (!empty($fbReturn)) {
-            foreach ($fbReturn as $u) {
-              $OLD_FlistMatchArray[] = $u['uid'];
-            }
-          } else {
-            FbcmdWarning("Could Not get Group Members for GROUP {$gidMatches[0]}");
-          }
-        }
-        continue;
-      }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_page']) {
+        // if (!$allowPages) {
+          // global $fbcmdCommand;
+          // FbcmdWarning("{$fbcmdCommand} does not support pages: {$item} ignored");
+        // } else {
+          // global $dataPageNames;
+          // $pidMatches = OLD_FlistMatch($item,true,$dataPageNames,'page_id','name',$allowMultipleMatches);
+          // array_merge_unique($OLD_FlistMatchArray,$pidMatches);
+        // }
+        // continue;
+      // }
 
-      // @TAG FORMAT ///////////////////////////////////////////////////////////
+      // // ~GROUPS ///////////////////////////////////////////////////////////////
 
-      if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
-        $tagList = OLD_MatchTag(substr($item,1),$allowPages,false);
-        if ($tagList) {
-          array_merge_unique($OLD_FlistMatchArray,array($tagList[0][0]));
-        }
-        continue;
-      }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_group']) {
+        // global $dataGroupNames;
+        // global $fbObject;
+        // $gidMatches = OLD_FlistMatch($item,true,$dataGroupNames,'gid','name',false);
+        // if (isset($gidMatches[0])) {
+          // $fql = "SELECT uid FROM group_member WHERE gid={$gidMatches[0]}";
+          // try {
+            // $fbReturn = $fbObject->api_client->fql_query($fql);
+            // TraceReturn();
+          // } catch(Exception $e) {
+            // OLD_FbcmdException($e);
+          // }
+          // if (!empty($fbReturn)) {
+            // foreach ($fbReturn as $u) {
+              // $OLD_FlistMatchArray[] = $u['uid'];
+            // }
+          // } else {
+            // FbcmdWarning("Could Not get Group Members for GROUP {$gidMatches[0]}");
+          // }
+        // }
+        // continue;
+      // }
 
-      // REGULAR NAMES /////////////////////////////////////////////////////////
+      // // @TAG FORMAT ///////////////////////////////////////////////////////////
 
-      $uidMatches = OLD_FlistMatch($item,false,$dataFriendBaseInfo,'uid','name',$allowMultipleMatches);
-      array_merge_unique($OLD_FlistMatchArray,$uidMatches);
-    }
-    if (count($OLD_FlistMatchArray) == 0) {
-      if ($failOnEmpty) {
-        if (substr(strtoupper($flistString),0,5) == '=BDAY') {
-          print "No Friends With Birthday Matches\n";
-          exit;
-        } else {
-          FbcmdFatalError("Empty flist: {$flistString}");
-        }
-      } else {
-        $OLD_FlistMatchIdString = '';
-      }
-    } else {
-      $OLD_FlistMatchIdString = implode(',',$OLD_FlistMatchArray);
-    }
+      // if (substr($item,0,1) == $fbcmdPrefs['prefix_tag']) {
+        // $tagList = OLD_MatchTag(substr($item,1),$allowPages,false);
+        // if ($tagList) {
+          // array_merge_unique($OLD_FlistMatchArray,array($tagList[0][0]));
+        // }
+        // continue;
+      // }
 
-    foreach ($OLD_FlistMatchArray as $id) {
-      if (OLD_ProfileName($id) == 'unknown') {
-        $unknownNames[] = $id;
-      }
-    }
-    if (count($unknownNames) > 0) {
-      global $fqlFlistNames;
-      global $keyFlistNames;
-      $fqlFlistNames = 'SELECT id,name FROM profile WHERE id IN (' . implode(',',$unknownNames) . ')';
-      $keyFlistNames = 'id';
-      OLD_MultiFQL(array('FlistNames'));
-    }
-    return;
-  }
+      // // REGULAR NAMES /////////////////////////////////////////////////////////
+
+      // $uidMatches = OLD_FlistMatch($item,false,$dataFriendBaseInfo,'uid','name',$allowMultipleMatches);
+      // array_merge_unique($OLD_FlistMatchArray,$uidMatches);
+    // }
+    // if (count($OLD_FlistMatchArray) == 0) {
+      // if ($failOnEmpty) {
+        // if (substr(strtoupper($flistString),0,5) == '=BDAY') {
+          // print "No Friends With Birthday Matches\n";
+          // exit;
+        // } else {
+          // FbcmdFatalError("Empty flist: {$flistString}");
+        // }
+      // } else {
+        // $OLD_FlistMatchIdString = '';
+      // }
+    // } else {
+      // $OLD_FlistMatchIdString = implode(',',$OLD_FlistMatchArray);
+    // }
+
+    // foreach ($OLD_FlistMatchArray as $id) {
+      // if (OLD_ProfileName($id) == 'unknown') {
+        // $unknownNames[] = $id;
+      // }
+    // }
+    // if (count($unknownNames) > 0) {
+      // global $fqlFlistNames;
+      // global $keyFlistNames;
+      // $fqlFlistNames = 'SELECT id,name FROM profile WHERE id IN (' . implode(',',$unknownNames) . ')';
+      // $keyFlistNames = 'id';
+      // OLD_MultiFQL(array('FlistNames'));
+    // }
+    // return;
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -2830,28 +2585,28 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_GetNextChunkIds() {
-    global $fbcmdPrefs;
-    global $flistChunkCounter;
-    global $OLD_FlistMatchArray;
+  // function OLD_GetNextChunkIds() {
+    // global $fbcmdPrefs;
+    // global $flistChunkCounter;
+    // global $OLD_FlistMatchArray;
 
-    if ($flistChunkCounter == -1) {
-      return null;
-    }
-    if ($fbcmdPrefs['flist_chunksize']) {
-      $startPos = $flistChunkCounter * $fbcmdPrefs['flist_chunksize'];
-      $flistChunkCounter++;
-      $len = $fbcmdPrefs['flist_chunksize'];
-      if ($startPos + $len >= count($OLD_FlistMatchArray)) {
-        $flistChunkCounter = -1;
-        $len = count($OLD_FlistMatchArray) - $startPos;
-      }
-      return array_slice($OLD_FlistMatchArray,$startPos,$len);
-    } else {
-      $flistChunkCounter = -1;
-      return $OLD_FlistMatchArray;
-    }
-  }
+    // if ($flistChunkCounter == -1) {
+      // return null;
+    // }
+    // if ($fbcmdPrefs['flist_chunksize']) {
+      // $startPos = $flistChunkCounter * $fbcmdPrefs['flist_chunksize'];
+      // $flistChunkCounter++;
+      // $len = $fbcmdPrefs['flist_chunksize'];
+      // if ($startPos + $len >= count($OLD_FlistMatchArray)) {
+        // $flistChunkCounter = -1;
+        // $len = count($OLD_FlistMatchArray) - $startPos;
+      // }
+      // return array_slice($OLD_FlistMatchArray,$startPos,$len);
+    // } else {
+      // $flistChunkCounter = -1;
+      // return $OLD_FlistMatchArray;
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -2890,52 +2645,52 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_GetPostId($p, $allowSpecial = false) {
-    global $lastPostData;
-    global $userStatus;
-    global $fbUser;
-    global $fbObject;
+  // function OLD_GetPostId($p, $allowSpecial = false) {
+    // global $lastPostData;
+    // global $userStatus;
+    // global $fbUser;
+    // global $fbObject;
 
-    if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
-      if ($allowSpecial) {
-        if (strtoupper($p) == 'CURSTATUS') {
-          OLD_GetCurrentStatus();
-          if ($userStatus == '') {
-            FbcmdFatalError("CURSTATUS: Your status is blank");
-          }
-          $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
-        } else {
-          $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
-        }
-        try {
-          $fbReturn = $fbObject->api_client->fql_query($fql);
-          TraceReturn();
-        } catch(Exception $e) {
-          OLD_FbcmdException($e,'GET-POST');
-        }
-        if (isset($fbReturn[0]['post_id'])) {
-          return $fbReturn[0]['post_id'];
-        } else {
-          FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
-        }
-      } else {
-        global $fbcmdCommand;
-        FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
-      }
-    } else {
-      if ($p < 1001) {
-        $lastPostData = LoadDataFile('postfile','stream_save');
-        if (isset($lastPostData['ids'][$p])) {
-          return $lastPostData['ids'][$p];
-        } else {
-          FbcmdWarning ("Invalid Post ID: {$p}");
-          return false;
-        }
-      } else {
-        return $p;
-      }
-    }
-  }
+    // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
+      // if ($allowSpecial) {
+        // if (strtoupper($p) == 'CURSTATUS') {
+          // OLD_GetCurrentStatus();
+          // if ($userStatus == '') {
+            // FbcmdFatalError("CURSTATUS: Your status is blank");
+          // }
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+        // } else {
+          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
+        // }
+        // try {
+          // $fbReturn = $fbObject->api_client->fql_query($fql);
+          // TraceReturn();
+        // } catch(Exception $e) {
+          // OLD_FbcmdException($e,'GET-POST');
+        // }
+        // if (isset($fbReturn[0]['post_id'])) {
+          // return $fbReturn[0]['post_id'];
+        // } else {
+          // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
+        // }
+      // } else {
+        // global $fbcmdCommand;
+        // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
+      // }
+    // } else {
+      // if ($p < 1001) {
+        // $lastPostData = LoadDataFile('postfile','stream_save');
+        // if (isset($lastPostData['ids'][$p])) {
+          // return $lastPostData['ids'][$p];
+        // } else {
+          // FbcmdWarning ("Invalid Post ID: {$p}");
+          // return false;
+        // }
+      // } else {
+        // return $p;
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -2973,52 +2728,52 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_GetThreadId($p) { //, $allowSpecial = false) {
-    global $lastMailData;
-    global $userStatus;
-    global $fbUser;
-    global $fbObject;
+  // function OLD_GetThreadId($p) { //, $allowSpecial = false) {
+    // global $lastMailData;
+    // global $userStatus;
+    // global $fbUser;
+    // global $fbObject;
 
-    // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
-      // if ($allowSpecial) {
-        // if (strtoupper($p) == 'CURSTATUS') {
-          // OLD_GetCurrentStatus();
-          // if ($userStatus == '') {
-            // FbcmdFatalError("CURSTATUS: Your status is blank");
-          // }
-          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+    // // if (($p == 0)||(strtoupper($p) == 'LAST')||(strtoupper($p) == 'CURSTATUS')) {
+      // // if ($allowSpecial) {
+        // // if (strtoupper($p) == 'CURSTATUS') {
+          // // OLD_GetCurrentStatus();
+          // // if ($userStatus == '') {
+            // // FbcmdFatalError("CURSTATUS: Your status is blank");
+          // // }
+          // // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} AND attachment=='' LIMIT 1";
+        // // } else {
+          // // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
+        // // }
+        // // try {
+          // // $fbReturn = $fbObject->api_client->fql_query($fql);
+          // // TraceReturn();
+        // // } catch(Exception $e) {
+          // // OLD_FbcmdException($e,'GET-POST');
+        // // }
+        // // if (isset($fbReturn[0]['post_id'])) {
+          // // return $fbReturn[0]['post_id'];
+        // // } else {
+          // // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
+        // // }
+      // // } else {
+        // // global $fbcmdCommand;
+        // // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
+      // // }
+    // // } else {
+      // if ($p < 1001) {
+        // $lastMailData = LoadDataFile('mailfile','mail_save');
+        // if (isset($lastMailData['ids'][$p])) {
+          // return $lastMailData['ids'][$p];
         // } else {
-          // $fql = "SELECT post_id FROM stream WHERE source_id={$fbUser} AND actor_id={$fbUser} LIMIT 1";
-        // }
-        // try {
-          // $fbReturn = $fbObject->api_client->fql_query($fql);
-          // TraceReturn();
-        // } catch(Exception $e) {
-          // OLD_FbcmdException($e,'GET-POST');
-        // }
-        // if (isset($fbReturn[0]['post_id'])) {
-          // return $fbReturn[0]['post_id'];
-        // } else {
-          // FbcmdFatalError("GETPOST: Could not retrieve post_id = {$p}");
+          // FbcmdWarning ("Invalid Thread ID: {$p}");
+          // return false;
         // }
       // } else {
-        // global $fbcmdCommand;
-        // FbcmdWarning ("{$fbcmdCommand} does not support post_id = {$p}");
+        // return $p;
       // }
-    // } else {
-      if ($p < 1001) {
-        $lastMailData = LoadDataFile('mailfile','mail_save');
-        if (isset($lastMailData['ids'][$p])) {
-          return $lastMailData['ids'][$p];
-        } else {
-          FbcmdWarning ("Invalid Thread ID: {$p}");
-          return false;
-        }
-      } else {
-        return $p;
-      }
-    // }
-  }
+    // // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -3070,128 +2825,128 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_MatchTag($tag, $allowPages = true, $allowGroups = true) {
-    global $fbcmdPrefs;
-    global $dataFriendBaseInfo;
-    global $dataPageNames;
-    global $dataGroupNames;
-    $matchOrder = explode(',',$fbcmdPrefs['status_tag_order']);
-    $matchList = array();
-    foreach ($matchOrder as $order) {
-      $matchParams = explode(':',$order);
-      if ($matchParams[0] == 'friends') {
-        $matchList = OLD_TagFieldMatch($tag, $dataFriendBaseInfo, $matchParams[1], 'uid', $matchParams[2]);
-      }
-      if (($matchParams[0] == 'pages')&&($allowPages)) {
-        $matchList = OLD_TagFieldMatch($tag, $dataPageNames, $matchParams[1], 'page_id', $matchParams[2]);
-      }
-      if (($matchParams[0] == 'groups')&&($allowGroups)) {
-        $matchList = OLD_TagFieldMatch($tag, $dataGroupNames, $matchParams[1], 'gid', $matchParams[2]);
-      }
-      if (count($matchList) > 0) {
-        break;
-      }
-    }
-    if (count($matchList) == 1) {
-      return ($matchList);
-    } else {
-      if (count($matchList) == 0) {
-        FbcmdWarning("Tag [{$tag}] had no matches");
-      } else {
-        FbcmdWarning("Tag [{$tag}] had multiple matches:");
-        foreach ($matchList as $item) {
-          if ($item[1] != $item[2]) {
-            print "  {$item[1]} ({$item[2]})\n";
-          } else {
-            print "  {$item[1]}\n";
-          }
-        }
-      }
-      return (false);
-    }
-  }
+  // function OLD_MatchTag($tag, $allowPages = true, $allowGroups = true) {
+    // global $fbcmdPrefs;
+    // global $dataFriendBaseInfo;
+    // global $dataPageNames;
+    // global $dataGroupNames;
+    // $matchOrder = explode(',',$fbcmdPrefs['status_tag_order']);
+    // $matchList = array();
+    // foreach ($matchOrder as $order) {
+      // $matchParams = explode(':',$order);
+      // if ($matchParams[0] == 'friends') {
+        // $matchList = OLD_TagFieldMatch($tag, $dataFriendBaseInfo, $matchParams[1], 'uid', $matchParams[2]);
+      // }
+      // if (($matchParams[0] == 'pages')&&($allowPages)) {
+        // $matchList = OLD_TagFieldMatch($tag, $dataPageNames, $matchParams[1], 'page_id', $matchParams[2]);
+      // }
+      // if (($matchParams[0] == 'groups')&&($allowGroups)) {
+        // $matchList = OLD_TagFieldMatch($tag, $dataGroupNames, $matchParams[1], 'gid', $matchParams[2]);
+      // }
+      // if (count($matchList) > 0) {
+        // break;
+      // }
+    // }
+    // if (count($matchList) == 1) {
+      // return ($matchList);
+    // } else {
+      // if (count($matchList) == 0) {
+        // FbcmdWarning("Tag [{$tag}] had no matches");
+      // } else {
+        // FbcmdWarning("Tag [{$tag}] had multiple matches:");
+        // foreach ($matchList as $item) {
+          // if ($item[1] != $item[2]) {
+            // print "  {$item[1]} ({$item[2]})\n";
+          // } else {
+            // print "  {$item[1]}\n";
+          // }
+        // }
+      // }
+      // return (false);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_MultiFQL($queryList) {
+  // function OLD_MultiFQL($queryList) {
 
-    // This Function wraps the MultiQuery() API function in a non-obvious but convenient way:
-    //
-    // OLD_MultiFQL(array('Query1','Query2'))
-    //
-    // requires the global variables:
-    //
-    // $fqlQuery1 = "SELECT ...."
-    // $fqlQuery2 = "SELECT x FROM y WHERE x IN (SELECT z FROM #fqlQuery1)"
-    //
-    // and generates the global variables $dataQuery1 and $dataQuery2
-    // also, if $keyQuery1 is defined, then an associative array $indexQuery1 is generated
+    // // This Function wraps the MultiQuery() API function in a non-obvious but convenient way:
+    // //
+    // // OLD_MultiFQL(array('Query1','Query2'))
+    // //
+    // // requires the global variables:
+    // //
+    // // $fqlQuery1 = "SELECT ...."
+    // // $fqlQuery2 = "SELECT x FROM y WHERE x IN (SELECT z FROM #fqlQuery1)"
+    // //
+    // // and generates the global variables $dataQuery1 and $dataQuery2
+    // // also, if $keyQuery1 is defined, then an associative array $indexQuery1 is generated
 
-    global $fbObject;
+    // global $fbObject;
 
-    $queryStrings = array();
-    foreach ($queryList as $queryName) {
-      $queryStrings[] = '"fql' . $queryName . '":"' . $GLOBALS['fql' . $queryName] . '"';
-    }
-    try {
-      $fbOLD_MultiFQLReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
-      TraceReturn($fbOLD_MultiFQLReturn);
-    } catch (Exception $e) {
-      OLD_FbcmdException($e,'OLD_MultiFQL');
-    }
-    if ($fbOLD_MultiFQLReturn) {
-      for ($i=0; $i < count($queryList); $i++) {
-        foreach ($fbOLD_MultiFQLReturn as $ret) {
-          if ($ret['name'] == 'fql' . $queryList[$i]) {
-            $GLOBALS['data' . $queryList[$i]] = $ret['fql_result_set'];
-            if (isset($GLOBALS['key' . $queryList[$i]])) {
-              $GLOBALS['index' . $queryList[$i]] = array();
-              if ((is_array($ret['fql_result_set']))&&(count($ret['fql_result_set'] > 0))) {
-                foreach ($ret['fql_result_set'] as $record) {
-                  $GLOBALS['index' . $queryList[$i]][$record[$GLOBALS['key' . $queryList[$i]]]] = $record;
-                }
-              }
-            }
-          }
-        }
-      }
-    } else {
-      FbcmdFatalError('Unexpected: OLD_MultiFQL Empty');
-    }
-  }
+    // $queryStrings = array();
+    // foreach ($queryList as $queryName) {
+      // $queryStrings[] = '"fql' . $queryName . '":"' . $GLOBALS['fql' . $queryName] . '"';
+    // }
+    // try {
+      // $fbOLD_MultiFQLReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
+      // TraceReturn($fbOLD_MultiFQLReturn);
+    // } catch (Exception $e) {
+      // OLD_FbcmdException($e,'OLD_MultiFQL');
+    // }
+    // if ($fbOLD_MultiFQLReturn) {
+      // for ($i=0; $i < count($queryList); $i++) {
+        // foreach ($fbOLD_MultiFQLReturn as $ret) {
+          // if ($ret['name'] == 'fql' . $queryList[$i]) {
+            // $GLOBALS['data' . $queryList[$i]] = $ret['fql_result_set'];
+            // if (isset($GLOBALS['key' . $queryList[$i]])) {
+              // $GLOBALS['index' . $queryList[$i]] = array();
+              // if ((is_array($ret['fql_result_set']))&&(count($ret['fql_result_set'] > 0))) {
+                // foreach ($ret['fql_result_set'] as $record) {
+                  // $GLOBALS['index' . $queryList[$i]][$record[$GLOBALS['key' . $queryList[$i]]]] = $record;
+                // }
+              // }
+            // }
+          // }
+        // }
+      // }
+    // } else {
+      // FbcmdFatalError('Unexpected: OLD_MultiFQL Empty');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_MultiFQLById($idArray,$selectStatement) {
-    global $fbObject;
-    $queryStrings = array();
-    foreach ($idArray as $id) {
-      $queryStrings[] = '"fql' . $id . '":"' . str_replace('[id]', $id, $selectStatement). '"';
-    }
-    try {
-      $fbReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
-      TraceReturn();
-    } catch (Exception $e) {
-      OLD_FbcmdException($e,'MULTI-FQL-ID');
-    }
-    $results = array();
-    if ($fbReturn) {
-      foreach ($fbReturn as $ret) {
-        if($ret['fql_result_set']) {
-          $id = substr($ret['name'],3);
-          $results[$id] = $ret['fql_result_set'];
-        }
-      }
-    }
-    foreach ($idArray as $id) {
-      if (!isset($results[$id])) {
-        $results[$id] = null;
-      }
-    }
-    return $results;
-  }
+  // function OLD_MultiFQLById($idArray,$selectStatement) {
+    // global $fbObject;
+    // $queryStrings = array();
+    // foreach ($idArray as $id) {
+      // $queryStrings[] = '"fql' . $id . '":"' . str_replace('[id]', $id, $selectStatement). '"';
+    // }
+    // try {
+      // $fbReturn = $fbObject->api_client->fql_multiquery("{" . implode(',',$queryStrings) . "}");
+      // TraceReturn();
+    // } catch (Exception $e) {
+      // OLD_FbcmdException($e,'MULTI-FQL-ID');
+    // }
+    // $results = array();
+    // if ($fbReturn) {
+      // foreach ($fbReturn as $ret) {
+        // if($ret['fql_result_set']) {
+          // $id = substr($ret['name'],3);
+          // $results[$id] = $ret['fql_result_set'];
+        // }
+      // }
+    // }
+    // foreach ($idArray as $id) {
+      // if (!isset($results[$id])) {
+        // $results[$id] = null;
+      // }
+    // }
+    // return $results;
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -3223,16 +2978,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_NotifyHelper($notifyArray,$dataNotify,$baseType,$inviteType) {
-    if ($notifyArray) {
-      OLD_PrintRow($baseType . '_' . $inviteType,count($notifyArray));
-      for ($j=0; $j < count($dataNotify); $j++) {
-        OLD_PrintRow($baseType . '_'  . ($j+1), $dataNotify[$j]['name']);
-      }
-    } else {
-      OLD_PrintRow($baseType . '_' . $inviteType,'0');
-    }
-  }
+  // function OLD_NotifyHelper($notifyArray,$dataNotify,$baseType,$inviteType) {
+    // if ($notifyArray) {
+      // OLD_PrintRow($baseType . '_' . $inviteType,count($notifyArray));
+      // for ($j=0; $j < count($dataNotify); $j++) {
+        // OLD_PrintRow($baseType . '_'  . ($j+1), $dataNotify[$j]['name']);
+      // }
+    // } else {
+      // OLD_PrintRow($baseType . '_' . $inviteType,'0');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -3341,95 +3096,14 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintAttachmentData($base,$post,$field,$display) {
-    global $fbcmdPrefs;
-    if (isset($post['attachment'][$field])) {
-      if ($post['attachment'][$field] != '') {
-        OLD_PrintRow($base,$display,htmlspecialchars_decode(strip_tags($post['attachment'][$field])));
-      }
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function PostCore() {
-    global $fbcmdParams;
-    global $fbcmdPrefs;
-    global $fbcmdTargetId;
-    global $facebook;
-    global $fbReturn;
-    global $fbcmdExtraFields;
-
-    $args = array();
-    $firstParam = strtoupper($fbcmdParams[1]);
-
-    if (strtoupper($fbcmdParams[1]) == 'MP3') {
-      FbcmdFatalError("2.0: POST MP3 not done yet / not supported");
-    }
-    if (strtoupper($fbcmdParams[1]) == 'SRC') {
-      ValidateParamCount(2,9);
-      SetDefaultParam(2,$fbcmdPrefs['default_post_src_url']);
-      $args['source'] = $fbcmdParams[2];
-      RemoveParams(1,2);
-    }
-    if (strtoupper($fbcmdParams[1]) == 'IMG') {
-      ValidateParamCount(2,7);
-      SetDefaultParam(2,$fbcmdPrefs['default_post_img_url']);
-      $args['picture'] = $fbcmdParams[2];
-      RemoveParams(1,2);
-    }
-    // if ($firstParam == 'MP3') {
-      // ValidateParamCount($offset+2, $offset+9);
-      // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
-      // SetDefaultParam($offset+2,$fbcmdPrefs['default_postmp3_mp3src']);
-      // SetDefaultParam($offset+3,$fbcmdPrefs['default_postmp3_mp3title']);
-      // SetDefaultParam($offset+4,$fbcmdPrefs['default_postmp3_mp3artist']);
-      // SetDefaultParam($offset+5,$fbcmdPrefs['default_postmp3_mp3album']);
-      // $msg = $fbcmdParams[$offset+1];
-      // $media = array(array('type' => 'mp3', 'src' => $fbcmdParams[$offset+2], 'title' => $fbcmdParams[$offset+3], 'artist' => $fbcmdParams[$offset+4], 'album' => $fbcmdParams[$offset+5]));
-      // $offsetPostData = $offset + 6;
-    // }
-    // if ($firstParam == 'IMG') {
-      // ValidateParamCount($offset+2, $offset+7);
-      // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
-      // SetDefaultParam($offset+2,$fbcmdPrefs['default_postimg_imgsrc']);
-      // if ($fbcmdPrefs['default_postimg_imglink'] == '0') {
-        // SetDefaultParam($offset+3,$fbcmdParams[$offset+2]);
-      // } else {
-        // SetDefaultParam($offset+3,$fbcmdPrefs['default_postimg_imglink']);
+  // function OLD_PrintAttachmentData($base,$post,$field,$display) {
+    // global $fbcmdPrefs;
+    // if (isset($post['attachment'][$field])) {
+      // if ($post['attachment'][$field] != '') {
+        // OLD_PrintRow($base,$display,htmlspecialchars_decode(strip_tags($post['attachment'][$field])));
       // }
-      // $msg = $fbcmdParams[$offset+1];
-      // $media = array(array('type' => 'image', 'src' => $fbcmdParams[$offset+2], 'href' => $fbcmdParams[$offset+3]));
-      // $offsetPostData = $offset + 4;
     // }
-    // if ($firstParam == 'FLASH') {
-      // ValidateParamCount($offset+3, $offset+7);
-      // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
-      // SetDefaultParam($offset+2,$fbcmdPrefs['default_postflash_swfsrc']);
-      // SetDefaultParam($offset+3,$fbcmdPrefs['default_postflash_imgsrc']);
-      // $msg = $fbcmdParams[$offset+1];
-      // $media = array(array('type' => 'flash', 'swfsrc' => $fbcmdParams[$offset+2], 'imgsrc' => $fbcmdParams[$offset+3]));
-      // $offsetPostData = $offset + 4;
-    // }
-    ValidateParamCount(1,5);
-    SetDefaultParam(1,$fbcmdPrefs['default_post_message']);
-    //$msg = $fbcmdParams[1]; //2 todo: tagging
-    //$media = '';
-    SetDefaultParam(2, $fbcmdPrefs['default_post_name']); //1 //2 consider changing order: link before name ??
-    SetDefaultParam(3, $fbcmdPrefs['default_post_link']);
-    SetDefaultParam(4, $fbcmdPrefs['default_post_caption']);
-    SetDefaultParam(5, $fbcmdPrefs['default_post_description']);
-
-    $args['message'] = $fbcmdParams[1];
-    if ($fbcmdParams[2]) $args['name'] = $fbcmdParams[2];
-    if ($fbcmdParams[3]) $args['link'] = $fbcmdParams[3];
-    if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
-    if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
-
-    // $fbcmdExtraFields = array('index' => 'lastpost');// 2 TODO: revisit this
-    OpenGraphAPI("/{$fbcmdTargetId}/feed",'POST',$args);
-  }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -3445,515 +3119,515 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintCsvRow($rowIn) {
-    global $fbcmdPrefs;
-    $rowOut = array();
-    foreach ($rowIn as $col) {
-      $bookend = false;
-      if (strpos($col,$fbcmdPrefs['csv_bookend'])) {
-        $col = str_replace($fbcmdPrefs['csv_bookend'],$fbcmdPrefs['csv_escaped_bookend'],$col);
-        $bookend = true;
-      }
-      if ((strpos($col,$fbcmdPrefs['csv_separator']))||($fbcmdPrefs['csv_force_bookends'])) {
-        $bookend = true;
-      }
-      if ($bookend) {
-        $col = $fbcmdPrefs['csv_bookend'] . $col . $fbcmdPrefs['csv_bookend'];
-      }
-      if ($fbcmdPrefs['print_linefeed_subst']) {
-        $col = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $col);
-      }
+  // function OLD_PrintCsvRow($rowIn) {
+    // global $fbcmdPrefs;
+    // $rowOut = array();
+    // foreach ($rowIn as $col) {
+      // $bookend = false;
+      // if (strpos($col,$fbcmdPrefs['csv_bookend'])) {
+        // $col = str_replace($fbcmdPrefs['csv_bookend'],$fbcmdPrefs['csv_escaped_bookend'],$col);
+        // $bookend = true;
+      // }
+      // if ((strpos($col,$fbcmdPrefs['csv_separator']))||($fbcmdPrefs['csv_force_bookends'])) {
+        // $bookend = true;
+      // }
+      // if ($bookend) {
+        // $col = $fbcmdPrefs['csv_bookend'] . $col . $fbcmdPrefs['csv_bookend'];
+      // }
+      // if ($fbcmdPrefs['print_linefeed_subst']) {
+        // $col = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $col);
+      // }
 
-      $rowOut[] = $col;
-    }
-    print implode($fbcmdPrefs['csv_separator'],$rowOut) . "\n";
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_PrintFinish() {
-    global $fbcmdPrefs;
-    global $printMatrix;
-    if ($fbcmdPrefs['print_csv']) {
-      return;
-    }
-    if (isset($printMatrix)) {
-      $columnWidth = array();
-      if (count($printMatrix) > 0) {
-        foreach ($printMatrix as $row) {
-          while (count($row) > count($columnWidth)) {
-            $columnWidth[] = 0;
-          }
-          for ($i=0; $i<count($row); $i++) {
-            if (strlen($row[$i])>$columnWidth[$i]) {
-              $columnWidth[$i]=strlen($row[$i]);
-            }
-          }
-        }
-        for ($i=0; $i<count($columnWidth)-1; $i++) {
-          $columnWidth[$i] += $fbcmdPrefs['print_col_padding'];
-        }
-
-        if ($fbcmdPrefs['print_wrap']) {
-          $consoleWidth = $fbcmdPrefs['print_wrap_width'];
-          if ($fbcmdPrefs['print_wrap_env_var']) {
-            if (getenv($fbcmdPrefs['print_wrap_env_var'])) {
-              $consoleWidth = getenv($fbcmdPrefs['print_wrap_env_var']);
-            }
-          }
-          $colToWrap = count($columnWidth) - 1;
-          $wrapWidth = $consoleWidth - array_sum($columnWidth) + $columnWidth[$colToWrap] - 1;
-          if ($wrapWidth < $fbcmdPrefs['print_wrap_min_width']) {
-            $wrapWidth = $columnWidth[$colToWrap]+1;
-          }
-          $backupMatrix = $printMatrix;
-          $printMatrix = array();
-          foreach ($backupMatrix as $row) {
-            if (isset($row[$colToWrap])) {
-              $rightCol = array_pop($row);
-              $wrapped = wordwrap($rightCol,$wrapWidth,"\n",$fbcmdPrefs['print_wrap_cut']);
-              $newRows = explode("\n",$wrapped);
-              foreach ($newRows as $nr) {
-                $addRow = $row;
-                array_push($addRow,$nr);
-                $printMatrix[] = OLD_CleanColumns($addRow);
-              }
-            } else {
-              $printMatrix[] = $row;
-            }
-          }
-        } else {
-          if ($fbcmdPrefs['print_linefeed_subst']) {
-            $colToWrap = count($columnWidth) - 1;
-            for ($j=0; $j < count($printMatrix); $j++) {
-              if (isset($printMatrix[$j][$colToWrap])) {
-                $printMatrix[$j][$colToWrap] = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $printMatrix[$j][$colToWrap]);
-              }
-            }
-          }
-        }
-
-        foreach ($printMatrix as $row) {
-          for ($i=0; $i<count($row); $i++) {
-            if ($i < count($row)-1) {
-              print str_pad($row[$i], $columnWidth[$i], ' ');
-            } else {
-              print $row[$i];
-            }
-          }
-          print "\n";
-        }
-      }
-    }
-  }
+      // $rowOut[] = $col;
+    // }
+    // print implode($fbcmdPrefs['csv_separator'],$rowOut) . "\n";
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintFolderHeader() {
-    global $fbcmdPrefs;
-    $threadInfo = array();
-    if ($fbcmdPrefs['mail_save']) {
-      $threadInfo[] = '[#]';
-    }
-    if ($fbcmdPrefs['folder_show_threadid']) {
-      $threadInfo[] = 'THREAD_ID';
-    }
-    OLD_PrintHeader($threadInfo,'FIELD','VALUE');
-    if ($fbcmdPrefs['folder_blankrow']) {
-      OLD_PrintRow('');
-    }
-  }
+  // function OLD_PrintFinish() {
+    // global $fbcmdPrefs;
+    // global $printMatrix;
+    // if ($fbcmdPrefs['print_csv']) {
+      // return;
+    // }
+    // if (isset($printMatrix)) {
+      // $columnWidth = array();
+      // if (count($printMatrix) > 0) {
+        // foreach ($printMatrix as $row) {
+          // while (count($row) > count($columnWidth)) {
+            // $columnWidth[] = 0;
+          // }
+          // for ($i=0; $i<count($row); $i++) {
+            // if (strlen($row[$i])>$columnWidth[$i]) {
+              // $columnWidth[$i]=strlen($row[$i]);
+            // }
+          // }
+        // }
+        // for ($i=0; $i<count($columnWidth)-1; $i++) {
+          // $columnWidth[$i] += $fbcmdPrefs['print_col_padding'];
+        // }
+
+        // if ($fbcmdPrefs['print_wrap']) {
+          // $consoleWidth = $fbcmdPrefs['print_wrap_width'];
+          // if ($fbcmdPrefs['print_wrap_env_var']) {
+            // if (getenv($fbcmdPrefs['print_wrap_env_var'])) {
+              // $consoleWidth = getenv($fbcmdPrefs['print_wrap_env_var']);
+            // }
+          // }
+          // $colToWrap = count($columnWidth) - 1;
+          // $wrapWidth = $consoleWidth - array_sum($columnWidth) + $columnWidth[$colToWrap] - 1;
+          // if ($wrapWidth < $fbcmdPrefs['print_wrap_min_width']) {
+            // $wrapWidth = $columnWidth[$colToWrap]+1;
+          // }
+          // $backupMatrix = $printMatrix;
+          // $printMatrix = array();
+          // foreach ($backupMatrix as $row) {
+            // if (isset($row[$colToWrap])) {
+              // $rightCol = array_pop($row);
+              // $wrapped = wordwrap($rightCol,$wrapWidth,"\n",$fbcmdPrefs['print_wrap_cut']);
+              // $newRows = explode("\n",$wrapped);
+              // foreach ($newRows as $nr) {
+                // $addRow = $row;
+                // array_push($addRow,$nr);
+                // $printMatrix[] = OLD_CleanColumns($addRow);
+              // }
+            // } else {
+              // $printMatrix[] = $row;
+            // }
+          // }
+        // } else {
+          // if ($fbcmdPrefs['print_linefeed_subst']) {
+            // $colToWrap = count($columnWidth) - 1;
+            // for ($j=0; $j < count($printMatrix); $j++) {
+              // if (isset($printMatrix[$j][$colToWrap])) {
+                // $printMatrix[$j][$colToWrap] = str_replace("\n", $fbcmdPrefs['print_linefeed_subst'], $printMatrix[$j][$colToWrap]);
+              // }
+            // }
+          // }
+        // }
+
+        // foreach ($printMatrix as $row) {
+          // for ($i=0; $i<count($row); $i++) {
+            // if ($i < count($row)-1) {
+              // print str_pad($row[$i], $columnWidth[$i], ' ');
+            // } else {
+              // print $row[$i];
+            // }
+          // }
+          // print "\n";
+        // }
+      // }
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintFolderObject($threadNum, $thread) {
-    global $fbcmdPrefs;
-    global $fbUser;
-
-    $threadInfo = array();
-    if ($fbcmdPrefs['mail_save']) {
-      $showThreadNum = '[' . $threadNum . ']';
-      if ($thread['unread']) {
-        $showThreadNum .= '*';
-      }
-      $threadInfo[] = $showThreadNum;
-    }
-    if ($fbcmdPrefs['folder_show_threadid']) {
-      $threadInfo[] = $thread['thread_id'];
-    }
-
-    $subjectShow = $thread['subject'];
-    if ($subjectShow == '') {
-      $subjectShow = '[no subject]';
-    }
-    OLD_PrintRow($threadInfo,'subject',$subjectShow);
-
-    $recipientsList = array();
-    foreach ($thread['recipients'] as $r) {
-      if ($r != $fbUser) {
-        $recipientsList[] = OLD_ProfileName($r);
-      }
-    }
-    $recipientsShow = implode(',',$recipientsList);
-    OLD_PrintRow($threadInfo,':to/from',$recipientsShow);
-
-
-    if ($fbcmdPrefs['folder_show_date']) {
-      OLD_PrintRow($threadInfo,':date', date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
-    }
-
-
-    if ($fbcmdPrefs['folder_show_snippet']) {
-      $snippetShow = str_replace("\n", ' ', $thread['snippet']);
-      if (count($recipientsList) > 1) {
-        $snippetShow = OLD_ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
-      }
-      OLD_PrintRow($threadInfo,':snippet', $snippetShow);
-    }
-
-    if ($fbcmdPrefs['folder_blankrow']) {
-      OLD_PrintRow('');
-    }
-  }
+  // function OLD_PrintFolderHeader() {
+    // global $fbcmdPrefs;
+    // $threadInfo = array();
+    // if ($fbcmdPrefs['mail_save']) {
+      // $threadInfo[] = '[#]';
+    // }
+    // if ($fbcmdPrefs['folder_show_threadid']) {
+      // $threadInfo[] = 'THREAD_ID';
+    // }
+    // OLD_PrintHeader($threadInfo,'FIELD','VALUE');
+    // if ($fbcmdPrefs['folder_blankrow']) {
+      // OLD_PrintRow('');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintHeader() {
-    global $fbcmdPrefs;
-    if ($fbcmdPrefs['print_header']) {
-      OLD_PrintRow(func_get_args());
-    }
-  }
+  // function OLD_PrintFolderObject($threadNum, $thread) {
+    // global $fbcmdPrefs;
+    // global $fbUser;
+
+    // $threadInfo = array();
+    // if ($fbcmdPrefs['mail_save']) {
+      // $showThreadNum = '[' . $threadNum . ']';
+      // if ($thread['unread']) {
+        // $showThreadNum .= '*';
+      // }
+      // $threadInfo[] = $showThreadNum;
+    // }
+    // if ($fbcmdPrefs['folder_show_threadid']) {
+      // $threadInfo[] = $thread['thread_id'];
+    // }
+
+    // $subjectShow = $thread['subject'];
+    // if ($subjectShow == '') {
+      // $subjectShow = '[no subject]';
+    // }
+    // OLD_PrintRow($threadInfo,'subject',$subjectShow);
+
+    // $recipientsList = array();
+    // foreach ($thread['recipients'] as $r) {
+      // if ($r != $fbUser) {
+        // $recipientsList[] = OLD_ProfileName($r);
+      // }
+    // }
+    // $recipientsShow = implode(',',$recipientsList);
+    // OLD_PrintRow($threadInfo,':to/from',$recipientsShow);
+
+
+    // if ($fbcmdPrefs['folder_show_date']) {
+      // OLD_PrintRow($threadInfo,':date', date($fbcmdPrefs['folder_dateformat'],$thread['updated_time']));
+    // }
+
+
+    // if ($fbcmdPrefs['folder_show_snippet']) {
+      // $snippetShow = str_replace("\n", ' ', $thread['snippet']);
+      // if (count($recipientsList) > 1) {
+        // $snippetShow = OLD_ProfileName($thread['snippet_author']) . " :: " . $snippetShow;
+      // }
+      // OLD_PrintRow($threadInfo,':snippet', $snippetShow);
+    // }
+
+    // if ($fbcmdPrefs['folder_blankrow']) {
+      // OLD_PrintRow('');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintHeaderQuiet() {
-    global $fbcmdPrefs;
-    if ($fbcmdPrefs['quiet']) {
-      return;
-    }
-    if ($fbcmdPrefs['print_header']) {
-      OLD_PrintRow(func_get_args());
-    }
-  }
+  // function OLD_PrintHeader() {
+    // global $fbcmdPrefs;
+    // if ($fbcmdPrefs['print_header']) {
+      // OLD_PrintRow(func_get_args());
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintIf($boolValue,$optVar) {
-    if ($boolValue) {
-      return $optVar;
-    } else {
-      return 'SKIP_COLUMN';
-    }
-  }
+  // function OLD_PrintHeaderQuiet() {
+    // global $fbcmdPrefs;
+    // if ($fbcmdPrefs['quiet']) {
+      // return;
+    // }
+    // if ($fbcmdPrefs['print_header']) {
+      // OLD_PrintRow(func_get_args());
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintIfPref($paramName,$optVar) {
-    global $fbcmdPrefs;
-    return OLD_PrintIf($fbcmdPrefs[$paramName],$optVar);
-  }
+  // function OLD_PrintIf($boolValue,$optVar) {
+    // if ($boolValue) {
+      // return $optVar;
+    // } else {
+      // return 'SKIP_COLUMN';
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintNotificationHeader() {
-    global $fbcmdPrefs;
-    $header = array();
-    $header[] = '[#]';
-    $header[] = OLD_PrintIfPref('notices_show_id','NOTIFICATION_ID');
-    $header[] = 'SOURCE';
-    $header[] = 'FIELD';
-    $header[] = 'VALUE';
-    OLD_PrintHeader($header);
-    if ($fbcmdPrefs['notices_blankrow']) {
-      OLD_PrintRow('');
-    }
-  }
+  // function OLD_PrintIfPref($paramName,$optVar) {
+    // global $fbcmdPrefs;
+    // return OLD_PrintIf($fbcmdPrefs[$paramName],$optVar);
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintNotificationObject($threadNum, $n) {
-    global $fbcmdPrefs;
-    global $fbUser;
-
-    $postInfo = array();
-    $postInfo[] = '[' . $threadNum . ']';
-    if ($n['is_unread']) {
-      $postInfo[0] .= '*';
-    }
-    if ($fbcmdPrefs['notices_show_id']) {
-      $postInfo[] = $n['notification_id'];
-    }
-    $prefix = '';
-    if ($n['sender_id'] != $fbUser) {
-      OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'from',OLD_ProfileName($n['sender_id']));
-      $prefix = ':';
-    }
-    if ($fbcmdPrefs['notices_show_date']) {
-      OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'date',date($fbcmdPrefs['notices_dateformat'],$n['created_time']));
-      $prefix = ':';
-    }
-    if ($n['title_text'] != '') {
-      OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
-      $prefix = ':';
-    }
-    if ($n['body_text'] != '') {
-      OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'body',strip_tags($n['body_text']));
-    }
-    if ($fbcmdPrefs['notices_blankrow']) {
-      OLD_PrintRow('');
-    }
-  }
+  // function OLD_PrintNotificationHeader() {
+    // global $fbcmdPrefs;
+    // $header = array();
+    // $header[] = '[#]';
+    // $header[] = OLD_PrintIfPref('notices_show_id','NOTIFICATION_ID');
+    // $header[] = 'SOURCE';
+    // $header[] = 'FIELD';
+    // $header[] = 'VALUE';
+    // OLD_PrintHeader($header);
+    // if ($fbcmdPrefs['notices_blankrow']) {
+      // OLD_PrintRow('');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintPostHeader() {
-    global $fbcmdPrefs;
-    $header = array();
-    $header[] = OLD_PrintIfPref('stream_save','[#]');
-    $header[] = OLD_PrintIfPref('stream_show_postid','POST_ID');
-    $header[] = OLD_PrintIfPref('show_id','SOURCE_UID');
-    $header[] = 'NAME';
-    $header[] = OLD_PrintIfPref('stream_show_date','TIME');
-    $header[] = 'TYPE';
-    $header[] = 'MESSAGE';
-    OLD_PrintHeader($header);
-    if ($fbcmdPrefs['stream_blankrow']) {
-      OLD_PrintRow('');
-    }
-  }
+  // function OLD_PrintNotificationObject($threadNum, $n) {
+    // global $fbcmdPrefs;
+    // global $fbUser;
+
+    // $postInfo = array();
+    // $postInfo[] = '[' . $threadNum . ']';
+    // if ($n['is_unread']) {
+      // $postInfo[0] .= '*';
+    // }
+    // if ($fbcmdPrefs['notices_show_id']) {
+      // $postInfo[] = $n['notification_id'];
+    // }
+    // $prefix = '';
+    // if ($n['sender_id'] != $fbUser) {
+      // OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'from',OLD_ProfileName($n['sender_id']));
+      // $prefix = ':';
+    // }
+    // if ($fbcmdPrefs['notices_show_date']) {
+      // OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'date',date($fbcmdPrefs['notices_dateformat'],$n['created_time']));
+      // $prefix = ':';
+    // }
+    // if ($n['title_text'] != '') {
+      // OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'title',strip_tags($n['title_text']));
+      // $prefix = ':';
+    // }
+    // if ($n['body_text'] != '') {
+      // OLD_PrintRow($postInfo,OLD_ProfileName($n['app_id']),$prefix . 'body',strip_tags($n['body_text']));
+    // }
+    // if ($fbcmdPrefs['notices_blankrow']) {
+      // OLD_PrintRow('');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintPostObject($postNum, $post, $commentData = false) {
-
-    global $fbcmdPrefs;
-
-    $postInfo = array();
-
-    if ($fbcmdPrefs['stream_save']) {
-      $postInfo[] = '[' . $postNum . ']';
-    }
-
-    if ($fbcmdPrefs['stream_show_postid']) {
-      $postInfo[] = $post['post_id'];
-    }
-
-    $userInfo = array();
-    $userInfo[] = OLD_PrintIfPref('show_id',$post['actor_id']);
-
-    $userInfo[] = OLD_ProfileName($post['actor_id']);
-
-    $timeInfo = OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$post['created_time']));
-
-    if ($post['attachment']) {
-      $msgType = 'attach post';
-      if (isset($post['attachment']['media'][0])) {
-        if (isset($post['attachment']['media'][0]['type'])) {
-          $msgType = $post['attachment']['media'][0]['type'] . ' post';
-        }
-      }
-    } else {
-      if ($post['app_data']) {
-        $msgType = 'app post';
-      } else {
-        if ($post['target_id']) {
-          $msgType = 'wall post';
-        } else {
-          $msgType = 'status';
-        }
-      }
-    }
-
-    $msgShow = $post['message'];
-
-    if ($post['target_id']) {
-      $msgShow = '--> ' . OLD_ProfileName($post['target_id']) . ' :: ' . $post['message'];
-    } else {
-      $msgShow = $post['message'];
-    }
-    if ($msgShow == '') if (isset($post['attachment']['name'])) $msgShow = $post['attachment']['name'];
-    if ($msgShow == '') if (isset($post['attachment']['caption'])) $msgShow = $post['attachment']['caption'];
-    if ($msgShow == '') if (isset($post['attachment']['href'])) $msgShow = $post['attachment']['href'];
-    if ($msgShow == '') if (isset($post['attachment']['description'])) $msgShow = $post['attachment']['description'];
-
-    OLD_PrintRow($postInfo,$userInfo,$timeInfo,$msgType,$msgShow);
-
-    if ($fbcmdPrefs['stream_show_appdata']) {
-      if ($post['app_data'] != '') {
-        OLD_PrintRecursiveObject(array($postInfo,$userInfo,$timeInfo),':app',$post['app_data']);
-      }
-    }
-
-    if ($fbcmdPrefs['stream_show_attachments']) {
-      if ($post['attachment']) {
-        OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'name',':name');
-        OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'href',':link');
-        OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'caption',':caption');
-        OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'description',':desc');
-      }
-    }
-
-    if ($fbcmdPrefs['stream_show_likes']) {
-      if (isset($post['likes']['count'])) {
-        if ($post['likes']['count'] > 0) {
-          if ($post['likes']['count'] == 1) {
-            $likesMessage = '1 person likes this.';
-          } else {
-            $likesMessage = "{$post['likes']['count']} people like this.";
-          }
-          if (isset($post['likes']['friends'])) {
-            if ((is_array($post['likes']['friends']))&&(count($post['likes']['friends']) > 0)) {
-              $likers = array();
-              foreach ($post['likes']['friends'] as $id) {
-                $likers[] = OLD_ProfileName($id);
-              }
-              $likesMessage = $likesMessage . ' (' . implode(',',$likers) . ')';
-            }
-          }
-          OLD_PrintRow($postInfo,$userInfo,$timeInfo,':likes',$likesMessage);
-        }
-      }
-    }
-
-    if ($commentData) {
-      $shownCount = count($commentData);
-      if (isset($post['comments']['count'])) {
-        $totalCount = $post['comments']['count'];
-        if ($shownCount < $totalCount) {
-          OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
-        }
-      }
-      $commentCount = 0;
-      foreach ($commentData as $comment) {
-        $commentCount++;
-        $timeInfo = OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
-        OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,OLD_ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
-      }
-    } else {
-      if ($fbcmdPrefs['stream_show_comments']) {
-        if (isset($post['comments']['count'])) {
-          $totalCount = $post['comments']['count'];
-          if ($totalCount > 0) {
-            $shownCount = 0;
-            if (isset($post['comments']['comment_list'])) {
-              if (is_array($post['comments']['comment_list'])) {
-                $shownCount = count($post['comments']['comment_list']);
-              }
-            }
-            if ($shownCount == 0) {
-              OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comments',"{$totalCount} Comments");
-            } else {
-              if ($shownCount < $totalCount) {
-                OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
-              }
-              $commentCount = 0;
-              foreach ($post['comments']['comment_list'] as $comment) {
-                $commentCount++;
-                $timeInfo = OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
-                OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,OLD_ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
-              }
-            }
-          }
-        }
-      }
-    }
-    if ($fbcmdPrefs['stream_blankrow']) {
-      OLD_PrintRow('');
-    }
-  }
+  // function OLD_PrintPostHeader() {
+    // global $fbcmdPrefs;
+    // $header = array();
+    // $header[] = OLD_PrintIfPref('stream_save','[#]');
+    // $header[] = OLD_PrintIfPref('stream_show_postid','POST_ID');
+    // $header[] = OLD_PrintIfPref('show_id','SOURCE_UID');
+    // $header[] = 'NAME';
+    // $header[] = OLD_PrintIfPref('stream_show_date','TIME');
+    // $header[] = 'TYPE';
+    // $header[] = 'MESSAGE';
+    // OLD_PrintHeader($header);
+    // if ($fbcmdPrefs['stream_blankrow']) {
+      // OLD_PrintRow('');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
- function OLD_PrintQuiet($msg) {
-  global $fbcmdPrefs;
-  if (!$fbcmdPrefs['quiet']) {
-      print $msg;
-    }
-  }
+  // function OLD_PrintPostObject($postNum, $post, $commentData = false) {
+
+    // global $fbcmdPrefs;
+
+    // $postInfo = array();
+
+    // if ($fbcmdPrefs['stream_save']) {
+      // $postInfo[] = '[' . $postNum . ']';
+    // }
+
+    // if ($fbcmdPrefs['stream_show_postid']) {
+      // $postInfo[] = $post['post_id'];
+    // }
+
+    // $userInfo = array();
+    // $userInfo[] = OLD_PrintIfPref('show_id',$post['actor_id']);
+
+    // $userInfo[] = OLD_ProfileName($post['actor_id']);
+
+    // $timeInfo = OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$post['created_time']));
+
+    // if ($post['attachment']) {
+      // $msgType = 'attach post';
+      // if (isset($post['attachment']['media'][0])) {
+        // if (isset($post['attachment']['media'][0]['type'])) {
+          // $msgType = $post['attachment']['media'][0]['type'] . ' post';
+        // }
+      // }
+    // } else {
+      // if ($post['app_data']) {
+        // $msgType = 'app post';
+      // } else {
+        // if ($post['target_id']) {
+          // $msgType = 'wall post';
+        // } else {
+          // $msgType = 'status';
+        // }
+      // }
+    // }
+
+    // $msgShow = $post['message'];
+
+    // if ($post['target_id']) {
+      // $msgShow = '--> ' . OLD_ProfileName($post['target_id']) . ' :: ' . $post['message'];
+    // } else {
+      // $msgShow = $post['message'];
+    // }
+    // if ($msgShow == '') if (isset($post['attachment']['name'])) $msgShow = $post['attachment']['name'];
+    // if ($msgShow == '') if (isset($post['attachment']['caption'])) $msgShow = $post['attachment']['caption'];
+    // if ($msgShow == '') if (isset($post['attachment']['href'])) $msgShow = $post['attachment']['href'];
+    // if ($msgShow == '') if (isset($post['attachment']['description'])) $msgShow = $post['attachment']['description'];
+
+    // OLD_PrintRow($postInfo,$userInfo,$timeInfo,$msgType,$msgShow);
+
+    // if ($fbcmdPrefs['stream_show_appdata']) {
+      // if ($post['app_data'] != '') {
+        // OLD_PrintRecursiveObject(array($postInfo,$userInfo,$timeInfo),':app',$post['app_data']);
+      // }
+    // }
+
+    // if ($fbcmdPrefs['stream_show_attachments']) {
+      // if ($post['attachment']) {
+        // OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'name',':name');
+        // OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'href',':link');
+        // OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'caption',':caption');
+        // OLD_PrintAttachmentData(array($postInfo,$userInfo,$timeInfo),$post,'description',':desc');
+      // }
+    // }
+
+    // if ($fbcmdPrefs['stream_show_likes']) {
+      // if (isset($post['likes']['count'])) {
+        // if ($post['likes']['count'] > 0) {
+          // if ($post['likes']['count'] == 1) {
+            // $likesMessage = '1 person likes this.';
+          // } else {
+            // $likesMessage = "{$post['likes']['count']} people like this.";
+          // }
+          // if (isset($post['likes']['friends'])) {
+            // if ((is_array($post['likes']['friends']))&&(count($post['likes']['friends']) > 0)) {
+              // $likers = array();
+              // foreach ($post['likes']['friends'] as $id) {
+                // $likers[] = OLD_ProfileName($id);
+              // }
+              // $likesMessage = $likesMessage . ' (' . implode(',',$likers) . ')';
+            // }
+          // }
+          // OLD_PrintRow($postInfo,$userInfo,$timeInfo,':likes',$likesMessage);
+        // }
+      // }
+    // }
+
+    // if ($commentData) {
+      // $shownCount = count($commentData);
+      // if (isset($post['comments']['count'])) {
+        // $totalCount = $post['comments']['count'];
+        // if ($shownCount < $totalCount) {
+          // OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
+        // }
+      // }
+      // $commentCount = 0;
+      // foreach ($commentData as $comment) {
+        // $commentCount++;
+        // $timeInfo = OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
+        // OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,OLD_ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
+      // }
+    // } else {
+      // if ($fbcmdPrefs['stream_show_comments']) {
+        // if (isset($post['comments']['count'])) {
+          // $totalCount = $post['comments']['count'];
+          // if ($totalCount > 0) {
+            // $shownCount = 0;
+            // if (isset($post['comments']['comment_list'])) {
+              // if (is_array($post['comments']['comment_list'])) {
+                // $shownCount = count($post['comments']['comment_list']);
+              // }
+            // }
+            // if ($shownCount == 0) {
+              // OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comments',"{$totalCount} Comments");
+            // } else {
+              // if ($shownCount < $totalCount) {
+                // OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comments',"Showing {$shownCount} of {$totalCount} Comments");
+              // }
+              // $commentCount = 0;
+              // foreach ($post['comments']['comment_list'] as $comment) {
+                // $commentCount++;
+                // $timeInfo = OLD_PrintIfPref('stream_show_date',date($fbcmdPrefs['stream_dateformat'],$comment['time']));
+                // OLD_PrintRow($postInfo,$userInfo,$timeInfo,':comment' . $commentCount,OLD_ProfileName($comment['fromid']) . ' :: ' . $comment['text']);
+              // }
+            // }
+          // }
+        // }
+      // }
+    // }
+    // if ($fbcmdPrefs['stream_blankrow']) {
+      // OLD_PrintRow('');
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
- function OLD_PrintRow() {
-    global $fbcmdPrefs;
-    global $printMatrix;
-    $rowArray = OLD_array_flatten(func_get_args());
-    $columns = array();
-    foreach ($rowArray as $col) {
-      if (is_array($col)) {
-        foreach ($col as $c) {
-          if ($c != 'SKIP_COLUMN') {
-            $columns[] = $c;
-          }
-        }
-      } else {
-        if ($col != 'SKIP_COLUMN') {
-          $columns[] = $col;
-        }
-      }
-    }
-    $printColumns = OLD_CleanColumns($columns);
-    $printMatrix[] = $printColumns;
-
-    if ($fbcmdPrefs['print_csv']) {
-      OLD_PrintCsvRow($printColumns);
-    }
-  }
+ // function OLD_PrintQuiet($msg) {
+  // global $fbcmdPrefs;
+  // if (!$fbcmdPrefs['quiet']) {
+      // print $msg;
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintRowQuiet() {
-    global $fbcmdPrefs;
-    if ($fbcmdPrefs['quiet']) {
-      return;
-    }
-    OLD_PrintRow(func_get_args());
-  }
+ // function OLD_PrintRow() {
+    // global $fbcmdPrefs;
+    // global $printMatrix;
+    // $rowArray = OLD_array_flatten(func_get_args());
+    // $columns = array();
+    // foreach ($rowArray as $col) {
+      // if (is_array($col)) {
+        // foreach ($col as $c) {
+          // if ($c != 'SKIP_COLUMN') {
+            // $columns[] = $c;
+          // }
+        // }
+      // } else {
+        // if ($col != 'SKIP_COLUMN') {
+          // $columns[] = $col;
+        // }
+      // }
+    // }
+    // $printColumns = OLD_CleanColumns($columns);
+    // $printMatrix[] = $printColumns;
+
+    // if ($fbcmdPrefs['print_csv']) {
+      // OLD_PrintCsvRow($printColumns);
+    // }
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintRecursiveObject ($arrayPrefix, $fieldPrefix, $obj) {
-    global $fbcmdPrefs;
-    if (is_array($obj)) {
-      foreach ($obj as $key=>$value) {
-        if ($fieldPrefix == '') {
-          OLD_PrintRecursiveObject($arrayPrefix,"{$key}",$value);
-        } else {
-          OLD_PrintRecursiveObject($arrayPrefix,"{$fieldPrefix}.{$key}",$value);
-        }
-      }
-    } else {
-      if (($obj)||($fbcmdPrefs['print_blanks'])) {
-        $row = $arrayPrefix;
-        $row[] = $fieldPrefix;
-        $row[] = $obj;
-        OLD_PrintRow($row);
-      }
-    }
-  }
+  // function OLD_PrintRowQuiet() {
+    // global $fbcmdPrefs;
+    // if ($fbcmdPrefs['quiet']) {
+      // return;
+    // }
+    // OLD_PrintRow(func_get_args());
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_PrintStart() {
-    global $printMatrix;
-    $printMatrix = array();
-  }
+  // function OLD_PrintRecursiveObject ($arrayPrefix, $fieldPrefix, $obj) {
+    // global $fbcmdPrefs;
+    // if (is_array($obj)) {
+      // foreach ($obj as $key=>$value) {
+        // if ($fieldPrefix == '') {
+          // OLD_PrintRecursiveObject($arrayPrefix,"{$key}",$value);
+        // } else {
+          // OLD_PrintRecursiveObject($arrayPrefix,"{$fieldPrefix}.{$key}",$value);
+        // }
+      // }
+    // } else {
+      // if (($obj)||($fbcmdPrefs['print_blanks'])) {
+        // $row = $arrayPrefix;
+        // $row[] = $fieldPrefix;
+        // $row[] = $obj;
+        // OLD_PrintRow($row);
+      // }
+    // }
+  // }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  // function OLD_PrintStart() {
+    // global $printMatrix;
+    // $printMatrix = array();
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -3963,7 +3637,7 @@
     global $printColFields;
     global $printColWidths;
     global $printCSV;
-    
+
     $consoleWidth = $fbcmdPrefs['output_wrap_width'];
     if ($fbcmdPrefs['output_wrap_env_var']) { // good behaviour? env over arg?
       if (getenv($fbcmdPrefs['output_wrap_env_var'])) {
@@ -3992,7 +3666,7 @@
       if ($printColWidths[$j] == 0) {
         $numZeros++;
         $zeroPos = $j;
-        $printColWidths[$j] = $fbcmdPrefs['output_wrap_min_width'];        
+        $printColWidths[$j] = $fbcmdPrefs['output_wrap_min_width'];
       }
     }
     if ($numZeros) {
@@ -4006,20 +3680,20 @@
         $printColWidths[$zeroPos] += $spaceRemaining;
       }
     }
-    
+
     if ($fbcmdPrefs['output_header']) {
       if ($printCSV) {
         PrintCsvRow($printColFields);
       } else {
         PrintTxtRowWrap($printColFields);
-      }    
+      }
     }
   }
 
   function PrintCol() {
     global $fbProcessed;
     global $fbReturnType;
-   
+
     PrintColRecCommon('col');
     if ($fbReturnType == 'array') {
       foreach ($fbProcessed as $o) {
@@ -4062,7 +3736,7 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4090,8 +3764,8 @@
     }
     print implode($fbcmdPrefs['csv_separator'],$rowOut) . "\n";
   }
-  
-  
+
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4138,7 +3812,7 @@
     global $fbProcessed;
     global $fbReturnType;
     global $fbcmdPrefs;
-   
+
     PrintColRecCommon('rec');
     if ($fbReturnType == 'array') {
       foreach ($fbProcessed as $o) {
@@ -4159,7 +3833,7 @@
     global $fbcmdPrefs;
     global $printColFields;
     global $printCSV;
-    
+
     $first = true;
     foreach ($arr as $k => $v) {
       if (!in_array($k,$printColFields)) {
@@ -4191,7 +3865,7 @@
           }
         }
         if (strlen(implode($cols)) > 0) {
-          $first = false;        
+          $first = false;
           if ($printCSV) {
             PrintCsvRow($cols);
           } else {
@@ -4201,7 +3875,7 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4221,21 +3895,38 @@
         $printFormat = 'json';
       }
     }
-    if ($printFormat == 'json') print json_encode($fbProcessed) . "\n";
-    if ($printFormat == 'php') print_r($fbProcessed) . "\n";
-    if ($printFormat == 'serial') print serialize($fbProcessed) . "\n";
+    if ($printFormat == 'json') {
+      print json_encode($fbProcessed) . "\n";
+      return;
+    }
+    if ($printFormat == 'php') {
+      print_r($fbProcessed) . "\n";
+      return;
+    }
+    if ($printFormat == 'serial') {
+      print serialize($fbProcessed) . "\n";
+    }
 
     if ($printFormat == 'csvcol') {
       $printCSV = true;
       PrintCol();
+      return;
     }
     if ($printFormat == 'csvrec') {
       $printCSV = true;
       PrintRec();
-    }    
-    $printCSV = false;    
-    if ($printFormat == 'col') PrintCol();
-    if ($printFormat == 'rec') PrintRec();
+      return;
+    }
+    $printCSV = false;
+    if ($printFormat == 'col') {
+      PrintCol();
+      return;
+    }
+    if ($printFormat == 'rec') {
+      PrintRec();
+      return;
+    }
+    FbcmdFatalError("Invalid output_format: -o={$printFormat}");
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4289,18 +3980,18 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_ProcessEventMask($mask) {
-    if ((!is_numeric($mask))||($mask > 15)||($mask <= 0)) {
-      FbcmdWarning("Invalid Event Mask: using 1 ('attending')");
-      $mask = 1;
-    }
-    $eventOptions = array();
-    if ($mask & 1) $eventOptions[] = "'attending'";
-    if ($mask & 2) $eventOptions[] = "'unsure'";
-    if ($mask & 4) $eventOptions[] = "'not_replied'";
-    if ($mask & 8) $eventOptions[] = "'declined'";
-    return implode(',',$eventOptions);
-  }
+  // function OLD_ProcessEventMask($mask) {
+    // if ((!is_numeric($mask))||($mask > 15)||($mask <= 0)) {
+      // FbcmdWarning("Invalid Event Mask: using 1 ('attending')");
+      // $mask = 1;
+    // }
+    // $eventOptions = array();
+    // if ($mask & 1) $eventOptions[] = "'attending'";
+    // if ($mask & 2) $eventOptions[] = "'unsure'";
+    // if ($mask & 4) $eventOptions[] = "'not_replied'";
+    // if ($mask & 8) $eventOptions[] = "'declined'";
+    // return implode(',',$eventOptions);
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -4308,13 +3999,13 @@
   function ProcessReturn() {
     // fbReturnType: three possibilities
     // 'value', 'obj', 'array'
-    global $fbcmdPrefs;    
+    global $fbcmdPrefs;
     global $fbReturn;
     global $fbReturnType;
     global $fbProcessed;
     global $printFlat;
     global $printFormat;
-    global $fbcmdExtraFields;
+    global $fbcmdExtraOutput;
 
     $printFormat = strtolower(GetCommandPref('output_format'));
 
@@ -4326,10 +4017,10 @@
         $printFlat = $fbcmdPrefs['output_flat_' . $printFormat];
       }
     }
-    
+
     if (!is_array($fbReturn)) {
       $fbReturnType = 'value';
-      $fbProcessed = AddToProcessed(array('retval' => $fbReturn));
+      $fbProcessed = AddExtraOutput(array('retval' => $fbReturn));
       return;
     }
     if (isset($fbReturn['data'][0])) {
@@ -4337,7 +4028,7 @@
       $fbProcessed = array();
       for ($j=0; $j < count($fbReturn['data']); $j++) {
         $i = $j+1;  //2 eventually, will have to add COUNT support
-        $fbcmdExtraFields['index'] = $i;
+        $fbcmdExtraOutput['index'] = $i;
         $fbProcessed[$i] = ProcessShowFields($fbReturn['data'][$j]);
       }
       return;
@@ -4351,14 +4042,14 @@
 
   function ProcessShowFields($inArr) {
     global $printFields;
-    global $fbcmdExtraFields;
+    global $fbcmdExtraOutput;
     $show = GetCommandPref('output_show');
     $printFields = explode(',',strtolower($show));
-    if (in_array('none',$printFields)) return array();    
-    $arr = AddToProcessed($inArr);
+    if (in_array('none',$printFields)) return array();
+    $arr = AddExtraOutput($inArr);
     return ProcessShowRecurse($arr);
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4394,37 +4085,37 @@
     }
     return $ret;
   }
-    
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_ProfileName($id) {
-    global $indexFriendBaseInfo;
-    global $indexPageNames;
-    global $indexStreamNames;
-    global $indexMessageNames;
-    global $indexFlistNames;
-    global $indexApplicationNames;
-    if (isset($indexFriendBaseInfo[$id])) {
-      return $indexFriendBaseInfo[$id]['name'];
-    }
-    if (isset($indexPageNames[$id])) {
-      return $indexPageNames[$id]['name'];
-    }
-    if (isset($indexStreamNames[$id])) {
-      return $indexStreamNames[$id]['name'];
-    }
-    if (isset($indexMessageNames[$id])) {
-      return $indexMessageNames[$id]['name'];
-    }
-    if (isset($indexFlistNames[$id])) {
-      return $indexFlistNames[$id]['name'];
-    }
-    if (isset($indexApplicationNames[$id])) {
-      return $indexApplicationNames[$id]['display_name'];
-    }
-    return 'unknown';
-  }
+  // function OLD_ProfileName($id) {
+    // global $indexFriendBaseInfo;
+    // global $indexPageNames;
+    // global $indexStreamNames;
+    // global $indexMessageNames;
+    // global $indexFlistNames;
+    // global $indexApplicationNames;
+    // if (isset($indexFriendBaseInfo[$id])) {
+      // return $indexFriendBaseInfo[$id]['name'];
+    // }
+    // if (isset($indexPageNames[$id])) {
+      // return $indexPageNames[$id]['name'];
+    // }
+    // if (isset($indexStreamNames[$id])) {
+      // return $indexStreamNames[$id]['name'];
+    // }
+    // if (isset($indexMessageNames[$id])) {
+      // return $indexMessageNames[$id]['name'];
+    // }
+    // if (isset($indexFlistNames[$id])) {
+      // return $indexFlistNames[$id]['name'];
+    // }
+    // if (isset($indexApplicationNames[$id])) {
+      // return $indexApplicationNames[$id]['display_name'];
+    // }
+    // return 'unknown';
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -4642,40 +4333,6 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_SaveEventData($obj) {
-    $saveData = array ('ids' => array('0'), 'timestamp' => time());
-    foreach ($obj as $d) {
-      $saveData['ids'][] = $d['eid'];
-    }
-    SaveDataFile('eventfile',$saveData,'event_save');
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_SaveMailData($obj) {
-    $saveData = array ('ids' => array('0'), 'timestamp' => time());
-    foreach ($obj as $d) {
-      $saveData['ids'][] = $d['thread_id'];
-    }
-    SaveDataFile('mailfile',$saveData,'mail_save');
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_SaveNoticeData($obj) {
-    $saveData = array ('ids' => array('0'), 'href' => array('0'), 'timestamp' => time());
-    foreach ($obj as $d) {
-      $saveData['ids'][] = $d['notification_id'];
-      $saveData['href'][] = $d['href'];
-    }
-    SaveDataFile('noticefile',$saveData,'notices_save');
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
   function SavePhoto($urlSource, $picObject, $albumId, $tagId, $outputDir, $fileFormat, $checkSkip = true) { //2 todo: refactor
     global $fbcmdPrefs;
     $photoContents = false;
@@ -4729,77 +4386,7 @@
 
     return true;
   }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_SavePhoto($urlSource, $picObject, $tagId, $outputDir, $fileFormat, $checkSkip = true) {
-    global $fbcmdPrefs;
-    $photoContents = false;
-    $retry=0;
-
-    $fileFormat = str_replace('\\', '/', $fileFormat);
-    if ($picObject) {
-      $fileFormat = str_replace('[aid]', $picObject['aid'], $fileFormat);
-      $fileFormat = str_replace('[pid]', $picObject['pid'], $fileFormat);
-      $fileFormat = str_replace('[oid]', $picObject['owner'], $fileFormat);
-      $fileFormat = str_replace('[oname]', OLD_ProfileName($picObject['owner']), $fileFormat);
-    }
-    if ($tagId) {
-      $fileFormat = str_replace('[tid]', $tagId, $fileFormat);
-      $fileFormat = str_replace('[tname]', OLD_ProfileName($tagId), $fileFormat);
-    }
-    $outputFile = CleanPath($outputDir) . $fileFormat;
-    VerifyOutputDir($outputFile);
-
-    if (($fbcmdPrefs['pic_skip_exists'])&&($checkSkip)) {
-      if (file_exists($outputFile)) {
-        return false;
-      }
-    }
-
-    do {
-      try {
-        $photoContents = @file_get_contents($urlSource);
-      } catch (Exception $e) {
-        FbcmdWarning("[{$e->getCode()}] {$e->getMessage()}");
-      }
-      if ($photoContents == false) {
-        if (++$retry > $fbcmdPrefs['pic_retry_count']) {
-          FbcmdWarning("Could not download {$urlSource}");
-          return false;
-        } else {
-          FbcmdWarning("Retry {$retry} :: {$urlSource}");
-          sleep($fbcmdPrefs['pic_retry_delay']);
-        }
-      }
-    } while ($photoContents == false);
-
-    if (file_put_contents($outputFile, $photoContents) == false) {
-      FbcmdWarning("Could not save {$outputFile}");
-      return false;
-    }
-
-    return true;
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_SavePostData($obj) {
-    $saveData = array ('ids' => array('0'), 'url' => array('0'), 'link' => array('0'), 'timestamp' => time());
-    foreach ($obj as $d) {
-      $saveData['ids'][] = $d['post_id'];
-      if (isset($d['attachment']['href'])) {
-        $saveData['link'][] = $d['attachment']['href'];
-      } else {
-        $saveData['link'][] = $d['permalink'];
-      }
-      $saveData['url'][] = $d['permalink'];
-    }
-    SaveDataFile('postfile',$saveData,'stream_save');
-  }
-
+  
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4839,6 +4426,24 @@
         $fbcmdParams[$n] = $value;
       }
     }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function ShiftPrev() {
+    global $fbcmdPrefs;
+    global $fbcmdPrev;
+
+    $k = $fbcmdPrefs['prev_length'];
+    while ($k > 0) {
+      if (isset($fbcmdPrev[$k-1])) {
+        $fbcmdPrev[$k] = $fbcmdPrev[$k-1];
+      }
+      $k--;
+    }
+    $fbcmdPrev[0] = array();
+    $fbcmdPrev[0][] = array('id' => 0, 'name' => '0');
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4934,123 +4539,123 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_StreamPostHelper($target_id, $uid, $offset) {
-    global $fbcmdParams;
-    global $fbcmdPrefs;
-    global $fbObject;
+  // function OLD_StreamPostHelper($target_id, $uid, $offset) {
+    // global $fbcmdParams;
+    // global $fbcmdPrefs;
+    // global $fbObject;
 
-    $firstParam = strtoupper($fbcmdParams[$offset]);
+    // $firstParam = strtoupper($fbcmdParams[$offset]);
 
-    if (in_array($firstParam, array('MP3','IMG','FLASH'))) {
-      if ($firstParam == 'MP3') {
-        ValidateParamCount($offset+2, $offset+9);
-        SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
-        SetDefaultParam($offset+2,$fbcmdPrefs['default_postmp3_mp3src']);
-        SetDefaultParam($offset+3,$fbcmdPrefs['default_postmp3_mp3title']);
-        SetDefaultParam($offset+4,$fbcmdPrefs['default_postmp3_mp3artist']);
-        SetDefaultParam($offset+5,$fbcmdPrefs['default_postmp3_mp3album']);
-        $msg = $fbcmdParams[$offset+1];
-        $media = array(array('type' => 'mp3', 'src' => $fbcmdParams[$offset+2], 'title' => $fbcmdParams[$offset+3], 'artist' => $fbcmdParams[$offset+4], 'album' => $fbcmdParams[$offset+5]));
-        $offsetPostData = $offset + 6;
-      }
-      if ($firstParam == 'IMG') {
-        ValidateParamCount($offset+2, $offset+7);
-        SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
-        SetDefaultParam($offset+2,$fbcmdPrefs['default_postimg_imgsrc']);
-        if ($fbcmdPrefs['default_postimg_imglink'] == '0') {
-          SetDefaultParam($offset+3,$fbcmdParams[$offset+2]);
-        } else {
-          SetDefaultParam($offset+3,$fbcmdPrefs['default_postimg_imglink']);
-        }
-        $msg = $fbcmdParams[$offset+1];
-        $media = array(array('type' => 'image', 'src' => $fbcmdParams[$offset+2], 'href' => $fbcmdParams[$offset+3]));
-        $offsetPostData = $offset + 4;
-      }
-      if ($firstParam == 'FLASH') {
-        ValidateParamCount($offset+3, $offset+7);
-        SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
-        SetDefaultParam($offset+2,$fbcmdPrefs['default_postflash_swfsrc']);
-        SetDefaultParam($offset+3,$fbcmdPrefs['default_postflash_imgsrc']);
-        $msg = $fbcmdParams[$offset+1];
-        $media = array(array('type' => 'flash', 'swfsrc' => $fbcmdParams[$offset+2], 'imgsrc' => $fbcmdParams[$offset+3]));
-        $offsetPostData = $offset + 4;
-      }
-    } else {
-      ValidateParamCount($offset,$offset+4);
-      SetDefaultParam($offset,$fbcmdPrefs['default_post_message']);
-      $msg = $fbcmdParams[$offset];
-      $media = '';
-      $offsetPostData = $offset + 1;
-    }
+    // if (in_array($firstParam, array('MP3','IMG','FLASH'))) {
+      // if ($firstParam == 'MP3') {
+        // ValidateParamCount($offset+2, $offset+9);
+        // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+        // SetDefaultParam($offset+2,$fbcmdPrefs['default_postmp3_mp3src']);
+        // SetDefaultParam($offset+3,$fbcmdPrefs['default_postmp3_mp3title']);
+        // SetDefaultParam($offset+4,$fbcmdPrefs['default_postmp3_mp3artist']);
+        // SetDefaultParam($offset+5,$fbcmdPrefs['default_postmp3_mp3album']);
+        // $msg = $fbcmdParams[$offset+1];
+        // $media = array(array('type' => 'mp3', 'src' => $fbcmdParams[$offset+2], 'title' => $fbcmdParams[$offset+3], 'artist' => $fbcmdParams[$offset+4], 'album' => $fbcmdParams[$offset+5]));
+        // $offsetPostData = $offset + 6;
+      // }
+      // if ($firstParam == 'IMG') {
+        // ValidateParamCount($offset+2, $offset+7);
+        // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+        // SetDefaultParam($offset+2,$fbcmdPrefs['default_postimg_imgsrc']);
+        // if ($fbcmdPrefs['default_postimg_imglink'] == '0') {
+          // SetDefaultParam($offset+3,$fbcmdParams[$offset+2]);
+        // } else {
+          // SetDefaultParam($offset+3,$fbcmdPrefs['default_postimg_imglink']);
+        // }
+        // $msg = $fbcmdParams[$offset+1];
+        // $media = array(array('type' => 'image', 'src' => $fbcmdParams[$offset+2], 'href' => $fbcmdParams[$offset+3]));
+        // $offsetPostData = $offset + 4;
+      // }
+      // if ($firstParam == 'FLASH') {
+        // ValidateParamCount($offset+3, $offset+7);
+        // SetDefaultParam($offset+1,$fbcmdPrefs['default_post_message']);
+        // SetDefaultParam($offset+2,$fbcmdPrefs['default_postflash_swfsrc']);
+        // SetDefaultParam($offset+3,$fbcmdPrefs['default_postflash_imgsrc']);
+        // $msg = $fbcmdParams[$offset+1];
+        // $media = array(array('type' => 'flash', 'swfsrc' => $fbcmdParams[$offset+2], 'imgsrc' => $fbcmdParams[$offset+3]));
+        // $offsetPostData = $offset + 4;
+      // }
+    // } else {
+      // ValidateParamCount($offset,$offset+4);
+      // SetDefaultParam($offset,$fbcmdPrefs['default_post_message']);
+      // $msg = $fbcmdParams[$offset];
+      // $media = '';
+      // $offsetPostData = $offset + 1;
+    // }
 
-    SetDefaultParam($offsetPostData, $fbcmdPrefs['default_post_name']);
-    SetDefaultParam($offsetPostData + 1, $fbcmdPrefs['default_post_link']);
-    SetDefaultParam($offsetPostData + 2, $fbcmdPrefs['default_post_caption']);
-    SetDefaultParam($offsetPostData + 3, $fbcmdPrefs['default_post_description']);
+    // SetDefaultParam($offsetPostData, $fbcmdPrefs['default_post_name']);
+    // SetDefaultParam($offsetPostData + 1, $fbcmdPrefs['default_post_link']);
+    // SetDefaultParam($offsetPostData + 2, $fbcmdPrefs['default_post_caption']);
+    // SetDefaultParam($offsetPostData + 3, $fbcmdPrefs['default_post_description']);
 
-    $attachment = array('name' => $fbcmdParams[$offsetPostData], 'href' => $fbcmdParams[$offsetPostData + 1], 'caption' => $fbcmdParams[$offsetPostData + 2], 'description' => $fbcmdParams[$offsetPostData + 3]);
-    if ($media) {
-      $attachment['media'] = $media;
-    }
+    // $attachment = array('name' => $fbcmdParams[$offsetPostData], 'href' => $fbcmdParams[$offsetPostData + 1], 'caption' => $fbcmdParams[$offsetPostData + 2], 'description' => $fbcmdParams[$offsetPostData + 3]);
+    // if ($media) {
+      // $attachment['media'] = $media;
+    // }
 
-    if (($fbcmdPrefs['sharepost'])&&($fbcmdParams[$offsetPostData + 1])) {
-      $actionLinks = array(array('text' => 'Share', 'href' => 'http://www.facebook.com/share.php?u=' . $fbcmdParams[$offsetPostData + 1]));
-    } else {
-      $actionLinks = null;
-    }
+    // if (($fbcmdPrefs['sharepost'])&&($fbcmdParams[$offsetPostData + 1])) {
+      // $actionLinks = array(array('text' => 'Share', 'href' => 'http://www.facebook.com/share.php?u=' . $fbcmdParams[$offsetPostData + 1]));
+    // } else {
+      // $actionLinks = null;
+    // }
 
-    try {
-      $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, $actionLinks, $target_id, $uid);
-      TraceReturn();
-    } catch(Exception $e) {
-      OLD_FbcmdException($e);
-    }
-    return $fbReturn;
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_TagFieldMatch($matchString, $dataToSearch, $matchField, $idField, $partial = false, $nameField = 'name') {
-    $matchList = array();
-    if ($partial) {
-      $matchExp = "/$matchString/i";
-    } else {
-      $matchExp = "/^$matchString/i";
-    }
-    if (isset($dataToSearch)) {
-      foreach ($dataToSearch as $d) {
-        if (isset($d[$matchField])) {
-          if (preg_match($matchExp,$d[$matchField])) {
-            $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
-          }
-        }
-      }
-    }
-    return $matchList;
-  }
+    // try {
+      // $fbReturn = $fbObject->api_client->stream_publish($msg, $attachment, $actionLinks, $target_id, $uid);
+      // TraceReturn();
+    // } catch(Exception $e) {
+      // OLD_FbcmdException($e);
+    // }
+    // return $fbReturn;
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OLD_TagText($textToTag) {
-    global $fbcmdPrefs;
-    $textToTag = str_replace('@@','[[AT]]',$textToTag);
-    if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches, PREG_SET_ORDER)) {
-      OLD_MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
-      foreach ($matches as $pregMatch) {
-        $matchList = OLD_MatchTag($pregMatch[1]);
-        if ($matchList) {
-          $taggedText = "@[{$matchList[0][0]}:{$matchList[0][0]}:{$matchList[0][1]}]";
-        } else {
-          $taggedText = "[[AT]]{$pregMatch[1]}";
-        }
-        $textToTag = str_replace($pregMatch[0],$taggedText,$textToTag);
-      }
-    }
-    $textToTag = str_replace('[[AT]]','@',$textToTag);
-    return $textToTag;
-  }
+  // function OLD_TagFieldMatch($matchString, $dataToSearch, $matchField, $idField, $partial = false, $nameField = 'name') {
+    // $matchList = array();
+    // if ($partial) {
+      // $matchExp = "/$matchString/i";
+    // } else {
+      // $matchExp = "/^$matchString/i";
+    // }
+    // if (isset($dataToSearch)) {
+      // foreach ($dataToSearch as $d) {
+        // if (isset($d[$matchField])) {
+          // if (preg_match($matchExp,$d[$matchField])) {
+            // $matchList[] = array($d[$idField],$d[$nameField],$d[$matchField]);
+          // }
+        // }
+      // }
+    // }
+    // return $matchList;
+  // }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  // function OLD_TagText($textToTag) {
+    // global $fbcmdPrefs;
+    // $textToTag = str_replace('@@','[[AT]]',$textToTag);
+    // if (preg_match_all($fbcmdPrefs['status_tag_syntax'], $textToTag, $matches, PREG_SET_ORDER)) {
+      // OLD_MultiFQL(array('FriendId','FriendBaseInfo','PageId','PageNames','GroupNames'));
+      // foreach ($matches as $pregMatch) {
+        // $matchList = OLD_MatchTag($pregMatch[1]);
+        // if ($matchList) {
+          // $taggedText = "@[{$matchList[0][0]}:{$matchList[0][0]}:{$matchList[0][1]}]";
+        // } else {
+          // $taggedText = "[[AT]]{$pregMatch[1]}";
+        // }
+        // $textToTag = str_replace($pregMatch[0],$taggedText,$textToTag);
+      // }
+    // }
+    // $textToTag = str_replace('[[AT]]','@',$textToTag);
+    // return $textToTag;
+  // }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -5063,28 +4668,6 @@
         $obj = $fbReturn;
       }
       print_r ($obj);
-    }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////
-
-  function OLD_UserPhotoSrc($obj) {
-    global $fbcmdPrefs;
-    $fieldName = 'pic_big';
-    if ($fbcmdPrefs['ppic_size'] == 0) {
-      $fieldName = 'pic_small';
-    }
-    if ($fbcmdPrefs['ppic_size'] == 2) {
-      $fieldName = 'pic';
-    }
-    if ($fbcmdPrefs['ppic_size'] == 3) {
-      $fieldName = 'pic_square';
-    }
-    if (isset($obj[$fieldName])) {
-      return $obj[$fieldName];
-    } else {
-      return '';
     }
   }
 

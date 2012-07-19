@@ -13,8 +13,10 @@ Moved to beta2
 
 Todo in beta1
 =============
+* finalize nail down auto/last? & current syntaxes. resolve ==> match?
+* add resolve message to refresh
+
 * look into why POSTLINK works, but POST does not :(
-* finalize nail down auto/last? & current syntaxes
 * clean up output -- fix [1] for showperm ??
 * add behaviour to show current status
 * add support for \n within posts, etc.
@@ -27,6 +29,7 @@ Todo in beta1
 * something for activities, friendrequests, checkins,
 * add a savepref reset
 * revisit defaults: null vs. '' :: add 'default' as valid argument
+* remove an alias
 
 PRINT
 * add csv
