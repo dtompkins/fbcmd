@@ -15,7 +15,8 @@ Todo in beta1
 =============
 * finalize nail down auto/last? & current syntaxes. resolve ==> match?
 * add resolve message to refresh
-
+* add [] or @ syntax to info
+* add API
 * look into why POSTLINK works, but POST does not :(
 * clean up output -- fix [1] for showperm ??
 * add behaviour to show current status
@@ -27,7 +28,7 @@ Todo in beta1
 * clean up LAST output... move to l.?
 * migrate showpref,version,?? to new output
 * something for activities, friendrequests, checkins,
-* add a savepref reset
+* add a savepref reset?
 * revisit defaults: null vs. '' :: add 'default' as valid argument
 * remove an alias
 

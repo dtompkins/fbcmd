@@ -316,7 +316,7 @@
   AddPreference('output_wrap_min_width','20');
   AddPreference('output_wrap_width','80','col');
 
-  AddPreference('csv_header','"');
+  AddPreference('csv_header','1');
   AddPreference('csv_bookend','"');
   AddPreference('csv_escaped_bookend','""');
   AddPreference('csv_force_bookends','0','csvf');
@@ -634,7 +634,7 @@
       FbcmdFatalError("AS does not support the command {$fbcmdCommand}.\nSupported commands: " . implode(',',$asCommands));
     }
     $newtoken = '';
-    if (Resolve($asId,true,'number,prev,alias,accounts')) {
+    if (Resolve($asId,true,'number,prev,alias,accounts,username')) {
       try {
         $fbReturn = $facebook->api('/me/accounts');
       } catch (FacebookApiException $e) {
@@ -1251,7 +1251,7 @@
 
   if ($fbcmdCommand == 'MUTUAL') { //2
     ValidateParamCount(1);
-    if (Resolve($fbcmdParams[1],true,'number,prev,alias,friends')) {
+    if (Resolve($fbcmdParams[1],true,'number,prev,alias,username,friends')) {
       OpenGraphAPI("/{$fbcmdTargetId}/mutualfriends/{$resolvedId}");
       if (!ReturnDataToPrev()) {
         FbcmdWarning('no friends');
@@ -1528,7 +1528,7 @@
 
   if ($fbcmdCommand == 'REFRESH') { //2
     ValidateParamCount(0);
-    BuildRefCache(true);
+    BuildRefCache();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2000,22 +2000,16 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function BuildRefCache($showMsg) { //2
+  function BuildRefCache() { //2
     global $fbcmdRefCache;
-    if ($showMsg) print "Building RefCache...\n";
     $fbcmdRefCache = array();
-    if ($showMsg) print "  accounts...\n";
-    $fbcmdRefCache['accounts'] = GetRefArray('/me/accounts');
-    if ($showMsg) print "  friends...\n";
-    $fbcmdRefCache['friends'] = GetRefArray('/me/friends');
-    if ($showMsg) print "  likes...\n";
-    $fbcmdRefCache['friendlists'] = GetRefArray('/me/friendlists');
-    if ($showMsg) print "  friendlists...\n";
-    $fbcmdRefCache['likes'] = GetRefArray('/me/likes');
-    if ($showMsg) print "  groups...\n";
-    $fbcmdRefCache['groups'] = GetRefArray('/me/groups');
-    if ($showMsg) print "  albums...\n";
-    $fbcmdRefCache['albums'] = GetRefArray('/me/albums');
+    $fbcmdRefCache['username'] = array();
+    GetRefArray('accounts','/me/accounts',true);
+    GetRefArray('friends','/me/friends',true);
+    GetRefArray('friendlists','/me/friendlists');
+    GetRefArray('likes','/me/likes',true);
+    GetRefArray('groups','/me/groups');
+    GetRefArray('albums','/me/albums');
     SaveDataFile('cachefile',$fbcmdRefCache,'cache_refs');
   }
 
@@ -2695,34 +2689,46 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function GetRefArray($apicall) { //2
+  function GetRefArray($refname, $apicall, $username = false, $fld = 'name') { //2
     global $facebook;
-    $arr = array();
+    global $fbcmdRefCache;
+    $fbcmdRefCache[$refname] = array();
     //2 TODO: GET PAGING WORKING (SEEMS TO FAIL ON ACCOUNTS).. will only get 1st 5000 entries
+    if ($username) {
+      $args = array( 'fields' => 'id,name,username');
+    } else {
+      $args = array();
+    }    
     try {
-      $fbReturn = $facebook->api($apicall);
-      if (isset($fbReturn['data'])) {
-        foreach ($fbReturn['data'] as $a) {
-          if ((isset($a['id']))&&(isset($a['name']))) {
-            $id = $a['id'];
-            $name = $a['name'];
-            if (isset($arr[$name])) {
-              $j = 2;
-              while (isset($arr["{$name} ({$j})"])) {
-                $j++;
-              }
-              $name = "{$name} ({$j})";
+      $fbReturn = $facebook->api($apicall,'GET',$args);
+    } catch (FacebookApiException $e) {
+      FbcmdException($e);
+    }      
+    if (isset($fbReturn['data'])) {
+      foreach ($fbReturn['data'] as $a) {
+        if ((isset($a['id']))&&(isset($a[$fld]))) {
+          $id = $a['id'];
+          $name = $a[$fld];
+          if (isset($fbcmdRefCache[$refname][$name])) {
+            $j = 2;
+            while (isset($fbcmdRefCache[$refname]["{$name} ({$j})"])) {
+              $j++;
             }
-            $arr[$name] = $id;
-          } else {
-            FbcmdWarning("Bad Entry [{$apicall}] " . var_export($a,true) . "\n");
+            $name = "{$name} ({$j})";
+          }
+          $fbcmdRefCache[$refname][$name] = $id;
+        } else {
+          FbcmdWarning("Bad Entry [{$apicall}] " . var_export($a,true) . "\n");
+        }
+        if ($username) {
+          if ((isset($a['id']))&&(isset($a['username']))) {
+            if (!isset($fbcmdRefCache['username'][$a['username']])) {
+              $fbcmdRefCache['username'][$a['username']] = $id;
+            }
           }
         }
       }
-    } catch (FacebookApiException $e) {
-      FbcmdException($e);
     }
-    return $arr;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3689,6 +3695,9 @@
       }
     }
   }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////  
 
   function PrintCol() {
     global $fbProcessed;
@@ -3738,6 +3747,32 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////  
+
+  function PrintCsvTable() {
+    global $fbProcessed;
+    global $fbReturnType;
+    global $printColFields;
+    global $printUniqueFields;
+    global $fbcmdPrefs;
+    
+    ProcessUniqueFields();
+    $printColFields = $printUniqueFields;
+    
+    if ($fbcmdPrefs['csv_header']) {
+      PrintCsvRow($printColFields);
+    }
+    if ($fbReturnType == 'array') {
+      foreach ($fbProcessed as $o) {
+        PrintColObj($o);
+      }
+    } else {
+      PrintColObj($fbProcessed);
+    }
+    exit;    
+  }
+
+////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
   function PrintCsvRow($rowIn) {
@@ -3764,7 +3799,6 @@
     }
     print implode($fbcmdPrefs['csv_separator'],$rowOut) . "\n";
   }
-
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -3906,7 +3940,11 @@
     if ($printFormat == 'serial') {
       print serialize($fbProcessed) . "\n";
     }
-
+    if ($printFormat == 'csv') {
+      $printCSV = true;
+      PrintCsvTable();
+      return;
+    }
     if ($printFormat == 'csvcol') {
       $printCSV = true;
       PrintCol();
@@ -3995,7 +4033,28 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+  
+  function ProcessUniqueFields() {
+    global $printUniqueFields;
+    global $fbProcessed;
+    global $fbReturnType;
 
+    $printUniqueFields = array();
+    
+    if ($fbReturnType == 'array') {
+      foreach ($fbProcessed as $o) {
+        if ($o) {
+          array_merge_unique($printUniqueFields,array_keys($o));
+        }
+      }
+    } else {
+      $printUniqueFields = array_keys($fbProcessed);
+    }
+  }
+  
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+  
   function ProcessReturn() {
     // fbReturnType: three possibilities
     // 'value', 'obj', 'array'
@@ -4154,7 +4213,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function Resolve($matchme, $exitOnFalse = true, $types = 'number,prev,alias,last,accounts,friends,likes') { //OLD_FlistMatch ($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
+  function Resolve($matchme, $exitOnFalse = true, $types = 'number,prev,alias,last,username,accounts,friends,likes') { //OLD_FlistMatch ($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
     global $fbcmdAlias;
     global $resolvedId;
     global $resolvedText;
