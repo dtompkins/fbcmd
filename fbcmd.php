@@ -54,7 +54,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '2.0-dev9';
+  $fbcmdVersion = '2.0-beta1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -129,46 +129,46 @@
   AddCommand('ADDPIC',    'filename [album_id] [caption]~Upload (add) a photo to an album');
   AddCommand('ADDPICD',   'dirname [album_id]~Upload (add) all *.jpg files in a directory to an album~(change to *.png with -pext=png)');
   AddCommand('ALBUMS',    '<no parameters>~List all your photo albums');
-  AddCommand('ALIAS',     '[aliasname objname]~Create a new alias for an object~or list all aliases if no parameters');//2
+  AddCommand('ALIAS',     '[aliasname objname]~Create a new alias for an object~or list all aliases if no parameters');
   AddCommand('APICS',     'album_id [savedir]~List [and optionally save] all photos from an album');
-  AddCommand('AS',        'objname COMMAND <parameters>~execute COMMAND on behalf of objname (eg: for pages)'); //2
+  AddCommand('AS',        'objname COMMAND <parameters>~execute COMMAND on behalf of objname (eg: for pages)');
   AddCommand('AUTH',      'authcode~Enter your facebook authorization code');
   AddCommand('COMMENT',   'objname text~Add a comment to a post, picture, etc.');
-  AddCommand('COUNT',     '[N|all] COMMAND <parameters>~retrieve N results for COMMAND'); //2
+  AddCommand('COUNT',     '[N|all] COMMAND <parameters>~retrieve N results for COMMAND');
   AddCommand('DEL',       'objname~Deletes a facebook object');
   AddCommand('FRIENDS',   '<no parameters>~List your friends');
   AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
-  AddCommand('GRAPHAPI',  'path [method] [php_params]~method is one of GET,POST,DELETE~php_params in php format: "array(\'fld1\' => val1, \'f2\' => v2, ...)"~e.g.: fbcmd graphapi /me/feed post "array(\'message\' => \'hi\')"');//2
+  AddCommand('GRAPHAPI',  'path [method] [php_params]~method is one of GET,POST,DELETE~php_params in php format: "array(\'fld1\' => val1, \'f2\' => v2, ...)"~e.g.: fbcmd graphapi /me/feed post "array(\'message\' => \'hi\')"');
   AddCommand('GROUPS',    '<no parameters>~List your groups');
   AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
   AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
-  AddCommand('INFO',      'objname [fields]~Display info for a facebook object (user, me, page, event, etc.)~fields is a comma-separated list of fields for the object');//2
-  AddCommand('LAST',      '[N]~Show results from [Nth] successful command'); //2
-  AddCommand('LIKE',      'objname~Like an object (can\'t like pages)'); //2
-  AddCommand('LIKES',     '[category]~List your likes~[category] is one of books,games,movies,music,television'); //2
+  AddCommand('INFO',      'objname [fields]~Display info for a facebook object (user, me, page, event, etc.)~fields is a comma-separated list of fields for the object');
+  AddCommand('LAST',      '[N]~Show results from [Nth] successful command');
+  AddCommand('LIKE',      'objname~Like an object (can\'t like pages)');
+  AddCommand('LIKES',     '[category]~List your likes~[category] is one of books,games,movies,music,television');
   AddCommand('LINKS',     '<no parameters>~Display your posted links');
   AddCommand('LOADNOTE',  'title filename~Same as POSTNOTE but loads the contents from a file');
-  AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist'); //2
-  AddCommand('MATCH',     'objname~Try to resolve a name to an object'); //2
+  AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist');
+  AddCommand('MATCH',     'objname~Try to resolve a name to an object');
   AddCommand('MUTUAL',    'friendid~List friend you have in common with another friend');
   AddCommand('NEWS',      '<no parameters>~Display News Feed Items');
   AddCommand('NOTES',     'Display your notes');
-  AddCommand('POST',      '<extra args> message [name] [link_url] [caption] [description]~Post a story on your feed.~<extra args> include:~  [IMG url] add a picture.~  [SRC url] add a source (eg: for videos, url for flash source)'); //2
+  AddCommand('POST',      '<extra args> message [link_url] [name] [caption] [description]~Post a story on your feed.~<extra args> include:~  [IMG url] add a picture.~  [SRC url] add a source (eg: for videos, url for flash source)');
   AddCommand('POSTS',     '<no parameters>~Display your posts');
   AddCommand('POSTLINK',  'link_url [message] [name] [caption] [description]~Share a link on your news feed');
   AddCommand('POSTNOTE',  'title body~Share a note on your news feed');
-  AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed matched id'); //2
-  AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');//2
+  AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed matched id');
+  AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
   AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
   AddCommand('SHOWPREF',  '[0|1]~Show your preferences (settings)~if arg is 1, will show command & output defaults');
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
-  AddCommand('STATUS',    '[text message]~Set your status'); //2
+  AddCommand('STATUS',    '[text message]~Set your status');
   AddCommand('STATUSES',  '<no parameters>~Display your statuses');
-  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for/on the objname~(can also use @objname syntax instead of target objname)~(e.g.: fbcmd @bob post "Hello, Bob!")'); //2
-  AddCommand('TEST',      '<no parameters>~Test your installation'); //2
+  AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for/on the objname~(can also use @objname syntax instead of target objname)~(e.g.: fbcmd @bob post "Hello, Bob!")');
+  AddCommand('TEST',      '<no parameters>~Test your installation');
   AddCommand('TPICS',     '[savedir]~List [and optionally save] all photos where you are tagged');
-  AddCommand('UNLIKE',    'objname~Unlike an object'); //2
+  AddCommand('UNLIKE',    'objname~Unlike an object');
   AddCommand('UPDATE',    '[branch] [dir] [trace] [ignore_err]~Update FBCMD to the latest version');
   AddCommand('USAGE',     '(same as HELP)');
   AddCommand('VERSION',   '[branch]~Check for the latest version of FBCMD available');
@@ -226,31 +226,31 @@
   // STEP ONE (part A) Universal Preferences
 
   // currently in 2.0
-  AddPreference('aliasfile',"[datadir]aliases.php"); //2
+  AddPreference('aliasfile',"[datadir]aliases.php");
   AddPreference('apics_filename','[pid].jpg','apf');
-  AddPreference('addpicd_ext','jpg','pext'); //2
+  AddPreference('addpicd_ext','jpg','pext');
   AddPreference('appkey','42463270450');
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
-  AddPreference('authfile',"[datadir]auth.txt"); //2
+  AddPreference('authfile',"[datadir]auth.txt");
   AddPreference('auto_mkdir','1');
   AddPreference('auto_refresh','604800');
-  AddPreference('cache_refs','1'); //2
-  AddPreference('cachefile',"[datadir]refcache.txt"); //2
+  AddPreference('cache_refs','1');
+  AddPreference('cachefile',"[datadir]refcache.txt");
   AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
-  AddPreference('last_length','10'); //2
-  AddPreference('last_save','1'); //2
-  AddPreference('lastfile',"[datadir]last.txt"); //2
+  AddPreference('last_length','10');
+  AddPreference('last_save','1');
+  AddPreference('lastfile',"[datadir]last.txt");
   AddPreference('launch_exec','');
   AddPreference('mkdir_mode','0777');
-  AddPreference('newline_subst','1'); //2
+  AddPreference('newline_subst','1');
   AddPreference('pic_retry_count','10','pr');
   AddPreference('pic_retry_delay','2','prd');
   AddPreference('pic_size','0','psize');
   AddPreference('pic_skip_exists','1','pskip');
   AddPreference('prefs','');
-  AddPreference('prev_length','10'); //2
-  AddPreference('prev_save','1'); //2
-  AddPreference('prevfile',"[datadir]prev.txt"); //2
+  AddPreference('prev_length','10');
+  AddPreference('prev_save','1');
+  AddPreference('prevfile',"[datadir]prev.txt");
   AddPreference('tpics_filename','[pid].jpg','tpf');
   AddPreference('trace','0','t');
   AddPreference('update_branch','master');
@@ -277,26 +277,26 @@
   AddPreference('default_addpic_message','');
   AddPreference('default_apics_albumid','');
   AddPreference('default_apics_savedir','');
-  AddPreference('default_as_obj',''); //2
+  AddPreference('default_as_obj','');
   AddPreference('default_comment_message','');
   AddPreference('default_loadnote_filename','');
   AddPreference('default_loadnote_title','');
   AddPreference('default_graphapi_method','GET');
   AddPreference('default_graphapi_params','');
   AddPreference('default_postlink_link','');
-  AddPreference('default_postlink_message',''); //2
+  AddPreference('default_postlink_message','');
   AddPreference('default_postnote_body','');
   AddPreference('default_postnote_title','');
   AddPreference('default_post_caption','');
   AddPreference('default_post_description','');
-  AddPreference('default_post_img_url',''); //2
+  AddPreference('default_post_img_url','');
   AddPreference('default_post_link','');
   AddPreference('default_post_message','');
   AddPreference('default_post_name','');
-  AddPreference('default_post_src_url',''); //2
+  AddPreference('default_post_src_url','');
   AddPreference('default_showpref_defaults','0');
-  AddPreference('default_target_obj',''); //2
-  AddPreference('default_tpics_savedir',''); //2
+  AddPreference('default_target_obj','');
+  AddPreference('default_tpics_savedir','');
   //2 AddPreference('default_count','');
   //2 AddPreference('default_loop','');
   //2 AddPreference('default_ppics_savedir',false);
@@ -519,7 +519,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdAliasFileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs['aliasfile']);  //2
+  $fbcmdAliasFileName = str_replace('[datadir]',$fbcmdBaseDir,$fbcmdPrefs['aliasfile']);
   if (file_exists($fbcmdAliasFileName)) {
     include($fbcmdAliasFileName);
   }
@@ -591,7 +591,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'AUTH') { //2
+  if ($fbcmdCommand == 'AUTH') {
     ValidateParamCount(1);
     GetOldSessionKey($fbcmdParams[1]);
     GenAuthInfoFromSessionKey();
@@ -634,7 +634,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdAuthInfo = LoadDataFile('authfile'); //2
+  $fbcmdAuthInfo = LoadDataFile('authfile');
   if (!isset($fbcmdAuthInfo['access_token'])) {
     FbcmdFatalError("Could not obtain oauth access_token");
   }
@@ -660,14 +660,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdRefCache = LoadDataFile('cachefile','cache_refs'); //2
+  $fbcmdRefCache = LoadDataFile('cachefile','cache_refs');
   AutoRefresh();
-  $fbcmdPrev = LoadDataFile('prevfile','prev_save'); //2
-  $fbcmdLast = LoadDataFile('lastfile','last_save'); //2
+  $fbcmdPrev = LoadDataFile('prevfile','prev_save');
+  $fbcmdLast = LoadDataFile('lastfile','last_save');
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'AS') { //2
+  if ($fbcmdCommand == 'AS') {
     ValidateParamCount(2,99);
     SetDefaultParam(1,$fbcmdPrefs['default_as_obj']);
     $asId = $fbcmdParams[1];
@@ -720,7 +720,7 @@
   $fbcmdTargetId = 'me';
   $fbcmdExtraOutput = array();
 
-  if ($fbcmdCommand == 'TARGET') { //2
+  if ($fbcmdCommand == 'TARGET') {
     ValidateParamCount(2,99);
     SetDefaultParam(1,$fbcmdPrefs['default_target_obj']);
     $target = $fbcmdParams[1];
@@ -773,7 +773,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ACCOUNTS') { //2
+  if ($fbcmdCommand == 'ACCOUNTS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/accounts");
     if (!ReturnDataToPrev()) {
@@ -783,7 +783,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ADDALBUM') { //2
+  if ($fbcmdCommand == 'ADDALBUM') {
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_addalbum_name']);
     SetDefaultParam(2,$fbcmdPrefs['default_addalbum_message']);
@@ -799,7 +799,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ADDPIC') { //2
+  if ($fbcmdCommand == 'ADDPIC') {
     ValidateParamCount(1,3);
     SetDefaultParam(1,$fbcmdPrefs['default_addpic_filename']);
     SetDefaultParam(2,$fbcmdPrefs['default_addpic_albumid']);
@@ -822,7 +822,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ADDPICD') {  //2
+  if ($fbcmdCommand == 'ADDPICD') {
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_addpicd_dirname']);
     SetDefaultParam(2,$fbcmdPrefs['default_addpicd_albumid']);
@@ -843,7 +843,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ALBUMS') { //2
+  if ($fbcmdCommand == 'ALBUMS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/albums");
     if (!ReturnDataToPrev()) {
@@ -853,7 +853,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'ALIAS') { //2
+  if ($fbcmdCommand == 'ALIAS') {
     ValidateParamCount(array(0,2));
     if (ParamCount() == 0) {
       $fbReturn = $fbcmdAlias;
@@ -870,7 +870,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'APICS') { //1
+  if ($fbcmdCommand == 'APICS') {
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_apics_albumid']);
     SetDefaultParam(2,$fbcmdPrefs['default_apics_savedir']);
@@ -890,7 +890,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'COMMENT') { //2
+  if ($fbcmdCommand == 'COMMENT') {
     ValidateParamCount(2);
     SetDefaultParam(2,$fbcmdPrefs['default_comment_message']);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
@@ -906,7 +906,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'DEL') { //2
+  if ($fbcmdCommand == 'DEL') {
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last,albums')) {
       OpenGraphAPI("/{$resolvedId}",'DELETE');
@@ -1023,7 +1023,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'FRIENDS') { //2
+  if ($fbcmdCommand == 'FRIENDS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/friends");
     if (!ReturnDataToPrev()) {
@@ -1107,7 +1107,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'GO') { //2
+  if ($fbcmdCommand == 'GO') {
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true)) {
       $go = $resolvedId;
@@ -1123,7 +1123,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'GRAPHAPI') { //2
+  if ($fbcmdCommand == 'GRAPHAPI') {
     ValidateParamCount(1,3);
     SetDefaultParam(2,$fbcmdPrefs['default_graphapi_method']);
     SetDefaultParam(3,$fbcmdPrefs['default_graphapi_params']);
@@ -1144,7 +1144,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'GROUPS') { //2
+  if ($fbcmdCommand == 'GROUPS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/groups");
     if (!ReturnDataToPrev()) {
@@ -1182,7 +1182,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'INFO') { //2
+  if ($fbcmdCommand == 'INFO') {
     ValidateParamCount(1,2);
     $obj = $fbcmdParams[1];
     SetDefaultParam(2,'');
@@ -1201,7 +1201,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'LAST') { //2
+  if ($fbcmdCommand == 'LAST') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,0);
     PrintLast($fbcmdParams[1]);
@@ -1209,7 +1209,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'LIKE') { //2
+  if ($fbcmdCommand == 'LIKE') {
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
       OpenGraphAPI("/{$resolvedId}/likes",'POST');
@@ -1221,7 +1221,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'LIKES') { //2
+  if ($fbcmdCommand == 'LIKES') {
     ValidateParamCount(0,1);
     if (ParamCount() == 0) {
       OpenGraphAPI("/{$fbcmdTargetId}/likes");
@@ -1235,7 +1235,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'LINKS') { //2
+  if ($fbcmdCommand == 'LINKS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/links");
     if (!ReturnDataToPrev()) {
@@ -1245,7 +1245,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'LOADNOTE') { //2
+  if ($fbcmdCommand == 'LOADNOTE') {
     ValidateParamCount(2);
     SetDefaultParam(1,$fbcmdPrefs['default_loadnote_title']);
     SetDefaultParam(2,$fbcmdPrefs['default_loadnote_filename']);
@@ -1261,7 +1261,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MATCH') { //2
+  if ($fbcmdCommand == 'MATCH') {
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true)) {
       NewLast('match', $resolvedId, $resolvedText);
@@ -1310,7 +1310,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'MUTUAL') { //2
+  if ($fbcmdCommand == 'MUTUAL') {
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,username,friends')) {
       OpenGraphAPI("/{$fbcmdTargetId}/mutualfriends/{$resolvedId}");
@@ -1353,7 +1353,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'NEWS') { //2
+  if ($fbcmdCommand == 'NEWS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/home");
     if (!ReturnDataToPrev()) {
@@ -1363,7 +1363,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'NOTES') { //2
+  if ($fbcmdCommand == 'NOTES') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/notes");
     if (!ReturnDataToPrev()) {
@@ -1458,7 +1458,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'POST') { //1
+  if ($fbcmdCommand == 'POST') {
     ValidateParamCount(1,10);
     $args = array();
     $firstParam = strtoupper($fbcmdParams[1]);
@@ -1478,16 +1478,15 @@
       RemoveParams(1,2);
     }
     ValidateParamCount(1,5);
-    SetDefaultParam(1,$fbcmdPrefs['default_post_message']);
-    //2 todo: tagging ?
-    SetDefaultParam(2, $fbcmdPrefs['default_post_name']); //1 //2 consider changing order: link before name ??
-    SetDefaultParam(3, $fbcmdPrefs['default_post_link']);
+    SetDefaultParam(1,$fbcmdPrefs['default_post_message']); //2 todo: tagging ?
+    SetDefaultParam(2, $fbcmdPrefs['default_post_link']);
+    SetDefaultParam(3, $fbcmdPrefs['default_post_name']);
     SetDefaultParam(4, $fbcmdPrefs['default_post_caption']);
     SetDefaultParam(5, $fbcmdPrefs['default_post_description']);
 
     $args['message'] = $fbcmdParams[1];
-    if ($fbcmdParams[2]) $args['name'] = $fbcmdParams[2];
-    if ($fbcmdParams[3]) $args['link'] = $fbcmdParams[3];
+    if ($fbcmdParams[2]) $args['link'] = $fbcmdParams[3];
+    if ($fbcmdParams[3]) $args['name'] = $fbcmdParams[2];
     if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
     if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
 
@@ -1502,7 +1501,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'POSTS') { //2
+  if ($fbcmdCommand == 'POSTS') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/posts");
     if (!ReturnDataToPrev()) {
@@ -1512,7 +1511,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'POSTLINK') { //2
+  if ($fbcmdCommand == 'POSTLINK') {
     ValidateParamCount(1,2);
     SetDefaultParam(1,$fbcmdPrefs['default_postlink_link']);
     SetDefaultParam(2,$fbcmdPrefs['default_postlink_message']);
@@ -1521,7 +1520,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'POSTNOTE') { //2
+  if ($fbcmdCommand == 'POSTNOTE') {
     ValidateParamCount(2);
     SetDefaultParam(1,$fbcmdPrefs['default_postnote_title']);
     SetDefaultParam(2,$fbcmdPrefs['default_postnote_body']);
@@ -1579,7 +1578,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'PREV') { //2
+  if ($fbcmdCommand == 'PREV') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,0);
     PrintPrev($fbcmdParams[1]);
@@ -1587,7 +1586,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'REFRESH') { //2
+  if ($fbcmdCommand == 'REFRESH') {
     ValidateParamCount(0);
     BuildRefCache();
   }
@@ -1717,14 +1716,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SHOWPERM') { //2
+  if ($fbcmdCommand == 'SHOWPERM') {
     ValidateParamCount(0);
     OpenGraphAPI('/me/permissions');
   }
 
 ///////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'SHOWPREF') { //2
+  if ($fbcmdCommand == 'SHOWPREF') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_showpref_defaults']);
     $fbReturn = array();
@@ -1783,7 +1782,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'STATUSES') { //2
+  if ($fbcmdCommand == 'STATUSES') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/statuses");
     if (!ReturnDataToPrev()) {
@@ -1878,8 +1877,8 @@
       } else {
         print "Test 1 FAILED. Could not determine your name :(\n";
       }
-      #$fbReturn = $facebook->api("/{$testPost}/likes",'POST');
-      #TraceReturn();
+      $fbReturn = $facebook->api("/{$testPost}/likes",'POST');
+      TraceReturn();
       if ($fbReturn == 1) {
         print "Test 2 PASSED. Liked the test post\n";
       } else {
@@ -1907,7 +1906,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'TPICS') { //1
+  if ($fbcmdCommand == 'TPICS') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['default_tpics_savedir']);
     OpenGraphAPI("/{$fbcmdTargetId}/photos");
@@ -1925,7 +1924,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'UNLIKE') { //2
+  if ($fbcmdCommand == 'UNLIKE') {
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
       OpenGraphAPI("/{$resolvedId}/likes",'DELETE');
@@ -1937,7 +1936,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'VERSION') { //1
+  if ($fbcmdCommand == 'VERSION') {
     ValidateParamCount(0,1);
     SetDefaultParam(1,$fbcmdPrefs['update_branch']);
     $fbReturn['LOCAL_VERSION'] = $fbcmdVersion;
@@ -1949,7 +1948,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'WALL') { //2
+  if ($fbcmdCommand == 'WALL') {
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/feed");
     if (!ReturnDataToPrev()) {
@@ -1959,7 +1958,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'WHOAMI') { //2
+  if ($fbcmdCommand == 'WHOAMI') {
     ValidateParamCount(0);
     OpenGraphAPI('/me');
     if (!isset($fbReturn['id'])) {
@@ -2058,6 +2057,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+
   function AutoRefresh() {
     global $fbcmdPrefs;
     global $fbcmdRefCache;
@@ -2074,7 +2074,10 @@
     }
   }
 
-  function BuildRefCache() { //2
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function BuildRefCache() {
     global $fbcmdRefCache;
     $fbcmdRefCache = array();
     $fbcmdRefCache['timestamp'] = time();
@@ -2637,7 +2640,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   function GetGithubVersion($branch) {
-    try {  //2
+    try {
       $phpFile = @file_get_contents("http://github.com/dtompkins/fbcmd/raw/{$branch}/fbcmd.php");
       preg_match ("/fbcmdVersion\s=\s'([^']+)'/",$phpFile,$matches);
       if (isset($matches[1])) {
@@ -2764,7 +2767,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function GetRefArray($refname, $apicall, $username = false, $fld = 'name') { //2
+  function GetRefArray($refname, $apicall, $username = false, $fld = 'name') {
     global $facebook;
     global $fbcmdRefCache;
     $fbcmdRefCache[$refname] = array();
