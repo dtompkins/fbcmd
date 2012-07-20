@@ -7,13 +7,15 @@ https://raw.github.com/dtompkins/fbcmd/dev/todo.txt
 
 Moved to beta2
 ==============
-* implement COUNT / work on paging: use parse_url & parse_str
+* implement COUNT / work on paging (use parse_url & parse_str)
 * implement LOOP
-* Try to get tags working in POST
+* Try to get tags working in POST (with locations?)
+* put back an FINFO-like command (FIELDS?), where you can specify extra fields=... to show.
 
 Todo in beta1
 =============
-* finalize nail down auto/last? & current syntaxes. resolve ==> match?
+* finalize nail down auto/last? & current syntaxes.
+* add lmatch
 * add resolve message to refresh
 * add [] or @ syntax to info
 * add API

@@ -148,6 +148,7 @@
   AddCommand('LINKS',     '<no parameters>~Display your posted links');
   AddCommand('LOADNOTE',  'title filename~Same as POSTNOTE but loads the contents from a file');
   AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist'); //2
+  AddCommand('MATCH',     'objname~Try to resolve a name to an object'); //2
   AddCommand('MUTUAL',    'friendid~List friend you have in common with another friend');
   AddCommand('NEWS',      '<no parameters>~Display News Feed Items');
   AddCommand('NOTES',     'Display your notes');
@@ -155,10 +156,9 @@
   AddCommand('POSTS',     '<no parameters>~Display your posts');
   AddCommand('POSTLINK',  'link_url [message] [name] [caption] [description]~Share a link on your news feed');
   AddCommand('POSTNOTE',  'title body~Share a note on your news feed');
-  AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed resolved id'); //2
+  AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed matched id'); //2
   AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');//2
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
-  AddCommand('RESOLVE',   'objname~Try to resolve a name to an object'); //2
   AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
   AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
@@ -307,6 +307,7 @@
   AddPreference('output_json_flat','0');
   AddPreference('output_php_flat','0');
   AddPreference('output_serial_flat','0');
+  AddPreference('output_yaml_flat','0');
 
   AddPreference('output_header','0','hdr');
   AddPreference('output_pad','2','pad');
@@ -368,19 +369,19 @@
   AddPreference('output_format_tpics','col');
   AddPreference('output_format_wall','col');
   AddPreference('output_format_whoami','col');
-  
+
   AddPreference('output_col_addpicd','filename,id:18,post_id:33');
   AddPreference('output_col_apics','!id');
   AddPreference('output_col_news','!fromname');
   AddPreference('output_col_tpics','!id');
   AddPreference('output_col_wall','!fromname');
   AddPreference('output_col_whoami','id:20,name');
-  
+
   AddPreference('output_rec_alias','key:20,value');
   AddPreference('output_rec_links','index:6,key:7,value');
   AddPreference('output_rec_notes','index:6,key:7,value');
   AddPreference('output_rec_showperm','key:30,value');
-  
+
   AddPreference('output_show_links','index,message,link,name');
   AddPreference('output_show_notes','index,subject,message');
 
@@ -1212,6 +1213,15 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'MATCH') { //2
+    ValidateParamCount(1);
+    if (Resolve($fbcmdParams[1],true)) {
+      print "{$resolvedId}  {$resolvedText}\n"; // revisit
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   // if ($fbcmdCommand == 'MSG') { //1
     // ValidateParamCount(1);
     // $curThreadId = OLD_GetThreadId($fbcmdParams[1]);
@@ -1531,15 +1541,6 @@
     BuildRefCache();
   }
 
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'RESOLVE') { //2
-    ValidateParamCount(1);
-    if (Resolve($fbcmdParams[1],true)) {
-      print "{$resolvedId}  {$resolvedText}\n"; // revisit
-    }
-  }
-
   ////////////////////////////////////////////////////////////////////////////////
 
   // if ($fbcmdCommand == 'RESTATUS') { //1
@@ -1819,8 +1820,8 @@
       } else {
         print "Test 1 FAILED. Could not determine your name :(\n";
       }
-      $fbReturn = $facebook->api("/{$testPost}/likes",'POST');
-      TraceReturn();
+      #$fbReturn = $facebook->api("/{$testPost}/likes",'POST');
+      #TraceReturn();
       if ($fbReturn == 1) {
         print "Test 2 PASSED. Liked the test post\n";
       } else {
@@ -1828,7 +1829,7 @@
       }
       $fbReturn = $facebook->api('/me/feed','POST', array (
         'message' => 'just successfully installed fbcmd',
-        'name' => 'fbcmd',
+        'name' => 'fbcmd (Command Line Interface for Facebook)',
         'link' => 'http://www.facebook.com/cmdlinepage',
         'caption' => 'Command Line Interface for Facebook',
         'description' => 'fbcmd is an open source facebook application.  The project home page is at http://fbcmd.dtompkins.com',
@@ -2698,12 +2699,12 @@
       $args = array( 'fields' => 'id,name,username');
     } else {
       $args = array();
-    }    
+    }
     try {
       $fbReturn = $facebook->api($apicall,'GET',$args);
     } catch (FacebookApiException $e) {
       FbcmdException($e);
-    }      
+    }
     if (isset($fbReturn['data'])) {
       foreach ($fbReturn['data'] as $a) {
         if ((isset($a['id']))&&(isset($a[$fld]))) {
@@ -3695,9 +3696,9 @@
       }
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 
   function PrintCol() {
     global $fbProcessed;
@@ -3747,7 +3748,7 @@
   }
 
 ////////////////////////////////////////////////////////////////////////////////
-////////////////////////////////////////////////////////////////////////////////  
+////////////////////////////////////////////////////////////////////////////////
 
   function PrintCsvTable() {
     global $fbProcessed;
@@ -3755,10 +3756,10 @@
     global $printColFields;
     global $printUniqueFields;
     global $fbcmdPrefs;
-    
+
     ProcessUniqueFields();
     $printColFields = $printUniqueFields;
-    
+
     if ($fbcmdPrefs['csv_header']) {
       PrintCsvRow($printColFields);
     }
@@ -3769,7 +3770,7 @@
     } else {
       PrintColObj($fbProcessed);
     }
-    exit;    
+    exit;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3846,12 +3847,13 @@
     global $fbProcessed;
     global $fbReturnType;
     global $fbcmdPrefs;
+    global $printCSV;
 
     PrintColRecCommon('rec');
     if ($fbReturnType == 'array') {
       foreach ($fbProcessed as $o) {
         PrintRecObj($o);
-        if ($fbcmdPrefs['output_rec_space']) {
+        if (($fbcmdPrefs['output_rec_space'])&&(!$printCSV)) {
           print "\n";
         }
       }
@@ -4033,14 +4035,14 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function ProcessUniqueFields() {
     global $printUniqueFields;
     global $fbProcessed;
     global $fbReturnType;
 
     $printUniqueFields = array();
-    
+
     if ($fbReturnType == 'array') {
       foreach ($fbProcessed as $o) {
         if ($o) {
@@ -4051,10 +4053,10 @@
       $printUniqueFields = array_keys($fbProcessed);
     }
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
-  
+
   function ProcessReturn() {
     // fbReturnType: three possibilities
     // 'value', 'obj', 'array'
@@ -4235,6 +4237,12 @@
     } else {
       $mDot = false;
     }
+
+    // if (substr($m,0,1) == '#') {
+      // $resolvedId = substr($m,1);
+      // $resolvedText = substr($m,1);
+      // return true;
+    // }
 
     if (in_array('number',$typelist)) {
       if (is_numeric($m)) {
@@ -4445,7 +4453,7 @@
 
     return true;
   }
-  
+
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -4481,7 +4489,7 @@
     if (ParamCount() < $n) {
       $fbcmdParams[$n] = $value;
     } else {
-      if ($fbcmdParams[$n] == '0') {
+      if (($fbcmdParams[$n] == '0')||(strtolower($fbcmdParams[$n]) == 'default')) {
         $fbcmdParams[$n] = $value;
       }
     }
