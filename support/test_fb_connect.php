@@ -1,6 +1,9 @@
 #!/usr/bin/php
 <?php
 
+  print "This needs to be updated for version 2.0\n";
+  exit;
+
   $GLOBALS['facebook_config']['debug'] = false;
   
   set_include_path (get_include_path() . PATH_SEPARATOR . '../');

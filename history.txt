@@ -1,0 +1,26 @@
+Version History for FBCMD
+=========================
+
+the most recent version of this file is at: 
+https://raw.github.com/dtompkins/fbcmd/dev/history.txt
+------------------------------------------------------
+
+Version 2.0-beta1
+=================
+
+* MASSIVE restructuring (only major highlights below)
+
+* MAJOR restructuring of how AUTH works... now uses authfile, not keyfile
+* new output formatting: -o, -oshow, -ocols, etc. (see wiki)
+* No longer use FLISTS, new caching & matching system
+* New commands: ACCOUNTS ALIAS AS DEL GRAPHAPI GROUPS INFO LAST LIKES LINKS MATCH NEWS NOTES POSTS PREV REFRESH MATCH STATUSES TARGET TEST UNLIKE WALL
+* renamed commands: FPICS -> TPICS (to reflect 'tagged photos'), FEEDLINK -> POSTLINK, FEEDNOTE -> POSTNOTE
+* modified syntax for: GO, POST, MUTUAL, STATUS
+* depricated commands: ALLINFO DELPOST DISPLAY FEED1 FEED2 FEVENTS FGROUPS FINFO LIMITS LOADDISP LOADINFO NSEND PINBOX PPOST SAVEDISP SAVEINFO UFIELDS WALLPOST
+* fixed github URLs to point to new github area
+* renamed, removed & added several preferences
+
+Version 1.1
+===========
+* All changes pre 2.0 are listed at:
+http://fbcmd.dtompkins.com/history/old

@@ -19,8 +19,10 @@
   PrintOut("openssl extension loaded = [" . extension_loaded('openssl') . "]\n");
   PrintOut("\n");
   PrintOut("curl extension loaded = [" . extension_loaded('curl') . "]\n");
+  PrintOut("curl_init function exists = [" . function_exists('curl_init') . "]\n");
   PrintOut("\n");
   PrintOut("json extension loaded = [" . extension_loaded('json') . "]\n");
+  PrintOut("json_decode function exists = [" . function_exists('json_decode') . "]\n");  
   PrintOut("\n");
   PrintOut("FBCMD environment variable = [" . getenv('FBCMD') . "]\n");
   PrintOut("\n");
@@ -46,7 +48,7 @@
     print "fail";
   }
   print ("\n");
-  $remoteFile = "https://github.com/dtompkins/fbcmd/raw/master/fbcmd.php";
+  $remoteFile = "https://raw.github.com/dtompkins/fbcmd/master/fbcmd.php";
   print "Testing downloading from online: [{$remoteFile}]...";
   $phpFile = file_get_contents($remoteFile);
   if ($phpFile) {

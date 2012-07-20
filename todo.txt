@@ -1,0 +1,40 @@
+Dave's Current TODOs for FBCMD
+==============================
+
+the most recent version of this file is at:
+https://raw.github.com/dtompkins/fbcmd/dev/todo.txt
+---------------------------------------------------
+
+Moved to beta2
+==============
+* implement COUNT / work on paging (use parse_url & parse_str)
+* implement LOOP
+* Try to get tags working in POST (with locations?)
+* add a cur syntax similar to LAST
+* add [] or @ syntax to info
+* add CPIC and PPIC
+* something for activities, friendrequests, checkins, etc.
+* add a savepref reset?
+* remove an alias
+* update test_fb_connect.php
+
+WEBSITE / Google Group
+======================
+
+* respond to http://fbcmd.dtompkins.com/feedback posts, and then redirect to new app page
+* respond to most google group responses
+* remove individual help page for each preference... have one big page
+* depricate the old commands (see history.txt)
+
+
+OLD pre 2.0 FEATURE REQUESTS
+============================
+* [From Carl C.] More comprehensive Backup options
+
+* [from Jeremy M.] Upload Photos to a Group
+
+* Enhance TAGPIC: Add a 'latest' and use same format as @tagging in status
+* add a FINDPOST command that searches the contents of posts. I'm waiting to see how the API will open this up
+* Some kind of interface to display who you are and aren't following
+* Add attachments to MSGs
+* Possibly a =family FLIST parameter?

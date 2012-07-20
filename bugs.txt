@@ -1,0 +1,18 @@
+Known Bugs in FBCMD:
+===================
+
+the most recent version of this file is at: 
+https://raw.github.com/dtompkins/fbcmd/dev/bugs.txt
+---------------------------------------------------
+
+Found a new bug? email us at: fbcmd@googlegroups.com
+----------------------------------------------------
+
+2012.07.01 :: I've JUST started this new bug tracker. I'll try to keep it up-to-date.
+
+2009.09.29 :: Warning: date(): It is not safe to rely on the system's timezone settings.
+              (or other timezone warnings).  We're hoping this is fixed in 2.0.  Contact us if you still get these
+
+2009.04.08 :: An unknown error occurred (out of memory)
+              This is a Facebook API error... NOT a PHP memory error... 
+              If this is still happening for you, then please contact us.
