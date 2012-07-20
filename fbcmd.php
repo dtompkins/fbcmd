@@ -138,10 +138,11 @@
   AddCommand('DEL',       'objname~Deletes a facebook object');
   AddCommand('FRIENDS',   '<no parameters>~List your friends');
   AddCommand('GO',        'destination [id]~Launches a web browser for the given destination');
+  AddCommand('GRAPHAPI',  'path [method] [php_params]~method is one of GET,POST,DELETE~php_params in php format: "array(\'fld1\' => val1, \'f2\' => v2, ...)"~e.g.: fbcmd graphapi /me/feed post "array(\'message\' => \'hi\')"');//2
   AddCommand('GROUPS',    '<no parameters>~List your groups');
   AddCommand('HELP',      '[command|preference]~Display this help message, or launch web browser for [command]');
   AddCommand('HOME',      '[webpage]~Launch a web browser to visit the FBCMD home page');
-  AddCommand('INFO',      'objname~Display info for a facebook object (friend, me, page, event, etc.)');//2
+  AddCommand('INFO',      'objname [fields]~Display info for a facebook object (user, me, page, event, etc.)~fields is a comma-separated list of fields for the object');//2
   AddCommand('LAST',      '[N]~Show results from [Nth] successful command'); //2
   AddCommand('LIKE',      'objname~Like an object (can\'t like pages)'); //2
   AddCommand('LIKES',     '[category]~List your likes~[category] is one of books,games,movies,music,television'); //2
@@ -160,7 +161,7 @@
   AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');//2
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
   AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
-  AddCommand('SHOWPREF',  '[0|1]~Show your current preferences (and optionally defaults too)');
+  AddCommand('SHOWPREF',  '[0|1]~Show your preferences (settings)~if arg is 1, will show command & output defaults');
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
   AddCommand('STATUS',    '[text message]~Set your status'); //2
   AddCommand('STATUSES',  '<no parameters>~Display your statuses');
@@ -175,7 +176,7 @@
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
-  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE','WHOAMI');
   $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -229,17 +230,19 @@
   AddPreference('apics_filename','[pid].jpg','apf');
   AddPreference('addpicd_ext','jpg','pext'); //2
   AddPreference('appkey','42463270450');
-  AddPreference('appsecret','88af69b7ab8d437bff783328781be79b'); // shh!
+  AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
   AddPreference('authfile',"[datadir]auth.txt"); //2
   AddPreference('auto_mkdir','1');
+  AddPreference('auto_refresh','604800');
   AddPreference('cache_refs','1'); //2
   AddPreference('cachefile',"[datadir]refcache.txt"); //2
   AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
   AddPreference('last_length','10'); //2
   AddPreference('last_save','1'); //2
-  AddPreference('lastfile',"[datadir]last.txt"); //2 alias
+  AddPreference('lastfile',"[datadir]last.txt"); //2
   AddPreference('launch_exec','');
   AddPreference('mkdir_mode','0777');
+  AddPreference('newline_subst','1'); //2
   AddPreference('pic_retry_count','10','pr');
   AddPreference('pic_retry_delay','2','prd');
   AddPreference('pic_size','0','psize');
@@ -247,7 +250,7 @@
   AddPreference('prefs','');
   AddPreference('prev_length','10'); //2
   AddPreference('prev_save','1'); //2
-  AddPreference('prevfile',"[datadir]prev.txt"); //2 alias
+  AddPreference('prevfile',"[datadir]prev.txt"); //2
   AddPreference('tpics_filename','[pid].jpg','tpf');
   AddPreference('trace','0','t');
   AddPreference('update_branch','master');
@@ -278,6 +281,8 @@
   AddPreference('default_comment_message','');
   AddPreference('default_loadnote_filename','');
   AddPreference('default_loadnote_title','');
+  AddPreference('default_graphapi_method','GET');
+  AddPreference('default_graphapi_params','');
   AddPreference('default_postlink_link','');
   AddPreference('default_postlink_message',''); //2
   AddPreference('default_postnote_body','');
@@ -351,6 +356,7 @@
   AddPreference('output_col_id','index:6,id:20,name:0');
   AddPreference('output_col_fromname','index:6,from.name:20,message/story:0');
   AddPreference('output_rec_default','index:6,key:25,value');
+  AddPreference('output_rec_bigindex','index:13,key:10,value');
 
   // --------------------------------------------------------------------------
 
@@ -362,6 +368,7 @@
   AddPreference('output_format_friends','col');
   AddPreference('output_format_groups','col');
   AddPreference('output_format_likes','col');
+  AddPreference('output_format_match','col');
   AddPreference('output_format_mutual','col');
   AddPreference('output_format_news','col');
   AddPreference('output_format_posts','col');
@@ -372,15 +379,21 @@
 
   AddPreference('output_col_addpicd','filename,id:18,post_id:33');
   AddPreference('output_col_apics','!id');
+  AddPreference('output_col_match','index:12,id:18,name');
   AddPreference('output_col_news','!fromname');
   AddPreference('output_col_tpics','!id');
   AddPreference('output_col_wall','!fromname');
   AddPreference('output_col_whoami','id:20,name');
 
+  AddPreference('output_rec_addalbum','!bigindex');
+  AddPreference('output_rec_addpic','!bigindex');
   AddPreference('output_rec_alias','key:20,value');
+  AddPreference('output_rec_comment','!bigindex');
   AddPreference('output_rec_links','index:6,key:7,value');
   AddPreference('output_rec_notes','index:6,key:7,value');
+  AddPreference('output_rec_post','!bigindex');
   AddPreference('output_rec_showperm','key:30,value');
+  AddPreference('output_rec_status','!bigindex');
 
   AddPreference('output_show_links','index,message,link,name');
   AddPreference('output_show_notes','index,subject,message');
@@ -405,6 +418,14 @@
       include($fbcmdPrefs['prefs']);
     } else {
       FbcmdWarning("Could not load Preferences file {$fbcmdPrefs['prefs']}");
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdPrefs['newline_subst']) {
+    for ($j=1; $j <= ParamCount(); $j++) {
+      $fbcmdParams[$j] = str_replace("\\n","\n",$fbcmdParams[$j]);
     }
   }
 
@@ -505,12 +526,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdRefCache = LoadDataFile('cachefile','cache_refs'); //2
-  $fbcmdPrev = LoadDataFile('prevfile','prev_save'); //2
-  $fbcmdLast = LoadDataFile('lastfile','last_save'); //2
-
-////////////////////////////////////////////////////////////////////////////////
-
   $urlAuth = "http://www.facebook.com/code_gen.php?v=1.0&api_key={$fbcmdPrefs['appkey']}";
   $urlAccess = "https://www.facebook.com/dialog/oauth?client_id={$fbcmdPrefs['appkey']}&redirect_uri=http://www.facebook.com/connect/login_success.html";
 
@@ -571,6 +586,7 @@
       }
     }
     ShowAuth();
+    return;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -623,6 +639,31 @@
     FbcmdFatalError("Could not obtain oauth access_token");
   }
   $facebook->setAccessToken($fbcmdAuthInfo['access_token']);
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'ADDPERM') {
+    ValidateParamCount(0,1);
+    SetDefaultParam(1,$fbcmdPrefs['default_addperm']);
+    if (strtoupper($fbcmdParams[1]) == 'ALL') {
+      $fbcmdParams[1] = $allPermissions;
+    }
+    $url = "{$urlAccess}&scope={$fbcmdParams[1]}";
+    LaunchBrowser($url);
+
+    print "This command should launch a browser to grant permissions.\n";
+    print "in case it doesn't, here is the messy url:\n\n{$url}\n\n";
+    print "(note: this grants only you access to your information and nobody else)\n\n";
+    print "after granting permssions, execute: fbcmd test\n\n\n";
+    return;
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  $fbcmdRefCache = LoadDataFile('cachefile','cache_refs'); //2
+  AutoRefresh();
+  $fbcmdPrev = LoadDataFile('prevfile','prev_save'); //2
+  $fbcmdLast = LoadDataFile('lastfile','last_save'); //2
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -747,30 +788,13 @@
     SetDefaultParam(1,$fbcmdPrefs['default_addalbum_name']);
     SetDefaultParam(2,$fbcmdPrefs['default_addalbum_message']);
 
+    $fbcmdExtraOutput['index'] = 'lastalbum';
     OpenGraphAPI("/me/albums",'POST',array('name' => $fbcmdParams[1], 'message' => $fbcmdParams[2]));
     if (isset($fbReturn['id'])) {
       NewLast('album', $fbReturn['id'], $fbcmdParams[1]);
     } else {
       FbcmdWarning('no return ID');
     }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'ADDPERM') {
-    ValidateParamCount(0,1);
-    SetDefaultParam(1,$fbcmdPrefs['default_addperm']);
-    if (strtoupper($fbcmdParams[1]) == 'ALL') {
-      $fbcmdParams[1] = $allPermissions;
-    }
-    $url = "{$urlAccess}&scope={$fbcmdParams[1]}";
-    LaunchBrowser($url);
-
-    print "This command should launch a browser to grant permissions.\n";
-    print "in case it doesn't, here is the messy url:\n\n{$url}\n\n";
-    print "(note: this grants only you access to your information and nobody else)\n\n";
-    print "after granting permssions, execute: fbcmd test\n\n\n";
-
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -784,6 +808,7 @@
       FbcmdFatalError("Could not find file {$fbcmdParams[1]}");
     }
     $albumId = GetAlbumId($fbcmdParams[2]);
+    $fbcmdExtraOutput['index'] = 'lastpic';
     OpenGraphAPI("/{$albumId}/photos",'POST',array('source' => '@' . $fbcmdParams[1], 'message' => $fbcmdParams[3]));
     if (isset($fbReturn['id'])) {
       NewLast('pic', $fbReturn['id'], "[{$fbcmdParams[1]}] {$fbcmdParams[3]}");
@@ -869,6 +894,7 @@
     ValidateParamCount(2);
     SetDefaultParam(2,$fbcmdPrefs['default_comment_message']);
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
+      $fbcmdExtraOutput['index'] = 'lastcomment';
       OpenGraphAPI("/{$resolvedId}/comments",'POST',array('message' => $fbcmdParams[2]));
       if (isset($fbReturn['id'])) {
         NewLast('comment', $fbReturn['id'], $fbcmdParams[2]);
@@ -1097,6 +1123,27 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCommand == 'GRAPHAPI') { //2
+    ValidateParamCount(1,3);
+    SetDefaultParam(2,$fbcmdPrefs['default_graphapi_method']);
+    SetDefaultParam(3,$fbcmdPrefs['default_graphapi_params']);
+    if ($fbcmdParams[3]) {
+      $code = "\$args = " . $fbcmdParams[3] . ";";
+      if (eval($code) === false) {
+        FbcmdFatalError("bad params syntax\n");
+      }
+      eval($code);
+    } else {
+      $args = '';
+    }
+    OpenGraphAPI($fbcmdParams[1],$fbcmdParams[2],$args);
+    if ($fbReturnType == 'array') {
+      ReturnDataToPrev();
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
   if ($fbcmdCommand == 'GROUPS') { //2
     ValidateParamCount(0);
     OpenGraphAPI("/{$fbcmdTargetId}/groups");
@@ -1136,18 +1183,19 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'INFO') { //2
-    ValidateParamCount(1);
+    ValidateParamCount(1,2);
     $obj = $fbcmdParams[1];
+    SetDefaultParam(2,'');
     if (Resolve($fbcmdParams[1],false)) {
       $obj = $resolvedId;
     }
-    try {
-      $fbReturn = $facebook->api($obj);
-      TraceReturn();
-      ProcessReturn();
-      PrintReturn();
-    } catch (FacebookApiException $e) {
-      FbcmdException($e);
+    $args = array();
+    if ($fbcmdParams[2]) {
+      $args = array('fields' => $fbcmdParams[2]);
+    }
+    OpenGraphAPI($obj,'GET',$args);
+    if ($fbReturnType == 'array') {
+      ReturnDataToPrev();
     }
   }
 
@@ -1216,7 +1264,10 @@
   if ($fbcmdCommand == 'MATCH') { //2
     ValidateParamCount(1);
     if (Resolve($fbcmdParams[1],true)) {
-      print "{$resolvedId}  {$resolvedText}\n"; // revisit
+      NewLast('match', $resolvedId, $resolvedText);
+      $fbReturn = array('index' => 'lastmatch', 'id' => $resolvedId, 'name' => $resolvedText);
+      ProcessReturn();
+      PrintReturn();
     }
   }
 
@@ -1440,7 +1491,7 @@
     if ($fbcmdParams[4]) $args['caption'] = $fbcmdParams[4];
     if ($fbcmdParams[5]) $args['description'] = $fbcmdParams[5];
 
-    //$fbcmdExtraOutput['index']  = 'lastpost';// 2 TODO: revisit this
+    $fbcmdExtraOutput['index']  = 'lastpost';
     OpenGraphAPI("/{$fbcmdTargetId}/feed",'POST',$args);
     if (isset($fbReturn['id'])) {
       NewLast('post', $fbReturn['id'], $fbcmdParams[1]);
@@ -1679,8 +1730,14 @@
     $fbReturn = array();
     foreach ($fbcmdPrefs as $k => $v) {
       if ($k != 'prefs') {
-        if ((substr($k,0,8) != 'default_')||($fbcmdParams[1]))
-        $fbReturn[$k] = var_export($v,true);
+        if (($fbcmdParams[1])||(
+          (substr($k,0,8) != 'default_')&&
+          (substr($k,0,13) != 'output_format')&&
+          (substr($k,0,11) != 'output_show')&&
+          (substr($k,0,10) != 'output_col')&&
+          (substr($k,0,10) != 'output_rec'))) {
+            $fbReturn[$k] = var_export($v,true);
+        }
       }
     }
     ProcessReturn();
@@ -1691,6 +1748,7 @@
 
   if ($fbcmdCommand == 'STATUS') { //2 just set for now
     ValidateParamCount(1);
+    $fbcmdExtraOutput['index'] = 'laststatus';
     OpenGraphAPI("/{$fbcmdTargetId}/feed",'POST',array('message' => $fbcmdParams[1]));
     if (isset($fbReturn['id'])) {
       NewLast('status', $fbReturn['id'], $fbcmdParams[1]);
@@ -2000,10 +2058,26 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
+  function AutoRefresh() {
+    global $fbcmdPrefs;
+    global $fbcmdRefCache;
+    if (($fbcmdPrefs['cachefile'])&&($fbcmdPrefs['auto_refresh'])) {
+      if ((isset($fbcmdRefCache['timestamp']))&&(isset($fbcmdRefCache['friends']))) {
+        if (time() - $fbcmdRefCache['timestamp'] > $fbcmdPrefs['auto_refresh']) {
+          BuildRefCache();
+        } elseif (count($fbcmdRefCache['friends']) == 0) {
+          BuildRefCache();
+        }
+      } else {
+        BuildRefCache();
+      }
+    }
+  }
 
   function BuildRefCache() { //2
     global $fbcmdRefCache;
     $fbcmdRefCache = array();
+    $fbcmdRefCache['timestamp'] = time();
     $fbcmdRefCache['username'] = array();
     GetRefArray('accounts','/me/accounts',true);
     GetRefArray('friends','/me/friends',true);
@@ -4246,8 +4320,8 @@
 
     if (in_array('number',$typelist)) {
       if (is_numeric($m)) {
-        if (in_array('prev',$typelist)) {
-          if (($m > 0)&&($m < 1000)) {
+        if (($m > 0)&&($m < 1000)) {
+          if (in_array('prev',$typelist)) {
             if (!$mDot) {
               $mLeft = 0;
               $mRight = $m;
@@ -4259,6 +4333,11 @@
             }
           }
         }
+        $resolvedId = $m;
+        $resolvedText = $m;
+        return true;
+      }
+      if (is_numeric(str_replace('_','',$m))) {
         $resolvedId = $m;
         $resolvedText = $m;
         return true;
@@ -4287,15 +4366,19 @@
         }
       }
     }
+    $ids = array();
     foreach ($typelist as $type) {
       if (isset($fbcmdRefCache[$type])) {
         $lst = $fbcmdRefCache[$type];
         foreach ($lst as $key => $val) {
           if (strtoupper($key) == $m) {
-            $resolvedId = $val;
-            $resolvedText = "{$key} [{$type}]";
-            $numMatch++;
-            $resolvedMatches[$numMatch] = array('id' => $resolvedId, 'name' => $resolvedText);
+            if (!isset($ids[$val])) {
+              $ids[$val] = 1;
+              $resolvedId = $val;
+              $resolvedText = "{$key} [{$type}]";
+              $numMatch++;
+              $resolvedMatches[$numMatch] = array('id' => $resolvedId, 'name' => $resolvedText);
+            }
           }
         }
       }
@@ -4307,10 +4390,13 @@
           $lst = $fbcmdRefCache[$type];
           foreach ($lst as $key => $val) {
             if (preg_match("/{$m}/i",$key)) {
-              $resolvedId = $val;
-              $resolvedText = "{$key} [{$type}]";
-              $numMatch++;
-              $resolvedMatches[$numMatch] = array('id' => $resolvedId, 'name' => $resolvedText);
+              if (!isset($ids[$val])) {
+                $ids[$val] = 1;
+                $resolvedId = $val;
+                $resolvedText = "{$key} [{$type}]";
+                $numMatch++;
+                $resolvedMatches[$numMatch] = array('id' => $resolvedId, 'name' => $resolvedText);
+              }
             }
           }
         }
@@ -4323,7 +4409,8 @@
     $resolvedText = '';
     if ($numMatch == 0) {
       if ($exitOnFalse) {
-        FbcmdFatalError("Could not resolve {$matchme} (no matches)");
+        print "\nCould not resolve \"{$matchme}\".  (to update your cache, fbcmd refresh)\n";
+        exit;
       }
       return false;
     }
@@ -4334,7 +4421,8 @@
       }
       SaveDataFile('prevfile',$fbcmdPrev,'prev_save');
       PrintPrev();
-      FbcmdFatalError("Could not resolve \"{$matchme}\"");
+      print "\nCould not resolve \"{$matchme}\".\n";
+      exit;
     }
     return false;
   }
@@ -4594,10 +4682,13 @@
     print "examples:\n\n";
 
     print "  fbcmd status \"is excited to play with fbcmd\"\n";
-    //print "  fbcmd finfo birthday_date -csv\n"; //2 POST, TARGET, INFO, ALIAS
-    //print "  fbcmd stream #family 25\n\n";
+    print "  fbcmd status \"this\\nis\\na\\nmulti-line\\nstatus\"\n";
+    print "  fbcmd match john\n";
+    print "  fbcmd alias jj 3   (# from the result of match)\n";
+    print "  fbcmd target jj post \"You're the man, John!\"\n";
+    print "  fbcmd info me/friends name,id,birthday\n";
 
-    print "for additional help, examples, parameter usage, preference settings,\n";
+    print "\nfor additional help, examples, parameter usage, preference settings,\n";
     print "visit the FBCMD wiki at:\n\n";
     print "  http://fbcmd.dtompkins.com\n\n";
     exit;

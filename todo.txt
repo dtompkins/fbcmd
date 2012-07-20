@@ -10,34 +10,13 @@ Moved to beta2
 * implement COUNT / work on paging (use parse_url & parse_str)
 * implement LOOP
 * Try to get tags working in POST (with locations?)
-* put back an FINFO-like command (FIELDS?), where you can specify extra fields=... to show.
-
-Todo in beta1
-=============
-* finalize nail down auto/last? & current syntaxes.
-* add lmatch
-* add resolve message to refresh
+* add a cur syntax similar to LAST
 * add [] or @ syntax to info
-* add API
-* look into why POSTLINK works, but POST does not :(
-* clean up output -- fix [1] for showperm ??
-* add behaviour to show current status
-* add support for \n within posts, etc.
-* add CPIC
-* add automatic (periodic) REFRESH
-* update test_fb_connect.php
-* clean up help syntaxes
-* clean up LAST output... move to l.?
-* migrate showpref,version,?? to new output
-* something for activities, friendrequests, checkins,
+* add CPIC and PPIC
+* something for activities, friendrequests, checkins, etc.
 * add a savepref reset?
-* revisit defaults: null vs. '' :: add 'default' as valid argument
 * remove an alias
-
-PRINT
-* add csv
-* add field col sizes
-
+* update test_fb_connect.php
 
 WEBSITE / Google Group
 ======================
@@ -47,7 +26,7 @@ WEBSITE / Google Group
 * remove individual help page for each preference... have one big page
 * add new "SYNTAX" page
 
-depricate the following:
+update website: depricate the following:
 
   //1 AddCommand('ALLINFO',   'flist~List all available profile information for friend(s)');
   //1 AddCommand('DELPOST',   'post_id~Deletes a post from your stream');
@@ -69,22 +48,14 @@ depricate the following:
   //1 AddCommand('WALLPOST',  'profile_id <parameters for POST>~Post a message on the wall of the target profile_id'); //2
 
 
-
 OLD pre 2.0 FEATURE REQUESTS
 ============================
 * [From Carl C.] More comprehensive Backup options
 
 * [from Jeremy M.] Upload Photos to a Group
 
-* Allow user to "alias" their key friends for easier reference
-* Option to Cache your Friend info, etc. to make faster FLISTS
 * Enhance TAGPIC: Add a 'latest' and use same format as @tagging in status
-* Facebook just updated the EVENT API... look into adding commands such as RSVP
-* Should add a 2nd STREAM parameter for when to start from ... ie: STREAM #family 100 200 would give posts 100->200
 * add a FINDPOST command that searches the contents of posts. I'm waiting to see how the API will open this up
 * Some kind of interface to display who you are and aren't following
-* Perhaps a PINFO Command similar to FINFO
-* The Facbeook Group Interface is lame... but maybe GINFO, GINFO, GEVENTS?
 * Add attachments to MSGs
 * Possibly a =family FLIST parameter?
-* Make it so you can reference albums by Name instead of ID
