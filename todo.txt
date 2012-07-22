@@ -17,6 +17,13 @@ Moved to beta2
 * add a savepref reset?
 * remove an alias
 * update test_fb_connect.php
+* add an ERRORLEVEL return code
+* add an &filename syntax for loading parameters from a file ?
+* UNICODE / UTF-8 support ?!? (do some tests at least)
+* look into online status via graph api
+* proxy support ?!?
+* bash completion scripts
+
 
 WEBSITE / Google Group
 ======================
@@ -31,7 +38,6 @@ OLD pre 2.0 FEATURE REQUESTS
 ============================
 * [From Carl C.] More comprehensive Backup options
 
-* [from Jeremy M.] Upload Photos to a Group
 
 * Enhance TAGPIC: Add a 'latest' and use same format as @tagging in status
 * add a FINDPOST command that searches the contents of posts. I'm waiting to see how the API will open this up
