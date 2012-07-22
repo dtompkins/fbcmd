@@ -581,9 +581,7 @@
       if (!unlink($fbcmdOldKeyFileName)) {
         FbcmdFatalError("Could not delete {$fbcmdAuthFileName}\n");
       }
-      if (!$fbcmdPrefs['quiet']) {
-        print "{$fbcmdAuthFileName} has been deleted\n";
-      }
+      print "{$fbcmdAuthFileName} has been deleted\n";
     }
     ShowAuth();
     return;
@@ -604,12 +602,10 @@
       $fbReturn = $facebook->api('/me');
       TraceReturn();
       if (isset($fbReturn['name'])) {
-        if (!$fbcmdPrefs['quiet']) {
-          print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\n\nWelcome to FBCMD, {$fbReturn['name']}!\n\n";
-          print "most FBCMD commands require additional permissions.\n";
-          print "to grant default permissions, execute: fbcmd addperm\n";
-          print "to test your permissions, execute: fbcmd test\n";
-        }
+        print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\n\nWelcome to FBCMD, {$fbReturn['name']}!\n\n";
+        print "most FBCMD commands require additional permissions.\n";
+        print "to grant default permissions, execute: fbcmd addperm\n";
+        print "to test your permissions, execute: fbcmd test\n";
       } else {
         FbcmdFatalError("Possible authentication error: could not determine your name");
       }
