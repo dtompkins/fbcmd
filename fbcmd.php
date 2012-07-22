@@ -4288,7 +4288,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function Resolve($matchme, $exitOnFalse = true, $types = 'number,prev,alias,last,username,accounts,friends,likes') { //OLD_FlistMatch ($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
+  function Resolve($matchme, $exitOnFalse = true, $types = 'number,prev,alias,last,username,accounts,friends,likes,groups') { //OLD_FlistMatch ($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
     global $fbcmdAlias;
     global $resolvedId;
     global $resolvedText;
