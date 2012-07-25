@@ -424,6 +424,19 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  // process special argument formats
+
+  for ($j=1; $j <= ParamCount(); $j++) {
+    if ((strlen($fbcmdParams[$j]) > 5)&&(strncmp('file:',strtolower($fbcmdParams[$j]),5)==0)) {
+      $contents = @file_get_contents(substr($fbcmdParams[$j],5));
+      if ($contents == false) {
+        FbcmdWarning("Could not read file {$fbcmdParams[$j]}");
+      } else {
+        $fbcmdParams[$j] = $contents;
+      }
+    }
+  }
+
   if ($fbcmdPrefs['newline_subst']) {
     for ($j=1; $j <= ParamCount(); $j++) {
       $fbcmdParams[$j] = str_replace("\\n","\n",$fbcmdParams[$j]);

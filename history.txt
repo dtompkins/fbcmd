@@ -7,6 +7,7 @@ https://raw.github.com/dtompkins/fbcmd/dev/history.txt
 
 Version 2.0-beta2
 =================
+* added file:filename syntax for all parameters
 * added pref 'warning_as_error' & exit codes
 
 Version 2.0-beta1
