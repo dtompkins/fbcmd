@@ -236,6 +236,8 @@
   AddPreference('auto_refresh','604800');
   AddPreference('cache_refs','1');
   AddPreference('cachefile','[datadir]refcache.txt');
+  AddPreference('extra_subst','0');
+  AddPreference('extra_subst_list','\\a=*,\\d=$,\\m=&,\\p=%,\\q=",\\s= ,\\u=\',\\w=?');
   AddPreference('keyfile','[datadir]sessionkeys.txt','key');
   AddPreference('last_length','10');
   AddPreference('last_save','1');
@@ -441,6 +443,26 @@
     for ($j=1; $j <= ParamCount(); $j++) {
       $fbcmdParams[$j] = str_replace('\n',"\n",$fbcmdParams[$j]);
     }
+  }
+
+  if ($fbcmdPrefs['extra_subst']) {
+    $espairs = explode(',',$fbcmdPrefs['extra_subst_list']);
+    foreach ($espairs as $p) {
+      if (preg_match('/^(.*)=(.*)$/',$p,$matches)) {
+        $extraSubst[$matches[1]] = $matches[2];
+      } else {
+        FbcmdWarning("Invalid extra-subst_list entry: {$p}");
+      }
+    }
+    for ($j=1; $j <= ParamCount(); $j++) {
+      $fbcmdParams[$j] = str_replace('\\\\','_fbcmddoublebackslash_',$fbcmdParams[$j]);
+      foreach ($extraSubst as $from => $to) {
+        $fbcmdParams[$j] = str_replace($from,$to,$fbcmdParams[$j]);
+      }
+      $fbcmdParams[$j] = str_replace('_fbcmddoublebackslash_','\\\\',$fbcmdParams[$j]);
+      print "{$fbcmdParams[$j]}\n";
+    }
+    exit;
   }
 
 ////////////////////////////////////////////////////////////////////////////////
