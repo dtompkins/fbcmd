@@ -5,6 +5,10 @@ the most recent version of this file is at:
 https://raw.github.com/dtompkins/fbcmd/dev/history.txt
 ------------------------------------------------------
 
+Version 2.0-beta2
+=================
+* added pref 'warning_as_error' & exit codes
+
 Version 2.0-beta1
 =================
 

@@ -54,7 +54,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '2.0-beta1';
+  $fbcmdVersion = '2.0-beta2-dev1';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -254,6 +254,7 @@
   AddPreference('tpics_filename','[pid].jpg','tpf');
   AddPreference('trace','0','t');
   AddPreference('update_branch','master');
+  AddPreference('warning_as_error','0','warn');
   // maybe in 2.0 (TBD)
   //2 AddPreference('event_dateformat','D M d H:i','edf');
   //2 AddPreference('events_attend_mask','15','emask');
@@ -2182,16 +2183,20 @@
     if (isset($result['error']['message'])) {
       $msg = $result['error']['message'];
     }
-    FbcmdFatalError("{$defaultCommand}\n[{$type}:{$code}] {$msg}");
+    $errmsg = "{$defaultCommand}\n[{$type}:{$code}] {$msg}";
+    if ($code == 0) {
+      $code = 1;
+    }
+    FbcmdFatalError($errmsg,$code);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function FbcmdFatalError($err) {
+  function FbcmdFatalError($err, $retcode = 1) {
     global $fbcmdVersion;
     print "fbcmd [v{$fbcmdVersion}] ERROR: {$err}";
-    exit;
+    exit($retcode);
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -2199,7 +2204,11 @@
 
   function FbcmdWarning($err) {
     global $fbcmdVersion;
+    global $fbcmdPrefs;
     print "fbcmd [v{$fbcmdVersion}] WARNING: {$err}\n";
+    if ($fbcmdPrefs['warning_as_error']) {
+      exit(1);
+    }
   }
 
 ////////////////////////////////////////////////////////////////////////////////
