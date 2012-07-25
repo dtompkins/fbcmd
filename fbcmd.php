@@ -226,20 +226,20 @@
   // STEP ONE (part A) Universal Preferences
 
   // currently in 2.0
-  AddPreference('aliasfile',"[datadir]aliases.php");
+  AddPreference('aliasfile','[datadir]aliases.php');
   AddPreference('apics_filename','[pid].jpg','apf');
   AddPreference('addpicd_ext','jpg','pext');
   AddPreference('appkey','42463270450');
   AddPreference('appsecret','88af69b7ab8d437bff783328781be79b');
-  AddPreference('authfile',"[datadir]auth.txt");
+  AddPreference('authfile','[datadir]auth.txt');
   AddPreference('auto_mkdir','1');
   AddPreference('auto_refresh','604800');
   AddPreference('cache_refs','1');
-  AddPreference('cachefile',"[datadir]refcache.txt");
-  AddPreference('keyfile',"[datadir]sessionkeys.txt",'key');
+  AddPreference('cachefile','[datadir]refcache.txt');
+  AddPreference('keyfile','[datadir]sessionkeys.txt','key');
   AddPreference('last_length','10');
   AddPreference('last_save','1');
-  AddPreference('lastfile',"[datadir]last.txt");
+  AddPreference('lastfile','[datadir]last.txt');
   AddPreference('launch_exec','');
   AddPreference('mkdir_mode','0777');
   AddPreference('newline_subst','1');
@@ -250,7 +250,7 @@
   AddPreference('prefs','');
   AddPreference('prev_length','10');
   AddPreference('prev_save','1');
-  AddPreference('prevfile',"[datadir]prev.txt");
+  AddPreference('prevfile','[datadir]prev.txt');
   AddPreference('tpics_filename','[pid].jpg','tpf');
   AddPreference('trace','0','t');
   AddPreference('update_branch','master');
@@ -412,7 +412,7 @@
 
   ParseArguments($fbcmd_argv,$fbcmd_argc);
 
-  // STEP FOUR: if a "-prefs=filename.php" was specified
+  // STEP FOUR: if a -prefs=filename.php was specified
 
   if ($fbcmdPrefs['prefs']) {
     if (file_exists($fbcmdPrefs['prefs'])) {
@@ -439,7 +439,7 @@
 
   if ($fbcmdPrefs['newline_subst']) {
     for ($j=1; $j <= ParamCount(); $j++) {
-      $fbcmdParams[$j] = str_replace("\\n","\n",$fbcmdParams[$j]);
+      $fbcmdParams[$j] = str_replace('\n',"\n",$fbcmdParams[$j]);
     }
   }
 
@@ -466,7 +466,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if (in_array($fbcmdCommand,$depricatedCommands)) {
-    FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . " for more information");
+    FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . ' for more information');
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -513,7 +513,7 @@
         FbcmdFatalError("Could not locate [{$updatePhp}]");
       }
     }
-    $execCmd = "php \"$updatePhp\"";
+    $execCmd = "php \"{$updatePhp}\"";
     for ($j=1; $j <= 4; $j++) {
       if (ParamCount() >= $j) {
         $execCmd .= " \"{$fbcmdParams[$j]}\"";
@@ -566,7 +566,7 @@
       print "\nGO Destinations:\n\n";
       foreach ($goDestinations as $key) {
         $desc = $goDestinationsHelp[$key];
-        if (substr($desc,0,1) == "#") {
+        if (substr($desc,0,1) == '#') {
           print str_pad("  go {$key} id",19,' ') . substr($desc,1) . "\n";
         } else {
           print str_pad("  go {$key}",19,' ') . $desc . "\n";
@@ -608,7 +608,7 @@
     GetOldSessionKey($fbcmdParams[1]);
     GenAuthInfoFromSessionKey();
     if (!isset($fbcmdAuthInfo['access_token'])) {
-      FbcmdFatalError("Could not obtain oauth access_token");
+      FbcmdFatalError('Could not obtain oauth access_token');
     }
     SaveDataFile('authfile',$fbcmdAuthInfo);
     $facebook->setAccessToken($fbcmdAuthInfo['access_token']);
@@ -621,7 +621,7 @@
         print "to grant default permissions, execute: fbcmd addperm\n";
         print "to test your permissions, execute: fbcmd test\n";
       } else {
-        FbcmdFatalError("Possible authentication error: could not determine your name");
+        FbcmdFatalError('Possible authentication error: could not determine your name');
       }
     } catch (FacebookApiException $e) {
       FbcmdException($e);
@@ -646,7 +646,7 @@
 
   $fbcmdAuthInfo = LoadDataFile('authfile');
   if (!isset($fbcmdAuthInfo['access_token'])) {
-    FbcmdFatalError("Could not obtain oauth access_token");
+    FbcmdFatalError('could not obtain oauth access_token');
   }
   $facebook->setAccessToken($fbcmdAuthInfo['access_token']);
 
@@ -665,7 +665,7 @@
 
     print "This command should launch a browser to grant permissions.\n";
     print "in case it doesn't, here is the messy url:\n\n{$url}\n\n";
-    print "(note: this grants only you access to your information and nobody else)\n\n";
+    print "(note: this grants only *you* access to your information and nobody else)\n\n";
     print "after granting permssions, execute: fbcmd test\n\n\n";
     return;
   }
@@ -799,7 +799,7 @@
     SetDefaultParam(2,$fbcmdPrefs['default_addalbum_message']);
 
     $fbcmdExtraOutput['index'] = 'lastalbum';
-    OpenGraphAPI("/me/albums",'POST',array('name' => $fbcmdParams[1], 'message' => $fbcmdParams[2]));
+    OpenGraphAPI('/me/albums','POST',array('name' => $fbcmdParams[1], 'message' => $fbcmdParams[2]));
     if (isset($fbReturn['id'])) {
       NewLast('album', $fbReturn['id'], $fbcmdParams[1]);
     } else {
@@ -909,7 +909,7 @@
       if (isset($fbReturn['id'])) {
         NewLast('comment', $fbReturn['id'], $fbcmdParams[2]);
       } else {
-        FbcmdWarning("no return id");
+        FbcmdWarning('no return id');
       }
     }
   }
@@ -921,7 +921,7 @@
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last,albums')) {
       OpenGraphAPI("/{$resolvedId}",'DELETE');
       if (!$fbReturn) {
-        FbcmdWarning("did not delete");
+        FbcmdWarning('did not delete');
       }
     }
   }
@@ -1138,9 +1138,9 @@
     SetDefaultParam(2,$fbcmdPrefs['default_graphapi_method']);
     SetDefaultParam(3,$fbcmdPrefs['default_graphapi_params']);
     if ($fbcmdParams[3]) {
-      $code = "\$args = " . $fbcmdParams[3] . ";";
+      $code = "\$args = {$fbcmdParams[3]};";
       if (eval($code) === false) {
-        FbcmdFatalError("bad params syntax\n");
+        FbcmdFatalError('bad params syntax');
       }
       eval($code);
     } else {
@@ -1224,7 +1224,7 @@
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
       OpenGraphAPI("/{$resolvedId}/likes",'POST');
       if (!$fbReturn) {
-        FbcmdWarning("did not like");
+        FbcmdWarning('did not like');
       }
     }
   }
@@ -1325,7 +1325,7 @@
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,username,friends')) {
       OpenGraphAPI("/{$fbcmdTargetId}/mutualfriends/{$resolvedId}");
       if (!ReturnDataToPrev()) {
-        FbcmdWarning('no friends');
+        FbcmdWarning('no mutual friends');
       }
     }
   }
@@ -1473,7 +1473,7 @@
     $args = array();
     $firstParam = strtoupper($fbcmdParams[1]);
     if (strtoupper($fbcmdParams[1]) == 'MP3') {
-      FbcmdFatalError("2.0: POST MP3 not done yet / not supported");
+      FbcmdFatalError('2.0: POST MP3 not done yet / not supported');
     }
     if (strtoupper($fbcmdParams[1]) == 'SRC') {
       ValidateParamCount(2,9);
@@ -1505,7 +1505,7 @@
     if (isset($fbReturn['id'])) {
       NewLast('post', $fbReturn['id'], $fbcmdParams[1]);
     } else {
-      FbcmdWarning("no return id");
+      FbcmdWarning('no return id');
     }
   }
 
@@ -1762,7 +1762,7 @@
     if (isset($fbReturn['id'])) {
       NewLast('status', $fbReturn['id'], $fbcmdParams[1]);
     } else {
-      FbcmdWarning("no return id");
+      FbcmdWarning('no return id');
     }
   }
     // if (ParamCount() == 0) {
@@ -1876,11 +1876,11 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   if ($fbcmdCommand == 'TEST') { //2 add more tests
-    $testPost = "474872245874123_476522569042424";
+    $testPost = '474872245874123_476522569042424';
     try {
       $fbReturn = $facebook->api('/me');
       TraceReturn();
-      $testName = "UNKNOWN";
+      $testName = 'UNKNOWN';
       if (isset($fbReturn['name'])) {
         $testName = $fbReturn['name'];
         print "Test 1 PASSED. Determine your name: Hello, {$testName}\n";
@@ -1900,7 +1900,7 @@
         'link' => 'http://www.facebook.com/cmdlinepage',
         'caption' => 'Command Line Interface for Facebook',
         'description' => 'fbcmd is an open source facebook application.  The project home page is at http://fbcmd.dtompkins.com',
-        'picture' => "http://fbcmd.dtompkins.com/attachments/fbcmd75.png"));
+        'picture' => 'http://fbcmd.dtompkins.com/attachments/fbcmd75.png'));
       TraceReturn();
       if (isset($fbReturn['id'])) {
         NewLast('post', $fbReturn['id'], 'just successfully installed fbcmd');
@@ -1939,7 +1939,7 @@
     if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
       OpenGraphAPI("/{$resolvedId}/likes",'DELETE');
       if (!$fbReturn) {
-        FbcmdWarning("did not unlike");
+        FbcmdWarning('did not unlike');
       }
     }
   }
@@ -1972,7 +1972,7 @@
     ValidateParamCount(0);
     OpenGraphAPI('/me');
     if (!isset($fbReturn['id'])) {
-      FbcmdWarning("no id");
+      FbcmdWarning('no id');
     }
   }
 
@@ -2313,12 +2313,12 @@
     global $fbcmdUserSecretKey;
     global $fbcmdAuthVersion;
     global $fbcmdAuthInfo;
-    $uidFromSessionKey = end(explode("-",$fbcmdUserSessionKey));
-    $result = CurlPost("https://graph.facebook.com/oauth/exchange_sessions","client_id={$fbcmdPrefs['appkey']}&client_secret={$fbcmdPrefs['appsecret']}&sessions={$fbcmdUserSessionKey}");
+    $uidFromSessionKey = end(explode('-',$fbcmdUserSessionKey));
+    $result = CurlPost('https://graph.facebook.com/oauth/exchange_sessions',"client_id={$fbcmdPrefs['appkey']}&client_secret={$fbcmdPrefs['appsecret']}&sessions={$fbcmdUserSessionKey}");
     if (isset($result[0]['access_token'])) {
       $authToken = $result[0]['access_token'];
     } else {
-      FbcmdFatalError("could not convert session key to auth token");
+      FbcmdFatalError('could not convert session key to auth token');
     }
     $fbcmdAuthInfo = array (
       'version' => $fbcmdAuthVersion,
@@ -2351,7 +2351,7 @@
     if ($fbcmdPrefs[$prefbase] != '') {
       return $fbcmdPrefs[$prefbase];
     } else {
-      return $fbcmdPrefs[$prefbase ."_" . strtolower($fbcmdCommand)];
+      return $fbcmdPrefs[$prefbase . '_' . strtolower($fbcmdCommand)];
     }
   }
 
@@ -2706,18 +2706,18 @@
     global $fbcmdUserSessionKey;
     global $fbcmdUserSecretKey;
 
-    $api_url = "http://api.facebook.com/restserver.php";
+    $api_url = 'http://api.facebook.com/restserver.php';
 
     $api_key = "api_key={$fbcmdPrefs['appkey']}";
     $auth_token = "auth_token={$authcode}";
-    $call_id = "call_id=" . microtime(true);
-    $format = "format=json-strings";
-    $generate_session_secret = "generate_session_secret=";
-    $method = "method=facebook.auth.getSession";
-    $session_key = "session_key=";
-    $v = "v=1.0";
+    $call_id = 'call_id=' . microtime(true);
+    $format = 'format=json-strings';
+    $generate_session_secret = 'generate_session_secret=';
+    $method = 'method=facebook.auth.getSession';
+    $session_key = 'session_key=';
+    $v = 'v=1.0';
 
-    $sig = "sig=" . md5("{$api_key}{$auth_token}{$call_id}{$format}{$generate_session_secret}{$method}{$session_key}{$v}{$fbcmdPrefs['appsecret']}");
+    $sig = 'sig=' . md5("{$api_key}{$auth_token}{$call_id}{$format}{$generate_session_secret}{$method}{$session_key}{$v}{$fbcmdPrefs['appsecret']}");
 
     $url = "{$api_url}?{$method}&{$format}&{$session_key}&{$api_key}&{$v}";
     $poststring = "{$auth_token}&{$generate_session_secret}&{$call_id}&{$sig}";
@@ -2728,7 +2728,7 @@
       $fbcmdUserSecretKey = $result['secret'];
       return;
     } else {
-      FbcmdFatalError("could not get session key from auth code");
+      FbcmdFatalError('could not get session key from auth code');
     }
   }
 
@@ -3132,9 +3132,9 @@
         while (substr($curArg,0,1) == '-') {
           $curArg = substr($curArg,1);
         }
-        if (strpos($curArg,"=")) {
-          $switchKey = substr($curArg,0,strpos($curArg,"="));
-          $switchValue = substr($curArg,strpos($curArg,"=")+1);
+        if (strpos($curArg,'=')) {
+          $switchKey = substr($curArg,0,strpos($curArg,'='));
+          $switchValue = substr($curArg,strpos($curArg,'=')+1);
           if ($switchValue == '') {
             $switchValue = '0';
           }
@@ -4085,16 +4085,16 @@
         $txt = ($nlpos == 0) ? '' : substr($txt,0,$nlpos);
       } elseif ($len > $max) {
         $wrap = true;
-        $spos = strpos($txt," ");
+        $spos = strpos($txt,' ');
         if (($spos === false)||($spos >= $max)) {
           $numkeep = $max;
-          while (($numkeep > 0)&&(strpos(".,-_;:()!+?",substr($txt,$numkeep-1,1))===false)) $numkeep--; //2 todo better
+          while (($numkeep > 0)&&(strpos('.,-_;:()!+?',substr($txt,$numkeep-1,1))===false)) $numkeep--; //2 todo better
           if ($numkeep == 0) $numkeep = $max;
           $next = substr($txt,$numkeep);
           $txt = substr($txt,0,$numkeep);
         } else {
-          while ((stripos($txt," ",$spos+1) !== false)&&(stripos($txt," ",$spos+1) <= $max)) {
-            $spos = stripos($txt," ",$spos+1);
+          while ((stripos($txt,' ',$spos+1) !== false)&&(stripos($txt,' ',$spos+1) <= $max)) {
+            $spos = stripos($txt,' ',$spos+1);
           }
           $next = substr($txt,$spos+1);
           $txt = substr($txt,0,$spos);
@@ -4237,7 +4237,7 @@
         }
       }
     } else {
-      FbcmdWarning("Unexpected: non-array passed to ProcessShowRecurse");
+      FbcmdWarning('Unexpected: non-array passed to ProcessShowRecurse');
     }
     return $ret;
   }
@@ -4461,7 +4461,7 @@
           if (isset($fbReturn['data'][$j]['name'])) {
             AddPrev($fbReturn['data'][$j]['id'], $fbReturn['data'][$j]['name']);
           } else {
-            AddPrev($fbReturn['data'][$j]['id'], "[no description]");
+            AddPrev($fbReturn['data'][$j]['id'], '[no description]');
           }
         }
       }
@@ -4557,7 +4557,7 @@
       FbcmdWarning("Could not save {$outputFile}");
       return false;
     } else {
-      print "$outputFile\n";
+      print "{$outputFile}\n";
     }
 
     return true;
@@ -4654,9 +4654,9 @@
       $fbcmdCommandHelp[$cmd] = "[No Help Available]\n";
     }
     $helpText = explode('~',$fbcmdCommandHelp[$cmd]);
-    print "  " . str_pad($cmd, 10, ' ') . $helpText[0]. "\n";
+    print '  ' . str_pad($cmd, 10, ' ') . "{$helpText[0]}\n";
     for ($j=1; $j < count($helpText); $j++) {
-      print "            " . $helpText[$j] . "\n";
+      print "            {$helpText[$j]}\n";
     }
     print "\n";
   }
@@ -4878,7 +4878,7 @@
       print "\n";
       FbcmdWarning("[{$fbcmdCommand}] Invalid number of parameters");
       print "\n";
-      print "try:        [fbcmd help ". strtolower($fbcmdCommand). "]\nto launch:  http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . "\n\nbasic help:\n\n";
+      print 'try:        [fbcmd help '. strtolower($fbcmdCommand). "]\nto launch:  http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . "\n\nbasic help:\n\n";
       ShowUsageCmd($fbcmdCommand);
       exit;
     }
