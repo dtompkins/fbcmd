@@ -147,7 +147,6 @@
   AddCommand('LIKE',      'objname~Like an object (can\'t like pages)');
   AddCommand('LIKES',     '[category]~List your likes~[category] is one of books,games,movies,music,television');
   AddCommand('LINKS',     '<no parameters>~Display your posted links');
-  AddCommand('LOADNOTE',  'title filename~Same as POSTNOTE but loads the contents from a file');
   AddCommand('LOOP',      'objlist COMMAND <parameters>~execute COMMAND for each objname in objlist');
   AddCommand('MATCH',     'objname~Try to resolve a name to an object');
   AddCommand('MUTUAL',    'friendid~List friend you have in common with another friend');
@@ -176,7 +175,7 @@
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
   $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
-  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE','WHOAMI');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE','WHOAMI');
   $deprecatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -282,8 +281,6 @@
   AddPreference('default_apics_savedir','');
   AddPreference('default_as_obj','');
   AddPreference('default_comment_message','');
-  AddPreference('default_loadnote_filename','');
-  AddPreference('default_loadnote_title','');
   AddPreference('default_graphapi_method','GET');
   AddPreference('default_graphapi_params','');
   AddPreference('default_postlink_link','');
@@ -1271,22 +1268,6 @@
     if (!ReturnDataToPrev()) {
       FbcmdWarning('no links');
     }
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
-  if ($fbcmdCommand == 'LOADNOTE') {
-    ValidateParamCount(2);
-    SetDefaultParam(1,$fbcmdPrefs['default_loadnote_title']);
-    SetDefaultParam(2,$fbcmdPrefs['default_loadnote_filename']);
-    if (!file_exists($fbcmdParams[2])) {
-      FbcmdFatalError("Could not locate file {$fbcmdParams[1]}");
-    }
-    $fbFbmlFile = @file_get_contents($fbcmdParams[2]);
-    if ($fbFbmlFile == false) {
-      FbcmdFatalError("Could not read file {$fbcmdParams[2]}");
-    }
-    OpenGraphAPI("/{$fbcmdTargetId}/notes",'POST',array('message' => $fbFbmlFile, 'subject' => $fbcmdParams[1]));
   }
 
 ////////////////////////////////////////////////////////////////////////////////

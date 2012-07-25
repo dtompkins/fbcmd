@@ -9,6 +9,7 @@ Version 2.0-beta2
 =================
 * added file:filename syntax for all parameters
 * added pref 'warning_as_error' & exit codes
+* deprecated LOADNOTE
 
 Version 2.0-beta1
 =================
@@ -21,7 +22,7 @@ Version 2.0-beta1
 * New commands: ACCOUNTS ALIAS AS DEL GRAPHAPI GROUPS INFO LAST LIKES LINKS MATCH NEWS NOTES POSTS PREV REFRESH MATCH STATUSES TARGET TEST UNLIKE WALL
 * renamed commands: FPICS -> TPICS (to reflect 'tagged photos'), FEEDLINK -> POSTLINK, FEEDNOTE -> POSTNOTE
 * modified syntax for: GO, POST, MUTUAL, STATUS
-* depricated commands: ALLINFO DELPOST DISPLAY FEED1 FEED2 FEVENTS FGROUPS FINFO LIMITS LOADDISP LOADINFO NSEND PINBOX PPOST SAVEDISP SAVEINFO UFIELDS WALLPOST
+* deprecated commands: ALLINFO DELPOST DISPLAY FEED1 FEED2 FEVENTS FGROUPS FINFO LIMITS LOADDISP LOADINFO NSEND PINBOX PPOST SAVEDISP SAVEINFO UFIELDS WALLPOST
 * fixed github URLs to point to new github area
 * renamed, removed & added several preferences
 
