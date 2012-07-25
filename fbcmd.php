@@ -177,7 +177,7 @@
 
   $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
   $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','LOADNOTE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE','WHOAMI');
-  $depricatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
+  $deprecatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   if (isset($fbcmd_include_newCommands)) {
     foreach ($fbcmd_include_newCommands as $c) {
@@ -485,7 +485,7 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if (in_array($fbcmdCommand,$depricatedCommands)) {
+  if (in_array($fbcmdCommand,$deprecatedCommands)) {
     FbcmdFatalError("{$fbcmdCommand} has been deprecated:\n  visit http://fbcmd.dtompkins.com/commands/" . strtolower($fbcmdCommand) . ' for more information');
   }
 
@@ -4700,7 +4700,7 @@
     print "commands: (can be in lower case)\n\n";
 
     print "=====================================================================\n";
-    print "NOT SUPPORTED YET IN 2.0 (may be depricated or merged into others)\n"  ;
+    print "NOT SUPPORTED YET IN 2.0 (may be deprecated or merged into others)\n"  ;
     print "=====================================================================\n\n";
 
 
