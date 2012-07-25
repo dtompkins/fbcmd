@@ -460,7 +460,6 @@
         $fbcmdParams[$j] = str_replace($from,$to,$fbcmdParams[$j]);
       }
       $fbcmdParams[$j] = str_replace('_fbcmddoublebackslash_','\\\\',$fbcmdParams[$j]);
-      print "{$fbcmdParams[$j]}\n";
     }
   }
 
