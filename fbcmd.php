@@ -96,7 +96,7 @@
 
   $fbcmdCommandList = array();
 
-  // the following are 1.1 commands that haven't been done yet, or will be changed
+  // the following are 1.1 commands that haven't been done yet, or will be changed, or deprecated
   $notYet = array('EVENTS','FINBOX','FLAST','FONLINE','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM');
   AddCommand('EVENTS',    '[time]~Display your events');
   AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
@@ -175,8 +175,8 @@
   AddCommand('WALL',      '<no parameters>~Display items posted on your wall');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
-  $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TAGPIC','TPICS','WALL');
-  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','POST','POSTLINK','POSTNOTE','STATUS','TAGPIC','TAGPICT','TEST','UNLIKE','WHOAMI');
+  $targetCommands = array('ALBUMS','APICS','COUNT','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TAGPIC','TPICS','WALL');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','COUNT','DEL','GRAPHAPI','INFO','LIKE','POST','POSTLINK','POSTNOTE','STATUS','TAGPIC','TAGPICT','TEST','UNLIKE','WHOAMI');
   $deprecatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -236,6 +236,7 @@
   AddPreference('auto_refresh','604800');
   AddPreference('cache_refs','1');
   AddPreference('cachefile','[datadir]refcache.txt');
+  AddPreference('count_attempts','2');
   AddPreference('extra_subst','0');
   AddPreference('extra_subst_list','\\a=*,\\d=$,\\m=&,\\p=%,\\q=",\\s= ,\\u=\',\\w=?');
   AddPreference('keyfile','[datadir]sessionkeys.txt','key');
@@ -753,14 +754,6 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  if ($fbcmdCommand == 'COUNT') {
-    print "Dave hasn't implemented COUNT yet... but it will be cool!\n";
-    //2 ensure doesn't try to work with included commands
-    exit;
-  }
-
-////////////////////////////////////////////////////////////////////////////////
-
   $fbcmdTargetId = 'me';
   $fbcmdExtraOutput = array();
 
@@ -776,6 +769,21 @@
       $fbcmdTargetId = $resolvedId;
     }
   }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  $fbcmdCountLoop = false;
+  $fbcmdCountIndex = 0;
+  if ($fbcmdCommand == 'COUNT') {
+    ValidateParamCount(2,99);
+    $fbcmdCountLoop = true;
+    $fbcmdCountRequest = strtolower($fbcmdParams[1]);
+    $fbcmdCountIteration = 0;
+    $fbcmdCountAttempts = 0;
+    $fbcmdCountPrevIndex = 0;
+    RemoveParams(0,1);
+  }
+  do { // COUNT loop
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -1992,6 +2000,32 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
+  if ($fbcmdCountLoop) {
+    if (isset($fbReturn['paging']['next'])) {
+      $parsed = parse_url($fbReturn['paging']['next']);
+      parse_str($parsed['query'],$fbcmdCountNext);
+      if ($fbcmdCountIndex - $fbcmdCountPrevIndex == 0) {
+        $fbcmdCountAttempts++;
+        if ($fbcmdCountAttempts >= $fbcmdPrefs['count_attempts']) {
+          $fbcmdCountLoop = false;
+        }
+      }
+      if ($fbcmdCountRequest != 'all') {
+        if ($fbcmdCountIndex >= $fbcmdCountRequest) {
+          $fbcmdCountLoop = false;
+        }
+      }
+      $fbcmdCountPrevIndex = $fbcmdCountIndex;
+      $fbcmdCountIteration++;
+    } else {
+      $fbcmdCountLoop = false;
+    }
+  }
+
+  } while ($fbcmdCountLoop); // COUNT loop
+
+////////////////////////////////////////////////////////////////////////////////
+
   return;
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -3124,18 +3158,30 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function OpenGraphAPI($path, $method = 'GET', $params = '') {
+  function OpenGraphAPI($path, $method = 'GET', $params = array()) {
     global $fbReturn;
     global $facebook;
-    //todo auto-params for paging
+    global $fbcmdPrefs;
+    global $fbcmdCountLoop;
+    global $fbcmdCountIteration;
+    global $fbcmdCountNext;
+
+    if (($fbcmdCountLoop)&&($fbcmdCountIteration > 0)) {
+      $p = array_merge($params,$fbcmdCountNext);
+    } else {
+      $p = $params;
+    }
+    if ($fbcmdPrefs['trace']) {
+      print_r (array('path' => $path, 'method' => $method, 'params' => $p));
+    }
     try {
-      $fbReturn = $facebook->api($path, $method, $params);
-      TraceReturn();
-      ProcessReturn();
-      PrintReturn();
+      $fbReturn = $facebook->api($path, $method, $p);
     } catch (FacebookApiException $e) {
       FbcmdException($e);
     }
+    TraceReturn();
+    ProcessReturn();
+    PrintReturn();
   }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -4192,6 +4238,9 @@
     global $printFlat;
     global $printFormat;
     global $fbcmdExtraOutput;
+    global $fbcmdCountLoop;
+    global $fbcmdCountIndex;
+    global $fbcmdCountRequest;
 
     $printFormat = strtolower(GetCommandPref('output_format'));
 
@@ -4213,9 +4262,12 @@
       $fbReturnType = 'array';
       $fbProcessed = array();
       for ($j=0; $j < count($fbReturn['data']); $j++) {
-        $i = $j+1;  //2 eventually, will have to add COUNT support
-        $fbcmdExtraOutput['index'] = $i;
-        $fbProcessed[$i] = ProcessShowFields($fbReturn['data'][$j]);
+        $fbcmdCountIndex++;
+        $fbcmdExtraOutput['index'] = $fbcmdCountIndex;
+        if ((!$fbcmdCountLoop)||($fbcmdCountRequest == 'all')||($fbcmdCountIndex <= $fbcmdCountRequest)) {
+          $fbProcessed[] = ProcessShowFields($fbReturn['data'][$j]);
+        }
+        unset($fbcmdExtraOutput['index']);
       }
       return;
     }
@@ -4371,7 +4423,7 @@
 
     if (in_array('number',$typelist)) {
       if (is_numeric($m)) {
-        if (($m > 0)&&($m < 1000)) {
+        if (($m > 0)&&($m < 5000)) {
           if (in_array('prev',$typelist)) {
             if (!$mDot) {
               $mLeft = 0;
@@ -4484,15 +4536,25 @@
   function ReturnDataToPrev() {
     global $fbReturn;
     global $fbcmdPrev;
+    global $fbcmdCountLoop;
+    global $fbcmdCountIteration;
     if ((isset($fbReturn['data']))&&(is_array($fbReturn['data']))) {
-      ShiftPrev();
+      if ((!$fbcmdCountLoop)||($fbcmdCountIteration == 0)) {
+        ShiftPrev();
+      }
       for ($j=0; $j < count($fbReturn['data']); $j++) {
         if (isset($fbReturn['data'][$j]['id'])) {
+          $id = $fbReturn['data'][$j]['id'];
           if (isset($fbReturn['data'][$j]['name'])) {
-            AddPrev($fbReturn['data'][$j]['id'], $fbReturn['data'][$j]['name']);
+            $name = $fbReturn['data'][$j]['name'];
+          } elseif (isset($fbReturn['data'][$j]['message'])) {
+            $name = $fbReturn['data'][$j]['message'];
+          } elseif (isset($fbReturn['data'][$j]['story'])) {
+            $name = $fbReturn['data'][$j]['story'];
           } else {
-            AddPrev($fbReturn['data'][$j]['id'], '[no description]');
+            $name = '[no description]';
           }
+          AddPrev($id,$name);
         }
       }
       if (count($fbcmdPrev[0]) > 1) {

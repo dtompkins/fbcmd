@@ -7,7 +7,6 @@ https://raw.github.com/dtompkins/fbcmd/dev/todo.txt
 
 Moved to beta2
 ==============
-* implement COUNT / work on paging (use parse_url & parse_str)
 * implement LOOP
 * Try to get tags working in POST (with locations?)
 * add a cur syntax similar to LAST
