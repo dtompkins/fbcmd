@@ -16,8 +16,6 @@ Moved to beta2
 * something for activities, friendrequests, checkins, etc.
 * remove an alias
 * update test_fb_connect.php
-* add an ERRORLEVEL return code
-* add an &filename syntax for loading parameters from a file ?
 * UNICODE / UTF-8 support ?!? (do some tests at least)
 * look into online status via graph api
 * proxy support ?!?

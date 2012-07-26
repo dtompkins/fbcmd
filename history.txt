@@ -7,6 +7,8 @@ https://raw.github.com/dtompkins/fbcmd/dev/history.txt
 
 Version 2.0-beta2
 =================
+* migrated TAGPIC
+* new command: TAGPICT
 * added file:filename syntax for all parameters
 * added pref 'warning_as_error' & exit codes
 * deprecated LOADNOTE

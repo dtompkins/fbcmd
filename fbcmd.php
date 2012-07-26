@@ -54,7 +54,7 @@
 //                                                                            //
 ////////////////////////////////////////////////////////////////////////////////
 
-  $fbcmdVersion = '2.0-beta2-dev1';
+  $fbcmdVersion = '2.0-beta2-dev2';
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -97,7 +97,7 @@
   $fbcmdCommandList = array();
 
   // the following are 1.1 commands that haven't been done yet, or will be changed
-  $notYet = array('EVENTS','FINBOX','FLAST','FONLINE','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM','TAGPIC');
+  $notYet = array('EVENTS','FINBOX','FLAST','FONLINE','FQL','FSTATUS','FSTREAM','FULLPOST','INBOX','MSG','MYWALL','NOTICES','NOTIFY','OPICS','PPICS','RECENT','RESTATUS','RSVP','SENTMAIL','SFILTERS','STREAM');
   AddCommand('EVENTS',    '[time]~Display your events');
   AddCommand('FINBOX',    '[flist]~Display mail messages from specific friend(s)');
   AddCommand('FLAST',     'flist [count]~See the last [count] status updates of friend(s)');
@@ -119,7 +119,6 @@
   AddCommand('SENTMAIL',  '[count|unread|new]~Display the latest messages from the sent mail folder');
   AddCommand('SFILTERS',  '<no parameters>~Display available stream filters for the STREAM command');
   AddCommand('STREAM',    '[filter_rank|filter_key|#filter_name] [count|new]~Show stream stories (with optional filter -- see SFILTERS)');
-  AddCommand('TAGPIC',    'pic_id target [x y]~Tag a photo');
 
   // The following are 2.0 commands (not all complete yet)
 
@@ -164,6 +163,8 @@
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
   AddCommand('STATUS',    '[text message]~Set your status');
   AddCommand('STATUSES',  '<no parameters>~Display your statuses');
+  AddCommand('TAGPIC',    'pic_id [x y]~Tag a photo (use with the TARGET command)~x & y <= 100, with (0,0) in upper left');
+  AddCommand('TAGPICT',   'pic_id tagtext [x y]~Tag a photo with some text (not a person)');
   AddCommand('TARGET',    'objname COMMAND <parameters>~execute COMMAND for/on the objname~(can also use @objname syntax instead of target objname)~(e.g.: fbcmd @bob post "Hello, Bob!")');
   AddCommand('TEST',      '<no parameters>~Test your installation');
   AddCommand('TPICS',     '[savedir]~List [and optionally save] all photos where you are tagged');
@@ -174,8 +175,8 @@
   AddCommand('WALL',      '<no parameters>~Display items posted on your wall');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
-  $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TPICS','WALL');
-  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','POST','POSTLINK','POSTNOTE','STATUS','TEST','UNLIKE','WHOAMI');
+  $targetCommands = array('ALBUMS','APICS','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TAGPIC','TPICS','WALL');
+  $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','DEL','GRAPHAPI','INFO','LIKE','POST','POSTLINK','POSTNOTE','STATUS','TAGPIC','TAGPICT','TEST','UNLIKE','WHOAMI');
   $deprecatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
   if (isset($fbcmd_include_newCommands)) {
@@ -295,15 +296,19 @@
   AddPreference('default_post_name','');
   AddPreference('default_post_src_url','');
   AddPreference('default_showpref_defaults','0');
+  AddPreference('default_tagpic_id','');
+  AddPreference('default_tagpic_x','50');
+  AddPreference('default_tagpic_y','50');
+  AddPreference('default_tagpict_text','');
   AddPreference('default_target_obj','');
   AddPreference('default_tpics_savedir','');
   //2 AddPreference('default_count','');
   //2 AddPreference('default_loop','');
   //2 AddPreference('default_ppics_savedir',false);
   //2 AddPreference('default_tagpic_pid','');
-  //2 AddPreference('default_tagpic_target','=ME');
-  //2 AddPreference('default_tagpic_x','50');
-  //2 AddPreference('default_tagpic_y','50');
+  //2 AddPreference('default_tagpic_targets','');
+  //2 AddPreference('default_tagpic_x','-1');
+  //2 AddPreference('default_tagpic_y','-1');
 
   // --------------------------------------------------------------------------
 
@@ -643,7 +648,7 @@
       $fbReturn = $facebook->api('/me');
       TraceReturn();
       if (isset($fbReturn['name'])) {
-        print "\nfbcmd [v$fbcmdVersion] AUTH Code accepted.\n\nWelcome to FBCMD, {$fbReturn['name']}!\n\n";
+        print "\nfbcmd [v{$fbcmdVersion}] AUTH Code accepted.\n\nWelcome to FBCMD, {$fbReturn['name']}!\n\n";
         print "most FBCMD commands require additional permissions.\n";
         print "to grant default permissions, execute: fbcmd addperm\n";
         print "to test your permissions, execute: fbcmd test\n";
@@ -1850,39 +1855,37 @@
 
 ////////////////////////////////////////////////////////////////////////////////
 
-  // if ($fbcmdCommand == 'TAGPIC') { //1
-    // ValidateParamCount(array(2,4));
-    // SetDefaultParam(1,$fbcmdPrefs['default_tagpic_pid']);
-    // SetDefaultParam(2,$fbcmdPrefs['default_tagpic_target']);
-    // SetDefaultParam(3,$fbcmdPrefs['default_tagpic_x']);
-    // SetDefaultParam(4,$fbcmdPrefs['default_tagpic_y']);
-    // $tagId = null;
-    // $OLD_TagText = $fbcmdParams[2];
-    // if (strtoupper($OLD_TagText) == '=ME') {
-      // $tagId = $fbUser;
-      // $OLD_TagText = null;
-    // } else {
-      // if (is_numeric($OLD_TagText)) {
-        // $tagId = $OLD_TagText;
-        // $OLD_TagText = null;
-      // } else {
-        // OLD_MultiFQL(array('FriendId','FriendBaseInfo'));
-        // foreach ($dataFriendBaseInfo as $friend) {
-          // if (strtoupper($OLD_TagText) == strtoupper($friend['name'])) {
-            // $tagId = $friend['uid'];
-            // $OLD_TagText = null;
-            // break;
-          // }
-        // }
-      // }
-    // }
-    // try {
-      // $fbReturn = $fbObject->api_client->photos_addTag($fbcmdParams[1],$tagId,$OLD_TagText,$fbcmdParams[3],$fbcmdParams[4],null,null);
-      // TraceReturn();
-    // } catch (Exception $e) {
-      // OLD_FbcmdException($e);
-    // }
-  // }
+  if ($fbcmdCommand == 'TAGPIC') {
+    ValidateParamCount(1,3);
+    SetDefaultParam(1,$fbcmdPrefs['default_tagpic_id']);
+    SetDefaultParam(2,$fbcmdPrefs['default_tagpic_x']);
+    SetDefaultParam(3,$fbcmdPrefs['default_tagpic_y']);
+    if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
+      $args = array();
+      $args['x'] = $fbcmdParams[2];
+      $args['y'] = $fbcmdParams[3];
+      FixTargetMe();
+      $args['to'] = $fbcmdTargetId;
+      OpenGraphAPI("/{$resolvedId}/tags",'POST',$args);
+    }
+  }
+
+////////////////////////////////////////////////////////////////////////////////
+
+  if ($fbcmdCommand == 'TAGPICT') {
+    ValidateParamCount(2,4);
+    SetDefaultParam(1,$fbcmdPrefs['default_tagpic_id']);
+    SetDefaultParam(2,$fbcmdPrefs['default_tagpict_text']);
+    SetDefaultParam(3,$fbcmdPrefs['default_tagpic_x']);
+    SetDefaultParam(4,$fbcmdPrefs['default_tagpic_y']);
+    if (Resolve($fbcmdParams[1],true,'number,prev,alias,last')) {
+      $args = array();
+      $args['tag_text'] = $fbcmdParams[2];
+      $args['x'] = $fbcmdParams[3];
+      $args['y'] = $fbcmdParams[4];
+      OpenGraphAPI("/{$resolvedId}/tags",'POST',$args);
+    }
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -2241,7 +2244,8 @@
   function FileMatches($dirName, $ext) {
     $matches = array();
     $dirName = CleanPath($dirName);
-    if ($handle = @opendir($dirName)) {
+    $handle = @opendir($dirName);
+    if ($handle) {
       while (false !== ($file = readdir($handle))) {
         if (strtoupper(substr($file,-strlen($ext))) == strtoupper($ext)) {
           $matches[] = $dirName . $file;
@@ -2314,6 +2318,21 @@
     // }
     // return $matchList;
   // }
+
+////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////
+
+  function FixTargetMe() {
+    global $fbcmdTargetId;
+    global $fbcmdAuthInfo;
+    if ($fbcmdTargetId == 'me') {
+      if ((isset($fbcmdAuthInfo['uid']))&&($fbcmdAuthInfo['uid'])) {
+        $fbcmdTargetId = $fbcmdAuthInfo['uid'];
+      } else {
+        FbcmdFatalError('Incomplete Authorization: cannot determine user id');
+      }
+    }
+  }
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
@@ -4321,7 +4340,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 
-  function Resolve($matchme, $exitOnFalse = true, $types = 'number,prev,alias,last,username,accounts,friends,likes,groups') { //OLD_FlistMatch ($flistItem,$isPrefixed,$dataArray,$keyId,$keyMatch,$allowMultipleMatches = true, $forceExactMatch = false) {
+  function Resolve($matchme, $exitOnFalse = true, $types = 'number,prev,alias,last,username,accounts,friends,likes,groups') {
     global $fbcmdAlias;
     global $resolvedId;
     global $resolvedText;
