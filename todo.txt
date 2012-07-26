@@ -14,7 +14,6 @@ Moved to beta2
 * add [] or @ syntax to info
 * add CPIC and PPIC
 * something for activities, friendrequests, checkins, etc.
-* add a savepref reset?
 * remove an alias
 * update test_fb_connect.php
 * add an ERRORLEVEL return code

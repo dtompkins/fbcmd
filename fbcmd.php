@@ -159,7 +159,7 @@
   AddCommand('PREV',      '[N]~Show output from [Nth] previous command or missed matched id');
   AddCommand('REFRESH',   '<no parameters>~Refresh the cache of references (do after new friends, likes, etc.)');
   AddCommand('RESET',     '<no parameters>~Delete your authorization info');
-  AddCommand('SAVEPREF',  '[filename]~Save your current preferences / switch settings to a file');
+  AddCommand('SAVEPREF',  '[filename|reset]~Save your current preferences (switch settings) to a file~or reset them to fbcmd defaults');
   AddCommand('SHOWPREF',  '[0|1]~Show your preferences (settings)~if arg is 1, will show command & output defaults');
   AddCommand('SHOWPERM',  '<no parameters>~List permissions granted to FBCMD');
   AddCommand('STATUS',    '[text message]~Set your status');
@@ -401,9 +401,9 @@
 ////////////////////////////////////////////////////////////////////////////////
 
   // STEP TWO: Load preferences from prefs.php in the base directory
-
-  if (file_exists("{$fbcmdBaseDir}prefs.php")) {
-    include("{$fbcmdBaseDir}prefs.php");
+  $fbcmdPrefsFile = "{$fbcmdBaseDir}prefs.php";
+  if (file_exists($fbcmdPrefsFile)) {
+    include($fbcmdPrefsFile);
   }
 
   // STEP THREE: Read switches set from the command line
@@ -464,8 +464,18 @@
 
   if ($fbcmdCommand == 'SAVEPREF') {
     ValidateParamCount(0,1);
-    SetDefaultParam(1,"{$fbcmdBaseDir}prefs.php");
-    SavePrefs($fbcmdParams[1]);
+    SetDefaultParam(1,$fbcmdPrefsFile);
+    if (strtolower($fbcmdParams[1])=='reset') {
+      if (file_exists($fbcmdPrefsFile)) {
+        if (!unlink($fbcmdPrefsFile)) {
+            FbcmdWarning("Could not remove file {$fbcmdPrefsFile}");
+        }
+      } else {
+        FbcmdWarning("Could not find file {$fbcmdPrefsFile}");
+      }
+    } else {
+      SavePrefs($fbcmdParams[1]);
+    }
     return;
   }
 

@@ -10,6 +10,7 @@ Version 2.0-beta2
 * added file:filename syntax for all parameters
 * added pref 'warning_as_error' & exit codes
 * deprecated LOADNOTE
+* added a [savepref reset] option to reset all user preferences
 
 Version 2.0-beta1
 =================
