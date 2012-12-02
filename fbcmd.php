@@ -175,7 +175,7 @@
   AddCommand('WALL',      '<no parameters>~Display items posted on your wall');
   AddCommand('WHOAMI',    '<no parameters>~Display the currently authorized user');
 
-  $targetCommands = array('ALBUMS','APICS','COUNT','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTS','STATUSES','TAGPIC','TPICS','WALL');
+  $targetCommands = array('ALBUMS','APICS','COUNT','FRIENDS','GROUPS','LIKES','LINKS','NEWS','NOTES','POST','POSTLINK','POSTS','STATUSES','TAGPIC','TPICS','WALL');
   $asCommands = array('ADDALBUM','ADDPIC','ADDPICD','ALBUMS','APICS','COMMENT','COUNT','DEL','GRAPHAPI','INFO','LIKE','POST','POSTLINK','POSTNOTE','STATUS','TAGPIC','TAGPICT','TEST','UNLIKE','WHOAMI');
   $deprecatedCommands = array('ALLINFO','DELPOST','DFILE','DISPLAY','FEED1','FEED2','FEED3','FEVENTS','FGROUPS','FINFO','FSTATUSID','FLSTATUS','LIMITS','LOADDISP','LOADINFO','NSEND','PICS','PINBOX','PPOST','SAVEDISP','SAVEINFO','UFIELDS','WALLPOST');
 
